@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# own stuff
+build/
+sdkconfig*
+**/spiffs_image.img
+spiffs_image/image2
+.vscode/BROWSE.VC.DB*

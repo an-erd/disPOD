@@ -11,7 +11,7 @@ Copied from ESP32_TFT_library, #aa21772
 - main/tft_demo.c used as a basis for my own programming
 
 Copied from espressif/esp-iot-solution, #49f305f
-- components/general/button
+- components/button
 - components/general/debugs
 - components/general/ota
 - components/general/param

@@ -44,7 +44,7 @@
 #include "dispod_ledc.h"
 
 // load fonts from ...?
-static const char* file_fonts[3] = {"/spiffs/fonts/DotMatrix_M.fon", "/spiffs/fonts/Ubuntu.fon", "/spiffs/fonts/Grotesk24x48.fon"};
+// static const char* file_fonts[3] = {"/spiffs/fonts/DotMatrix_M.fon", "/spiffs/fonts/Ubuntu.fon", "/spiffs/fonts/Grotesk24x48.fon"};
 
 static const char* TAG = "DISPOD";
 static const char* TAG_BTN = "DISPOD_BUTTON";

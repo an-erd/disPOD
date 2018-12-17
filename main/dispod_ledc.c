@@ -48,22 +48,22 @@ void sound(int gpio_num, uint32_t freq, uint32_t duration, uint32_t volume)
 	ledc_timer_config_t timer_conf;
     memset(&timer_conf, 0, sizeof(ledc_timer_config_t));
 
-	timer_conf.speed_mode = GPIO_OUTPUT_SPEED;
-	timer_conf.bit_num    = LEDC_TIMER_10_BIT;
-	timer_conf.timer_num  = LEDC_TIMER_0;
-	timer_conf.freq_hz    = freq;
+	timer_conf.speed_mode       = GPIO_OUTPUT_SPEED;
+	timer_conf.duty_resolution  = LEDC_TIMER_10_BIT;
+	timer_conf.timer_num        = LEDC_TIMER_0;
+	timer_conf.freq_hz          = freq;
 	ledc_timer_config(&timer_conf);
 
 	ledc_channel_config_t ledc_conf;
     memset(&ledc_conf, 0, sizeof(ledc_channel_config_t));
 
-	ledc_conf.gpio_num   = gpio_num;
-	ledc_conf.speed_mode = GPIO_OUTPUT_SPEED;
-	ledc_conf.channel    = LEDC_CHANNEL_0;
-	ledc_conf.intr_type  = LEDC_INTR_DISABLE;
-	ledc_conf.timer_sel  = LEDC_TIMER_0;
-	ledc_conf.duty       = 0x0; // 50%=0x3FFF, 100%=0x7FFF for 15 Bit
-	                            // 50%=0x01FF, 100%=0x03FF for 10 Bit
+	ledc_conf.gpio_num          = gpio_num;
+	ledc_conf.speed_mode        = GPIO_OUTPUT_SPEED;
+	ledc_conf.channel           = LEDC_CHANNEL_0;
+	ledc_conf.intr_type         = LEDC_INTR_DISABLE;
+	ledc_conf.timer_sel         = LEDC_TIMER_0;
+	ledc_conf.duty              = 0x0;  // 50%=0x3FFF, 100%=0x7FFF for 15 Bit
+	                                    // 50%=0x01FF, 100%=0x03FF for 10 Bit
 	ledc_channel_config(&ledc_conf);
 
     // uint32_t new_duty = map(volume, 0, 100, 0, 0x03FF);
