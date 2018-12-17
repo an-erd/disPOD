@@ -24,10 +24,6 @@
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
 
-#include "lwip/sys.h"
-#include "lwip/err.h"
-#include "lwip/arch.h"
-
 #include "driver/gpio.h"
 #include "driver/ledc.h"
 #include "tftspi.h"
