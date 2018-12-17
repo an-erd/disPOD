@@ -1,0 +1,91 @@
+
+// GATT Services provided by MilestonePod
+//	1800 Generic Access
+//	1801 Generic Attribute
+//	1814 Running Speed and Cadence			<--- relevant
+//	180a Device Information
+//	fff0 ?
+static BLEUUID serviceRscUUID((uint16_t)0x1814);		// RSC (Running Speed and Cadence)
+
+// Characteristics for service RSC
+//	0x2a54 RSC Feature
+//	0x2a53 RSC Measurement	(and 2902)		<--- relevant
+//	0x2a5d Sensor Location
+//	0x2a55 SC Control Point	(and 2902)
+//	0xff00 custom			(and 2902)		<--- relevant
+static BLEUUID    charRscMeasurementUUID((uint16_t)0x2a53);
+static BLEUUID    charCustomUUID((uint16_t)0xff00);
+
+ESP_GATT_CONN_UNKNOWN 				= 0
+ESP_GATT_CONN_L2C_FAILURE 			= 1
+ESP_GATT_CONN_TIMEOUT 				= 0x08
+ESP_GATT_CONN_TERMINATE_PEER_USER 	= 0x13
+ESP_GATT_CONN_TERMINATE_LOCAL_HOST 	= 0x16
+ESP_GATT_CONN_FAIL_ESTABLISH 		= 0x3e
+ESP_GATT_CONN_LMP_TIMEOUT 			= 0x22
+ESP_GATT_CONN_CONN_CANCEL 			= 0x0100
+ESP_GATT_CONN_NONE 					= 0x0101
+
+Program Flow
+	START
+	---
+	Register Callbacks
+	Register App Profiles
+	---
+	Set scan parameter
+	---
+	Start scanning
+	until Device = MilestonePod or timeout
+	---
+	Connect to Device
+	Connect ok?			-> handle, retry, ...
+	---
+	Configure MTU Size
+	Search Services
+	Get Characteristics
+	Register for Notification
+	---
+	END
+
+
+
+
+	static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t *param)
+{
+    case ESP_GATTC_REG_EVT:
+    case ESP_GATTC_CONNECT_EVT:
+    case ESP_GATTC_OPEN_EVT:
+    case ESP_GATTC_CFG_MTU_EVT:
+    case ESP_GATTC_SEARCH_RES_EVT:
+    case ESP_GATTC_SEARCH_CMPL_EVT:
+    case ESP_GATTC_REG_FOR_NOTIFY_EVT:
+    case ESP_GATTC_NOTIFY_EVT:
+    case ESP_GATTC_WRITE_DESCR_EVT:
+    case ESP_GATTC_SRVC_CHG_EVT:
+    case ESP_GATTC_WRITE_CHAR_EVT:
+    case ESP_GATTC_DISCONNECT_EVT:
+    default:
+}
+
+
+static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
+{
+    case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT:
+	case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
+    case ESP_GAP_BLE_SCAN_RESULT_EVT:{
+		case ESP_GAP_SEARCH_INQ_RES_EVT
+        case ESP_GAP_SEARCH_INQ_CMPL_EVT:
+    }
+    case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
+    case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
+    case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
+    default:
+}
+
+static void esp_gattc_cb(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t *param)
+{
+}
+
+Device:
+WEMOS LOLIN32, Chip is ESP32D0WDQ6 (revision 1)
+M5Stack-FIRE,  Chip is ESP32D0WDQ6 (revision 1)
