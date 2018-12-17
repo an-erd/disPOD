@@ -54,7 +54,10 @@
         "ledc.h": "c",
         "iot_button.h": "c",
         "math.h": "c",
-        "dispod_ledc.h": "c"
+        "dispod_ledc.h": "c",
+        "sys.h": "c",
+        "opt.h": "c",
+        "debug.h": "c"
     },
 	"files.exclude": {
 		"**/.git": true,

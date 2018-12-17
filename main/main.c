@@ -26,7 +26,6 @@
 
 #include "lwip/sys.h"
 #include "lwip/err.h"
-#include "lwip/err.h"
 #include "lwip/arch.h"
 
 #include "driver/gpio.h"

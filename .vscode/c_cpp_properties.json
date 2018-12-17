@@ -23,8 +23,12 @@
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/driver/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/spi_flash/sim/sdkconfig",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/esp_event/include",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/lwip/src",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/lwip/src/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/lwip/src/include/lwip",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/include/lwip/port/arch",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/port/esp32/include",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/port/esp32/include/arch",
                 "${workspaceFolder}/components/tft",
                 "${workspaceFolder}/components/spiffs",
                 "${workspaceFolder}/components/spidriver",
@@ -32,7 +36,12 @@
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/tcpip_adapter/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/lwip/test/unit",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/lwip/lwip/test/unit/esp",
-                "${workspaceFolder}/components/button/button/include"
+                "${workspaceFolder}/components/button/button/include",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/spiffs/include",
+                "${workspaceFolder}/components/button/include",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/sdmmc/include",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/fatfs/src",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/wear_levelling/include"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {
