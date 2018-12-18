@@ -57,7 +57,8 @@
         "dispod_ledc.h": "c",
         "sys.h": "c",
         "opt.h": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "stdlib.h": "c"
     },
 	"files.exclude": {
 		"**/.git": true,

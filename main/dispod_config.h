@@ -44,4 +44,22 @@ EventGroupHandle_t dispod_event_group;
 // UART
 #define USE_SERIAL Serial
 
+#define min(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b); \
+        _a < _b ? _a : _b; })
+
+#define max(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b); \
+        _a > _b ? _a : _b; })
+
+#define map(x,in_min,in_max,out_min,out_max)\
+    ({ __typeof__ (x) _x = (x); \
+        __typeof__ (in_min) _in_min = (in_min); \
+        __typeof__ (in_max) _in_max = (in_max); \
+        __typeof__ (out_min) _out_min = (out_min); \
+        __typeof__ (out_max) _out_max = (out_max); \
+        (_x - _in_min) * (_out_max - _out_min) / (_in_max - _in_min) + _out_min; })
+
 #endif // __DISPOD_CONFIG_H__

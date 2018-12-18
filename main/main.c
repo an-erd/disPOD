@@ -37,6 +37,7 @@
 #include "dispod_tft.h"
 #include "dispod_sntp.h"
 #include "dispod_ledc.h"
+#include "dispod_runvalues.h"
 
 // load fonts from ...?
 // static const char* file_fonts[3] = {"/spiffs/fonts/DotMatrix_M.fon", "/spiffs/fonts/Ubuntu.fon", "/spiffs/fonts/Grotesk24x48.fon"};
