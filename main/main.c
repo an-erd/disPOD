@@ -28,7 +28,6 @@
 #include "driver/ledc.h"
 #include "tftspi.h"
 #include "tft.h"
-
 #include "iot_button.h"
 
 #include "dispod_config.h"
@@ -47,26 +46,28 @@ static const char* TAG_BTN = "DISPOD_BUTTON";
 
 EventGroupHandle_t dispod_event_group;
 
+runningValuesStruct_t running_values;
+
 // Button callback functions
 void button_tap_cb(void* arg)
 {
     char* pstr = (char*) arg;
-    ESP_EARLY_LOGI(TAG_BTN, "tap cb (%s), heap: %d\n", pstr, esp_get_free_heap_size());
+    ESP_EARLY_LOGI(TAG_BTN, "tap cb (%s), heap: %d", pstr, esp_get_free_heap_size());
 }
 
 void button_press_2s_cb(void* arg)
 {
-    ESP_EARLY_LOGI(TAG_BTN, "press 2s, heap: %d\n", esp_get_free_heap_size());
+    ESP_EARLY_LOGI(TAG_BTN, "press 2s, heap: %d", esp_get_free_heap_size());
 }
 
 void button_press_5s_cb(void* arg)
 {
-    ESP_EARLY_LOGI(TAG_BTN, "press 5s, heap: %d\n", esp_get_free_heap_size());
+    ESP_EARLY_LOGI(TAG_BTN, "press 5s, heap: %d", esp_get_free_heap_size());
 }
 
 void button_test()
 {
-    ESP_EARLY_LOGI(TAG_BTN, "before btn init, heap: %d\n", esp_get_free_heap_size());
+    ESP_EARLY_LOGI(TAG_BTN, "before btn init, heap: %d", esp_get_free_heap_size());
 
     button_handle_t btn_handle = iot_button_create(BUTTON_A_PIN, BUTTON_ACTIVE_LEVEL);
 
@@ -85,10 +86,7 @@ void button_test()
     // printf("after free btn: heap:%d\n", esp_get_free_heap_size());
 }
 
-
-
-
-
+/*
 // ================== TEST SD CARD ==========================================
 
 #include "esp_vfs_fat.h"
@@ -212,11 +210,7 @@ void test_sd_card(void)
 
 // ================== TEST SD CARD ==========================================
 
-
-
-
-
-
+*/
 
 void app_main()
 {
@@ -230,6 +224,8 @@ void app_main()
     // disPOD overall initialization
     ESP_LOGI(TAG, "initialize_dispod");
     dispod_event_group = xEventGroupCreate();
+    dispod_runvalues_initialize(&running_values);
+
     // TODO further initialization
 
     // Initialize NVS
@@ -291,7 +287,7 @@ void app_main()
     dispod_ble_initialize();
 
     button_test();
-    test_sd_card();
+    // test_sd_card();
 
     // check sound
     // for (int i = 0; i < 15; i++) {

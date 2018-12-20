@@ -4,6 +4,7 @@
 #include "esp_event.h"
 #include "esp_event_loop.h"
 #include "freertos/event_groups.h"
+#include "dispod_runvalues.h"
 
 // disPOD event group
 #define DISPOD_WIFI_CONNECTING_BIT	        (BIT0)
@@ -14,8 +15,13 @@
 #define DISPOD_BLE_CONNECTING_BIT    	    (BIT5)
 #define DISPOD_BLE_CONNECTED_BIT	 	    (BIT6)
 #define DISPOD_SD_AVAILABLE_BIT			    (BIT7)
+extern EventGroupHandle_t dispod_event_group;
 
-EventGroupHandle_t dispod_event_group;
+// disPOD event loop
+
+
+// global running values data struct
+extern runningValuesStruct_t running_values;
 
 // SD card
 #define sdPIN_NUM_MISO 19
@@ -24,9 +30,6 @@ EventGroupHandle_t dispod_event_group;
 #define sdPIN_NUM_CS   4
 
 // Buttons
-#define BTN_A 0
-#define BTN_B 1
-#define BTN_C 2
 #define BUTTON_A 0
 #define BUTTON_B 1
 #define BUTTON_C 2
@@ -35,15 +38,13 @@ EventGroupHandle_t dispod_event_group;
 #define BUTTON_C_PIN 37
 #define BUTTON_ACTIVE_LEVEL 0
 
-
-// BEEP PIN
+// Speaker
 #define SPEAKER_PIN 25
-#define TONE_PIN_CHANNEL 0
-
 
 // UART
 #define USE_SERIAL Serial
 
+// missing functions
 #define min(a,b) \
     ({ __typeof__ (a) _a = (a); \
         __typeof__ (b) _b = (b); \
