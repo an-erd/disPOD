@@ -1,7 +1,7 @@
 {
-	//"C_Cpp.clang_format_path": "C:/Program Files/LLVM/bin/clang-format.exe",
-	"C_Cpp.clang_format_style": "Visual Studio",
-	"C_Cpp.clang_format_formatOnSave": false,
+    "C_Cpp.clang_format_style": "Visual Studio",
+	// "C_Cpp.clang_format_path": "C:/Program Files/LLVM/bin/clang-format.exe",
+	// "C_Cpp.clang_format_formatOnSave": false,
 	"[cpp]": {
 		"editor.quickSuggestions": true
 	},
@@ -71,11 +71,6 @@
 		"**/CVS": true,
 		"**/.DS_Store": true
 	  },
-	  "perforce.editOnFileModified": true,
-	"perforce.addOnFileCreate": true,
-	"perforce.editOnFileSave": true,
-	"perforce.annotate.enable": true,
-	"perforce.deleteOnFileDelete": true,
 	"C_Cpp.intelliSenseEngine": "Default",
 	"C_Cpp.errorSquiggles": "Disabled"
 }

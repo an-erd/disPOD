@@ -1,0 +1,236 @@
+rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0018,len:4
+load:0x3fff001c,len:6200
+load:0x40078000,len:10084
+load:0x40080400,len:6612
+entry 0x40080764
+I (28) boot: ESP-IDF v3.2-beta1-dirty 2nd stage bootloader
+I (28) boot: compile time 11:00:28
+I (28) boot: Enabling RNG early entropy source...
+I (34) boot: SPI Speed      : 40MHz
+I (38) boot: SPI Mode       : DIO
+I (42) boot: SPI Flash Size : 16MB
+I (46) boot: Partition Table:
+I (50) boot: ## Label            Usage          Type ST Offset   Length
+I (57) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (64) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (72) boot:  2 app0             OTA app          00 10 00010000 00640000
+I (79) boot:  3 app1             OTA app          00 11 00650000 00640000
+I (87) boot:  4 eeprom           Unknown data     01 99 00c90000 00001000
+I (94) boot:  5 spiffs           Unknown data     01 82 00c91000 0036f000
+I (102) boot: End of partition table
+I (106) boot: No factory image, trying OTA 0
+I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x2d6c0 (186048) map
+I (185) esp_image: segment 1: paddr=0x0003d6e8 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (185) esp_image: segment 2: paddr=0x0003d6f0 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (192) esp_image: segment 3: paddr=0x0003d6f8 vaddr=0x3ffbdb60 size=0x02918 ( 10520) load
+I (205) esp_image: segment 4: paddr=0x00040018 vaddr=0x400d0018 size=0xa73cc (685004) map
+0x400d0018: _flash_cache_start at ??:?
+
+I (449) esp_image: segment 5: paddr=0x000e73ec vaddr=0x3ffc0478 size=0x03948 ( 14664) load
+I (456) esp_image: segment 6: paddr=0x000ead3c vaddr=0x3ffc3dc0 size=0x00000 (     0) load
+I (456) esp_image: segment 7: paddr=0x000ead44 vaddr=0x40080000 size=0x00400 (  1024) load
+0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
+
+I (466) esp_image: segment 8: paddr=0x000eb14c vaddr=0x40080400 size=0x1871c (100124) load
+I (516) esp_image: segment 9: paddr=0x00103870 vaddr=0x400c0000 size=0x00000 (     0) load
+I (516) esp_image: segment 10: paddr=0x00103878 vaddr=0x50000000 size=0x00000 (     0) load
+I (523) esp_image: segment 11: paddr=0x00103880 vaddr=0x50000000 size=0x00000 (     0) load
+I (547) boot: Loaded app from partition at offset 0x10000
+I (547) boot: Disabling RNG early entropy source...
+I (547) cpu_start: Pro cpu up.
+I (551) cpu_start: Starting app cpu, entry point is 0x400811a8
+0x400811a8: call_start_cpu1 at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/cpu_start.c:245
+
+I (0) cpu_start: App cpu up.
+I (561) heap_init: Initializing. RAM available for dynamic allocation:
+I (568) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
+I (574) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
+I (580) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
+I (586) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
+I (592) heap_init: At 3FFCEB00 len 00011500 (69 KiB): DRAM
+I (599) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (605) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (611) heap_init: At 40098B1C len 000074E4 (29 KiB): IRAM
+I (618) cpu_start: Pro cpu start user code
+I (188) cpu_start: Starting scheduler on PRO CPU.
+I (0) cpu_start: Starting scheduler on APP CPU.
+I (190) DISPOD: app_main() entered
+I (193) DISPOD: initialize_dispod
+I (228) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
+I (459) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
+I (459) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
+I (461) INFO: Reading file
+I (1015) DISPOD_TFT: Display config, Pins used: miso=19, mosi=23, sck=18, cs=5
+I (1015) DISPOD_TFT: SPI: display device added to spi bus (1)
+I (1018) DISPOD_TFT: SPI: attached display device, speed=8000000
+I (1025) DISPOD_TFT: SPI: bus uses native pins: false
+I (1030) DISPOD_TFT: SPI: display init...
+I (1916) DISPOD_TFT: OK
+I (1922) DISPOD_TFT: SPI: Max rd speed = 1000000
+I (1922) DISPOD_TFT: SPI: Changed speed to 26666666
+I (1995) wifi: wifi driver task: 3ffd3d1c, prio:23, stack:3584, core=0
+I (1995) wifi: wifi firmware version: a85ca5e
+I (1996) wifi: config NVS flash: enabled
+I (1998) wifi: config nano formating: disabled
+I (2002) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (2012) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (2038) wifi: Init dynamic tx buffer num: 32
+I (2039) wifi: Init data frame dynamic rx buffer num: 32
+I (2039) wifi: Init management frame dynamic rx buffer num: 32
+I (2042) wifi: Init static rx buffer size: 1600
+I (2046) wifi: Init static rx buffer num: 10
+I (2050) wifi: Init dynamic rx buffer num: 32
+I (2133) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
+I (2134) wifi: mode : sta (84:0d:8e:25:92:34)
+I (4546) DISPOD_WIFI: Setting WiFi configuration SSID W12...
+I (4549) DISPOD_WIFI: Waiting for IP address...
+I (4789) wifi: n:1 0, o:1 0, ap:255 255, sta:1 0, prof:1
+I (5451) wifi: state: init -> auth (b0)
+I (5460) wifi: state: auth -> assoc (0)
+I (5464) wifi: state: assoc -> run (10)
+I (5491) wifi: connected with W12, channel 1
+I (5492) wifi: pm start, type: 1
+
+I (6498) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
+I (6499) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
+I (6502) DISPOD_SNTP: Initializing SNTP
+I (6508) DISPOD_SNTP: Waiting for system time to be set... (1/10)
+I (8513) DISPOD_SNTP: The current local date/time is: Thu Dec 20 12:26:40 2018
+I (8514) BTDM_INIT: BT controller compile version [6a842ec]
+I (8517) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (8761) DISPOD_GATTC: esp_gattc_cb()
+I (8764) DISPOD_GATTC: REG_EVT
+I (8765) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
+I (8769) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
+I (8774) DISPOD_GATTC: scan start success
+I (8778) DISPOD_BUTTON: before btn init, heap: 135244
+
+I (8785) gpio: GPIO[39]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
+I (8794) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (8799) DISPOD_GATTC: 52 b1 4d ea 1c eb
+I (8804) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (8811) DISPOD_GATTC: searched Device Name Len 0
+I (8816) DISPOD_GATTC:
+
+I (8820) DISPOD_BUTTON: after btn init, heap: 134544
+
+I (8972) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (8973) DISPOD_GATTC: 4a b3 a2 65 54 92
+I (8973) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (8979) DISPOD_GATTC: searched Device Name Len 0
+I (8984) DISPOD_GATTC:
+
+I (9522) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (9523) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (9523) DISPOD_GATTC: searched Adv Data Len 9, Scan Response Len 26
+I (9528) DISPOD_GATTC: searched Device Name Len 15
+I (9534) DISPOD_GATTC: MilestonePod 12
+I (9538) DISPOD_GATTC:
+
+I (9542) DISPOD_GATTC: searched device MilestonePod
+
+I (9547) DISPOD_GATTC: connect to the remote device.
+I (9558) DISPOD_GATTC: ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT
+I (9561) DISPOD_GATTC: stop scan successfully
+I (10008) DISPOD_GATTC: esp_gattc_cb()
+I (10010) DISPOD_GATTC: ESP_GATTC_CONNECT_EVT conn_id 0, if 1
+I (10011) DISPOD_GATTC: REMOTE BDA:
+I (10015) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (10019) DISPOD_GATTC: esp_gattc_cb()
+I (10023) DISPOD_GATTC: ESP_GATTC_OPEN_EVT
+I (10028) DISPOD_GATTC: open success
+I (11210) DISPOD_GATTC: esp_gattc_cb()
+I (11211) DISPOD_GATTC: ESP_GATTC_CFG_MTU_EVT, Status 0, MTU 23, conn_id 0
+I (11212) DISPOD_GATTC: esp_gattc_cb()
+I (11216) DISPOD_GATTC: ESP_GATTC_SEARCH_RES_EVT
+I (11221) DISPOD_GATTC: SEARCH RES: conn_id = 0 is primary service 1
+I (11228) DISPOD_GATTC: start handle 16 end handle 29 current handle value 16
+I (11236) DISPOD_GATTC: service found
+I (11240) DISPOD_GATTC: UUID16: 1814
+I (11245) DISPOD_GATTC: esp_gattc_cb()
+I (11249) DISPOD_GATTC: ESP_GATTC_SEARCH_CMPL_EVT
+I (11254) DISPOD_GATTC: Get service information from remote device
+I (11262) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 18
+I (11269) DISPOD_GATTC: REMOTE BDA:
+I (11273) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (11278) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 28
+I (11285) DISPOD_GATTC: REMOTE BDA:
+I (11289) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (11294) DISPOD_GATTC: esp_gattc_cb()
+I (11298) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
+I (11304) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 19, size 2, value 1, type_rsp 2, auth req 0
+I (11316) DISPOD_GATTC: esp_gattc_cb()
+I (11320) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
+I (11326) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 29, size 2, value 1, type_rsp 2, auth req 0
+I (11359) DISPOD_GATTC: esp_gattc_cb()
+I (11359) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
+I (11359) DISPOD_GATTC: write descr success
+I (11386) DISPOD_GATTC: esp_gattc_cb()
+I (11387) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
+I (11387) DISPOD_GATTC: write descr success
+I (15106) DISPOD_GATTC: ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT
+I (15107) DISPOD_GATTC: update connection params status = 0, min_int = 16, max_int = 32,conn_int = 32,latency = 0, timeout = 600
+
+=======================================================
+===== Test using SD Card in SPI mode              =====
+===== SD Card uses the same gpio's as TFT display =====
+=======================================================
+
+I (18834) SDCard test: Initializing SD card
+I (18838) SDCard test: Using SPI peripheral
+I (18845) gpio: GPIO[4]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0
+Name: SC16G
+Type: SDHC/SDXC
+Speed: 20 MHz
+Size: 15193MB
+I (18937) SDCard test: Opening file
+I (18951) SDCard test: File written
+I (18958) SDCard test: Renaming file
+I (18961) SDCard test: Reading file
+I (18962) SDCard test: Read from file: 'Hello SC16G!'
+I (18963) gpio: GPIO[23]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0
+I (18971) gpio: GPIO[19]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0
+I (18981) gpio: GPIO[18]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0
+I (18990) SDCard test: Card unmounted
+===== SD Card test end ================================
+
+I (21150) DISPOD_GATTC: esp_gattc_cb()
+I (21151) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (21151) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (21156) DISPOD_GATTC: 03 43 02 5d 91 00 dc c8 02 00
+I (21511) DISPOD_GATTC: esp_gattc_cb()
+I (21511) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (21511) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (21517) DISPOD_GATTC: 0f 2f 01 14
+I (21521) DISPOD_GATTC: esp_gattc_cb()
+I (21525) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (21530) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (21537) DISPOD_GATTC: 03 43 02 5d b3 00 fd c8 02 00
+I (21547) DISPOD_GATTC: esp_gattc_cb()
+I (21548) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (21552) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (21559) DISPOD_GATTC: 0f 35 02 04
+I (21588) DISPOD_GATTC: esp_gattc_cb()
+I (21588) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (21588) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (21593) DISPOD_GATTC: 03 4f 02 5b 90 00 21 c9 02 00
+I (21599) DISPOD_GATTC: esp_gattc_cb()
+I (21603) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (21608) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (21615) DISPOD_GATTC: 0f 10 01 04
+I (24308) DISPOD_GATTC: esp_gattc_cb()
+I (24311) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (24311) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (24317) DISPOD_GATTC: 03 00 00 00 00 00 2e c9 02 00
+I (24322) DISPOD_GATTC: esp_gattc_cb()
+I (24327) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (24331) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (24338) DISPOD_GATTC: 0f 00 00 01
+W (43582) BT_APPL: bta_gattc_conn_cback() - cif=1 connected=0 conn_id=1 reason=0x0008
+I (43584) DISPOD_GATTC: esp_gattc_cb()
+I (43584) DISPOD_GATTC: ESP_GATTC_DISCONNECT_EVT, reason = 8
+I (43591) DISPOD_GATTC: esp_gattc_cb()
