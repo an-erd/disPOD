@@ -1,8 +1,10 @@
+#include <string.h>
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "tftspi.h"
 #include "tft.h"
+#include "esp_log.h"
 #include "driver/gpio.h"
 #include "dispod_tft.h"
 
@@ -77,4 +79,159 @@ void dispod_display_initialize()
 	TFT_setRotation(PORTRAIT);
 	TFT_setFont(DEFAULT_FONT, NULL);
 	TFT_resetclipwin();
+}
+
+
+void initializeStatusScreenData(dispod_screen_info_t *params)
+{
+    dispod_screen_update_wifi(params, WIFI_NOT_CONNECTED, "n/a");
+    dispod_screen_update_ntp(params, NTP_TIME_NOT_SET);         // TODO where to deactivate?
+	dispod_screen_update_ble(params, BLE_NOT_CONNECTED, NULL);        // TODO where to deactivate?
+    dispod_screen_update_sd(params, SD_DEACTIVATED);            // TODO where to deactivate?
+    dispod_screen_update_button(params, BUTTON_A, true, "Retry Wifi");
+    dispod_screen_update_button(params, BUTTON_B, true, "Retry Pod");
+    dispod_screen_update_button(params, BUTTON_C, true, "Continue");
+    dispod_screen_update_statustext(params, false, "... none ...");
+}
+
+void dispod_screen_update_wifi(dispod_screen_info_t *params, display_wifi_status_t new_status, const char* new_ssid)
+{
+    params->wifi_status = new_status;
+	memcpy(params->wifi_ssid, new_ssid, strlen(new_ssid) + 1);
+}
+
+void dispod_screen_update_ntp(dispod_screen_info_t *params, display_ntp_status_t new_status)
+{
+    params->ntp_status = new_status;
+}
+
+void dispod_screen_update_ble(dispod_screen_info_t *params, display_ble_status_t new_status, const char* new_name)
+{
+	params->ble_status = new_status;
+    if(new_name)
+        memcpy(params->ble_name, new_name, strlen(new_name) + 1);
+}
+
+void dispod_screen_update_sd(dispod_screen_info_t *params, display_sd_status_t new_status)
+{
+		params->sd_status = new_status;
+}
+
+void dispod_screen_update_button(dispod_screen_info_t *params, uint8_t change_button, bool new_status, char* new_button_text)
+{
+    params->show_button[change_button] = new_status;
+    if(new_button_text)
+        memcpy(params->button_text[change_button], new_button_text, strlen(new_button_text) + 1);
+}
+
+void dispod_screen_update_statustext(dispod_screen_info_t *params, bool new_show_text, char* new_status_text)
+{
+    params->show_status_text = new_show_text;
+    if(new_status_text)
+    	memcpy(params->status_text, new_status_text, strlen(new_status_text) + 1);
+    else
+        memcpy(params->status_text, "", strlen("")+1);
+}
+
+void dispod_screen_update_display   (dispod_screen_info_t *params)
+{
+	uint16_t    textHeight, boxSize, xpos, ypos, xpos2;
+    color_t     tmp_color;
+
+	// Preparation
+    TFT_fillScreen(TFT_BLACK);
+	TFT_resetclipwin();
+    TFT_setFont(DEFAULT_FONT, NULL);    // TODO M5.Lcd.setFreeFont(FF17);
+    _fg = TFT_WHITE;
+	_bg = (color_t){ 64, 64, 64 };
+
+	textHeight = TFT_getfontheight();
+	boxSize = textHeight - 8;
+	ESP_LOGI(TAG, "screen textHeight %u", textHeight);
+
+	// Title
+	ypos = 10;
+    TFT_print("Starting disPOD...", CENTER, ypos);
+    // afterwards orientation -> set to "top left"
+
+	// 1) WiFi
+	xpos = XPAD;
+	ypos += textHeight + 5;
+    TFT_drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
+	switch (params->wifi_status) {
+	case WIFI_DEACTIVATED:      tmp_color = TFT_LIGHTGREY;  break;
+	case WIFI_NOT_CONNECTED:    tmp_color = TFT_RED;        break;
+	case WIFI_CONNECTING:       tmp_color = TFT_YELLOW;     break;
+    case WIFI_CONNECTED:        tmp_color = TFT_GREEN;      break;
+	default:                    tmp_color = TFT_PURPLE;     break;
+	}
+	TFT_fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
+	xpos += boxSize + XPAD;
+	TFT_print("Wifi ", xpos, ypos);
+	xpos2 = xpos + 40 + XPAD;   // TODO
+	TFT_print(params->wifi_ssid, xpos2, ypos);
+
+	// 2) NTP
+	xpos = XPAD;
+	ypos += textHeight;
+	TFT_drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
+	switch (params->ntp_status) {
+    case NTP_DEACTIVATED:       tmp_color = TFT_LIGHTGREY;  break;
+    case NTP_TIME_NOT_SET:      tmp_color = TFT_RED;        break;
+    case NTP_UPDATING:          tmp_color = TFT_YELLOW;     break;
+    case NTP_UPDATED:           tmp_color = TFT_GREEN;      break;
+	default:                    tmp_color = TFT_PURPLE;     break;
+	}
+
+	TFT_fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
+    xpos += boxSize + XPAD;
+	TFT_print("Internet time (NTP)", xpos, ypos);
+
+	// 3) BLE devices
+	xpos = XPAD;
+	ypos += textHeight;
+	TFT_drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
+	switch (params->ble_status) {
+    case BLE_DEACTIVATED:       tmp_color = TFT_LIGHTGREY;  break;
+    case BLE_NOT_CONNECTED:     tmp_color = TFT_RED;        break;
+    case BLE_SEARCHING:         tmp_color = TFT_BLUE;       break;
+    case BLE_CONNECTING:        tmp_color = TFT_YELLOW;     break;
+    case BLE_CONNECTED:         tmp_color = TFT_GREEN;      break;
+	default:                    tmp_color = TFT_PURPLE;     break;
+	}
+    TFT_fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
+	xpos += boxSize + XPAD;
+	TFT_print(params->ble_name, xpos, ypos);
+
+	// 4) SD Card storage
+	xpos = XPAD;
+	ypos += textHeight;
+	TFT_drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
+	switch (params->sd_status) {
+    case SD_DEACTIVATED:        tmp_color = TFT_LIGHTGREY;  break;
+    case SD_NOT_AVAILABLE:      tmp_color = TFT_RED;        break;
+    case SD_AVAILABLE:          tmp_color = TFT_GREEN;      break;
+	default:                    tmp_color = TFT_PURPLE;     break;
+	}
+    TFT_fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
+	xpos += boxSize + XPAD;
+	TFT_print("SD Card", xpos, ypos);
+
+	// 5) Status text line
+	// M5.Lcd.setTextDatum(TC_DATUM);
+	ypos += textHeight + YPAD;
+    if(params->show_status_text){
+	    TFT_print(params->status_text, xpos, ypos);
+    } else {
+        ;    // TODO no status text
+    }
+
+	// Button label
+	ypos = 240 - XPAD;
+	if (params->show_button[BUTTON_A])
+		TFT_print(params->button_text[BUTTON_A], X_BUTTON_A, ypos);   // TODO top-center not top-left, aargh
+	if (params->show_button[BUTTON_B])
+		TFT_print(params->button_text[BUTTON_B], X_BUTTON_B, ypos);
+	if (params->show_button[BUTTON_C])
+		TFT_print(params->button_text[BUTTON_C], X_BUTTON_C, ypos);
 }
