@@ -226,7 +226,6 @@ void app_main()
     dispod_event_group = xEventGroupCreate();
     dispod_runvalues_initialize(&running_values);
 
-    // TODO further initialization
 
     // Initialize NVS
     ret = nvs_flash_init();
@@ -280,6 +279,8 @@ void app_main()
     // esp_vfs_spiffs_unregister(NULL);
     // ESP_LOGI(TAG, "SPIFFS unmounted");
 #endif // CONFIG_DISPOD_USE_SPIFFS
+
+    // TODO further initialization
 
     dispod_display_initialize();
     dispod_wifi_network_up();
