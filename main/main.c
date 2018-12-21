@@ -23,6 +23,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
+#include "esp_event_base.h"
 
 #include "driver/gpio.h"
 #include "driver/ledc.h"
@@ -38,179 +39,115 @@
 #include "dispod_ledc.h"
 #include "dispod_runvalues.h"
 
-// load fonts from ...?
-// static const char* file_fonts[3] = {"/spiffs/fonts/DotMatrix_M.fon", "/spiffs/fonts/Ubuntu.fon", "/spiffs/fonts/Grotesk24x48.fon"};
+static const char* TAG      = "DISPOD";
 
-static const char* TAG = "DISPOD";
-static const char* TAG_BTN = "DISPOD_BUTTON";
-
+// Event group
 EventGroupHandle_t dispod_event_group;
 
+// Event loop
+ESP_EVENT_DEFINE_BASE(ACTIVITY_EVENTS);
+ESP_EVENT_DEFINE_BASE(WORKFLOW_EVENTS);
+esp_event_loop_handle_t dispod_loop_handle;
+
+// Storing values from BLE running device
 runningValuesStruct_t running_values;
 
-// Button callback functions
-void button_tap_cb(void* arg)
+// time to wait in
+const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
+
+// temp return value from xEventGroupWaitBits, ... functions
+EventBits_t uxBits;
+
+static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
-    char* pstr = (char*) arg;
-    ESP_EARLY_LOGI(TAG_BTN, "tap cb (%s), heap: %d", pstr, esp_get_free_heap_size());
-}
+    switch(id){
+    case DISPOD_STARTUP_EVT:
+        ESP_LOGI(TAG, "DISPOD_STARTUP_EVT");
+        dispod_runvalues_initialize(&running_values);
+        xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
+        xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
+        xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
 
-void button_press_2s_cb(void* arg)
-{
-    ESP_EARLY_LOGI(TAG_BTN, "press 2s, heap: %d", esp_get_free_heap_size());
-}
-
-void button_press_5s_cb(void* arg)
-{
-    ESP_EARLY_LOGI(TAG_BTN, "press 5s, heap: %d", esp_get_free_heap_size());
-}
-
-void button_test()
-{
-    ESP_EARLY_LOGI(TAG_BTN, "before btn init, heap: %d", esp_get_free_heap_size());
-
-    button_handle_t btn_handle = iot_button_create(BUTTON_A_PIN, BUTTON_ACTIVE_LEVEL);
-
-    iot_button_set_evt_cb(btn_handle, BUTTON_CB_PUSH, button_tap_cb, "PUSH");
-    iot_button_set_evt_cb(btn_handle, BUTTON_CB_RELEASE, button_tap_cb, "RELEASE");
-    iot_button_set_evt_cb(btn_handle, BUTTON_CB_TAP, button_tap_cb, "TAP");
-    // iot_button_set_serial_cb(btn_handle, 2, 1000/portTICK_RATE_MS, button_tap_cb, "SERIAL");
-
-    iot_button_add_custom_cb(btn_handle, 2, button_press_2s_cb, NULL);
-    iot_button_add_custom_cb(btn_handle, 5, button_press_5s_cb, NULL);
-    ESP_EARLY_LOGI(TAG_BTN, "after btn init, heap: %d\n", esp_get_free_heap_size());
-
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
-    // printf("free btn: heap:%d\n", esp_get_free_heap_size());
-    // iot_button_delete(btn_handle);
-    // printf("after free btn: heap:%d\n", esp_get_free_heap_size());
-}
-
-/*
-// ================== TEST SD CARD ==========================================
-
-#include "esp_vfs_fat.h"
-#include "driver/sdmmc_host.h"
-#include "driver/sdspi_host.h"
-#include "sdmmc_cmd.h"
-
-// This example can use SDMMC and SPI peripherals to communicate with SD card.
-// SPI mode IS USED
-
-// When testing SD and SPI modes, keep in mind that once the card has been
-// initialized in SPI mode, it can not be reinitialized in SD mode without
-// toggling power to the card.
-
-// Pin mapping when using SPI mode.
-// With this mapping, SD card can be used both in SPI and 1-line SD mode.
-// Note that a pull-up on CS line is required in SD mode.
-#define sdPIN_NUM_MISO 19
-#define sdPIN_NUM_MOSI 23
-#define sdPIN_NUM_CLK  18
-#define sdPIN_NUM_CS   4
-
-static const char* TAG_SD = "SDCard test";
-
-void test_sd_card(void)
-{
-    printf("\n=======================================================\n");
-    printf("===== Test using SD Card in SPI mode              =====\n");
-    printf("===== SD Card uses the same gpio's as TFT display =====\n");
-    printf("=======================================================\n\n");
-    ESP_LOGI(TAG_SD, "Initializing SD card");
-    ESP_LOGI(TAG_SD, "Using SPI peripheral");
-
-    sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-    sdspi_slot_config_t slot_config = SDSPI_SLOT_CONFIG_DEFAULT();
-    slot_config.gpio_miso = sdPIN_NUM_MISO;
-    slot_config.gpio_mosi = sdPIN_NUM_MOSI;
-    slot_config.gpio_sck  = sdPIN_NUM_CLK;
-    slot_config.gpio_cs   = sdPIN_NUM_CS;
-    // This initializes the slot without card detect (CD) and write protect (WP) signals.
-    // Modify slot_config.gpio_cd and slot_config.gpio_wp if your board has these signals.
-
-    // Options for mounting the filesystem.
-    // If format_if_mount_failed is set to true, SD card will be partitioned and
-    // formatted in case when mounting fails.
-    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = false,
-        .max_files = 5
-    };
-
-    // Use settings defined above to initialize SD card and mount FAT filesystem.
-    // Note: esp_vfs_fat_sdmmc_mount is an all-in-one convenience function.
-    // Please check its source code and implement error recovery when developing
-    // production applications.
-    sdmmc_card_t* card;
-    esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
-
-    if (ret != ESP_OK) {
-        if (ret == ESP_FAIL) {
-            ESP_LOGE(TAG_SD, "Failed to mount filesystem. "
-                "If you want the card to be formatted, set format_if_mount_failed = true.");
+        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+        break;
+    case DISPOD_BASIC_INIT_DONE_EVT:
+        ESP_LOGI(TAG, "DISPOD_BASIC_INIT_DONE_EVT");
+        dispod_display_initialize();
+        xEventGroupSetBits(dispod_event_group, DISPOD_SCREEN_STATUS_BIT);
+        xEventGroupSetBits(dispod_event_group, DISPOD_SCREEN_COMPLETE_BIT);
+        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_DISPLAY_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+        break;
+    case DISPOD_DISPLAY_INIT_DONE_EVT:
+        ESP_LOGI(TAG, "DISPOD_DISPLAY_INIT_DONE_EVT");
+        uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
+        if(uxBits & DISPOD_WIFI_ACTIVATED_BIT){
+            // WiFi config activated -> connect to WiFi
+            ESP_LOGI(TAG, "connect to WiFi");
+            dispod_wifi_network_up();
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_WIFI_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
-            ESP_LOGE(TAG_SD, "Failed to initialize the card (%d). "
-                "Make sure SD card lines have pull-up resistors in place.", ret);
+            // no WiFi and thus NTP configured, jump to BLE connect
+            ESP_LOGI(TAG, "no WiFi configured, connect to BLE (w/o WiFi&NTP)");
+            dispod_ble_initialize();
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
-        return;
+        break;
+    case DISPOD_WIFI_INIT_DONE_EVT:
+        ESP_LOGI(TAG, "DISPOD_WIFI_INIT_DONE_EVT");
+        uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, 0);
+        if(uxBits & DISPOD_WIFI_CONNECTED_BIT){
+            ESP_LOGI(TAG, "WiFi connected, update NTP");
+            dispod_sntp_check_time();
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+        } else {
+            // WiFi configured, but not connected, jump to BLE connect
+            ESP_LOGI(TAG, "no WiFi configured, connect to BLE (w/o WiFi&NTP)");
+            dispod_ble_initialize();
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
+        }
+        break;
+    case DISPOD_NTP_INIT_DONE_EVT:
+            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT");
+            dispod_ble_initialize();
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
+        break;
+    case DISPOD_BLE_DEVICE_DONE_EVT:
+        // at this point we've
+        // - no Wifi configured: no WiFi, no NTP, maybe BLE
+        // - WiFi configured: maybe WiFi -> maybe updated NTP, maybe BLE
+
+        break;
+    case DISPOD_LEAVE_SCREEN_EVT:
+        break;
+    case DISPOD_ENTER_SCREEN_EVT:
+        break;
+    case DISPOD_GO_SHUTDOWN_EVT:
+        break;
+    case DISPOD_GO_SLEEP_EVT:
+        break;
+
+    default:
+        ESP_LOGI(TAG, "unhandled event base/id %s:%d", base, id);
+        break;
     }
+    // Two types of data can be passed in to the event handler: the handler specific data and the event-specific data.
+    //
+    // The handler specific data (handler_arg) is a pointer to the original data, therefore, the user should ensure that
+    // the memory location it points to is still valid when the handler executes.
+    //
+    // The event-specific data (event_data) is a pointer to a deep copy of the original data, and is managed automatically.
+    // int iteration = *((int*) event_data);
 
-    // Card has been initialized, print its properties
-    sdmmc_card_print_info(stdout, card);
+    // char* loop;
 
-    // Use POSIX and C standard library functions to work with files.
-    // First create a file.
-    ESP_LOGI(TAG_SD, "Opening file");
-    FILE* f = fopen("/sdcard/hello.txt", "w");
-    if (f == NULL) {
-        ESP_LOGE(TAG_SD, "Failed to open file for writing");
-        return;
-    }
-    fprintf(f, "Hello %s!\n", card->cid.name);
-    fclose(f);
-    ESP_LOGI(TAG_SD, "File written");
-
-    // Check if destination file exists before renaming
-    struct stat st;
-    if (stat("/sdcard/foo.txt", &st) == 0) {
-        // Delete it if it exists
-        unlink("/sdcard/foo.txt");
-    }
-
-    // Rename original file
-    ESP_LOGI(TAG_SD, "Renaming file");
-    if (rename("/sdcard/hello.txt", "/sdcard/foo.txt") != 0) {
-        ESP_LOGE(TAG_SD, "Rename failed");
-        return;
-    }
-
-    // Open renamed file for reading
-    ESP_LOGI(TAG_SD, "Reading file");
-    f = fopen("/sdcard/foo.txt", "r");
-    if (f == NULL) {
-        ESP_LOGE(TAG_SD, "Failed to open file for reading");
-        return;
-    }
-    char line[64];
-    fgets(line, sizeof(line), f);
-    fclose(f);
-    // strip newline
-    char* pos = strchr(line, '\n');
-    if (pos) {
-        *pos = '\0';
-    }
-    ESP_LOGI(TAG_SD, "Read from file: '%s'", line);
-
-    // All done, unmount partition and disable SDMMC or SPI peripheral
-    esp_vfs_fat_sdmmc_unmount();
-    ESP_LOGI(TAG_SD, "Card unmounted");
-
-    printf("===== SD Card test end ================================\n\n");
+    // if (handler_args  == loop_with_task) {
+    //     loop = "loop_with_task";
+    // } else {
+    //     loop = "loop_without_task";
+    // }
 }
 
-// ================== TEST SD CARD ==========================================
-
-*/
 
 void app_main()
 {
@@ -218,14 +155,8 @@ void app_main()
 
     ESP_LOGI(TAG, "app_main() entered");
 
-	// adjust logging
+	// adjust logging, TODO still necessary?
 	esp_log_level_set("phy_init", ESP_LOG_INFO);
-
-    // disPOD overall initialization
-    ESP_LOGI(TAG, "initialize_dispod");
-    dispod_event_group = xEventGroupCreate();
-    dispod_runvalues_initialize(&running_values);
-
 
     // Initialize NVS
     ret = nvs_flash_init();
@@ -266,36 +197,28 @@ void app_main()
     } else {
         ESP_LOGI(TAG, "SPIFFS: Partition size: total: %d, used: %d", total, used);
     }
-
-    ESP_LOGI("INFO", "Reading file");
-    FILE* f = fopen("/spiffs/tiger.bmp", "r");
-    if (f == NULL) {
-        ESP_LOGE("INFO", "Failed to open file for reading");
-        return;
-    }
-
-
-    // All done, unmount partition and disable SPIFFS
-    // esp_vfs_spiffs_unregister(NULL);
-    // ESP_LOGI(TAG, "SPIFFS unmounted");
 #endif // CONFIG_DISPOD_USE_SPIFFS
 
-    // TODO further initialization
+    // disPOD overall initialization
+    ESP_LOGI(TAG, "initialize dispod");
+    dispod_event_group = xEventGroupCreate();
 
-    dispod_display_initialize();
-    dispod_wifi_network_up();
-    dispod_sntp_check_time();
-    dispod_ble_initialize();
+    esp_event_loop_args_t dispod_loop_args = {
+        .queue_size = 5,
+        .task_name = "loop_task",
+        .task_priority = uxTaskPriorityGet(NULL),
+        .task_stack_size = 4096,
+        .task_core_id = tskNO_AFFINITY
+    };
 
-    button_test();
-    // test_sd_card();
+    // Create the dispod event loop
+    ESP_ERROR_CHECK(esp_event_loop_create(&dispod_loop_args, &dispod_loop_handle));
 
-    // check sound
-    // for (int i = 0; i < 15; i++) {
-    //     ESP_LOGI(TAG, "play note, volume %u", 1+3*i);
-    //     for (int j = 0; j < 1; j++){
-    //         sound(SPEAKER_PIN, 660, 50, (uint32_t) 1+3*i);
-    //         vTaskDelay(150/portTICK_PERIOD_MS);
-    //     }
-    // }
+    // Register the handler for task iteration event.
+    // TODO check last argument...
+    ESP_ERROR_CHECK(esp_event_handler_register_with(dispod_loop_handle, ESP_EVENT_ANY_BASE, ESP_EVENT_ANY_ID, run_on_event, NULL));
+
+    // push a startup event in the loop
+    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_EVT, NULL, 0, portMAX_DELAY));
+
 }

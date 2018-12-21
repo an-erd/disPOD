@@ -32,7 +32,7 @@ config DISPOD_DISPLAY_TYPE
 
 config USE_WIFI
     bool "Use wifi in disPOD"
-    default n
+    default y
     help
         If WiFi is used ntp server will be used to provide the exact time
         and file timestamps will be correct.
@@ -97,10 +97,11 @@ endmenu
 config DISPOD_USE_SNTP
     bool "SNTP"
     depends on USE_WIFI
-    default n
+    default y
     help
         If WiFi and internet are available an ntp server will be used to get  the exact time
         and file timestamps will be correct.
+
 
 menu "BLE device configuration"
 

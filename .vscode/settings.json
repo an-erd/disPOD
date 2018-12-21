@@ -59,7 +59,9 @@
         "opt.h": "c",
         "debug.h": "c",
         "stdlib.h": "c",
-        "dispod_tft.h": "c"
+        "dispod_tft.h": "c",
+        "esp_event_base.h": "c",
+        "esp_event.h": "c"
     },
 	"files.exclude": {
 		"**/.git": true,

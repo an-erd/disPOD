@@ -8,18 +8,28 @@
 #include "dispod_runvalues.h"
 
 // disPOD event group
-#define DISPOD_WIFI_CONNECTING_BIT	        (BIT0)
-#define DISPOD_WIFI_CONNECTED_BIT		    (BIT1)
-#define DISPOD_SNTP_UPDATING_BIT    	    (BIT2)
-#define DISPOD_SNTP_UPDATED_BIT			    (BIT3)
-#define DISPOD_BLE_SCANNING_BIT     	    (BIT4)
-#define DISPOD_BLE_CONNECTING_BIT    	    (BIT5)
-#define DISPOD_BLE_CONNECTED_BIT	 	    (BIT6)
-#define DISPOD_SD_AVAILABLE_BIT			    (BIT7)
+#define DISPOD_WIFI_ACTIVATED_BIT                   (BIT0)
+#define DISPOD_WIFI_CONNECTING_BIT	                (BIT1)
+#define DISPOD_WIFI_CONNECTED_BIT		            (BIT2)
+#define DISPOD_NTP_ACTIVATED_BIT                    (BIT3)
+#define DISPOD_NTP_UPDATING_BIT    	                (BIT4)
+#define DISPOD_NTP_UPDATED_BIT			            (BIT5)
+#define DISPOD_BLE_ACTIVATED_BIT                    (BIT6)
+#define DISPOD_BLE_SCANNING_BIT     	            (BIT7)
+#define DISPOD_BLE_CONNECTING_BIT    	            (BIT8)
+#define DISPOD_BLE_CONNECTED_BIT                    (BIT9)
+#define DISPOD_SD_ACTIVATED_BIT                     (BIT10)
+#define DISPOD_SD_AVAILABLE_BIT                     (BIT11)
+#define DISPOD_SCREEN_STATUS_BIT                    (BIT12)
+#define DISPOD_SCREEN_RUNNING_BIT                   (BIT13)
+#define DISPOD_SCREEN_CONFIG_BIT                    (BIT14)
+#define DISPOD_SCREEN_OTA_BIT                       (BIT15)
+#define DISPOD_SCREEN_COMPLETE_BIT                  (BIT16)     // complete/first display update necessary
 extern EventGroupHandle_t dispod_event_group;
 
 // disPOD Client callback function events
 typedef enum {
+    // activities -> events
     DISPOD_WIFI_ACT_EVT                 = 0,        /*!< When WIFI has been activated, the event comes */
     DISPOD_WIFI_DEACT_EVT               = 1,        /*!< When WIFI has been deactivated, the event comes */
     DISPOD_WIFI_CONNECTING_EVT          = 2,        /*!< When WIFI is starting connecting, the event comes */
@@ -46,14 +56,22 @@ typedef enum {
     DISPOD_BUTTON_2SEC_PRESS_EVT        = 23,       /*!< When a button has been pressed for 2s, the event comes */
     DISPOD_BUTTON_5SEC_PRESS_EVT        = 24,       /*!< When a button has been pressed for 5s, the event comes */
     DISPOD_BUTTON_EVT                   = 25,       /*!< When a button has been PUSH, RELEASE, TAP event, the event comes */
-    DISPOD_STARTUP_EVT                  = 26,
-    DISPOD_BASIC_INIT_DONE_EVT          = 27,
-    DISPOD_DISPLAY_INIT_DONE            = 28,
-    DISPOD_WIFI_INIT_DONE               = 29,
-    DISPOD_NTP_INIT_DONE                = 30,
-    DISPOD_BLE_DEVICE_DONE              = 31,
+    DISPOD_DISPLAY_UPDATE_EVT           = 26,       /*!< When a display update is necessary, the event comes */
+    // workflow -> events
+    DISPOD_STARTUP_EVT                  = 27,       /*!< When the disPOD event loop started, the event comes */
+    DISPOD_BASIC_INIT_DONE_EVT          = 28,       /*!< When the basic init is completed, the event comes */
+    DISPOD_DISPLAY_INIT_DONE_EVT        = 29,       /*!< When the display init is completed, the event comes */
+    DISPOD_WIFI_INIT_DONE_EVT           = 30,       /*!< When the WiFi connect (successfull or failed!) completed, the event comes */
+    DISPOD_NTP_INIT_DONE_EVT            = 31,       /*!< When the NTP update (successfull or failed!) completed, the event comes */
+    DISPOD_BLE_DEVICE_DONE_EVT          = 32,       /*!< When the BLE connect (successfull or failed!) completed, the event comes */
+    DISPOD_LEAVE_SCREEN_EVT             = 33,       /*!< When the current screen should be left (& to determine next screen), the event comes */
+    DISPOD_ENTER_SCREEN_EVT             = 34,       /*!< When the new screen should be entered, the event comes */
+    DISPOD_GO_SHUTDOWN_EVT              = 35,       /*!< When the device should be shutdowned, the event comes */
+    DISPOD_GO_SLEEP_EVT                 = 36,       /*!< When the device should be shutdowned, the event comes */
 } dispod_cb_event_t;
 
+ESP_EVENT_DECLARE_BASE(ACTIVITY_EVENTS);
+ESP_EVENT_DECLARE_BASE(WORKFLOW_EVENTS);
 
 // global running values data struct
 extern runningValuesStruct_t running_values;
