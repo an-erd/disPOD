@@ -10,8 +10,7 @@
 #include "esp_err.h"
 #include "esp_event_loop.h"
 
-#include "sdkconfig.h"
-
+#include "dispod_config.h"
 #include "dispod_wifi.h"
 
 static const char* TAG = "DISPOD_WIFI";
@@ -52,23 +51,31 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
         case SYSTEM_EVENT_STA_START:
             ESP_LOGD(TAG, "started");
             xEventGroupSetBits(evg, STRT_BIT);
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_WIFI_SCANNING_EVT, NULL, 0, portMAX_DELAY));
             break;
         case SYSTEM_EVENT_SCAN_DONE:
             ESP_LOGD(TAG, "Scan done");
+            // TODO if no know WiFi is available
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_WIFI_CONNECTING_EVT, NULL, 0, portMAX_DELAY));
             xEventGroupSetBits(evg, SCAN_BIT);
             break;
         case SYSTEM_EVENT_STA_CONNECTED:
             ESP_LOGD(TAG, "connected");
+            // our DISPOD_WIFI_CONNECTED is including an IP address, so ignore this step
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
             ESP_LOGD(TAG, "dhcp");
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_WIFI_CONNECTED_EVT, NULL, 0, portMAX_DELAY));
             xEventGroupSetBits(evg, DHCP_BIT);
             break;
         case SYSTEM_EVENT_STA_STOP:
             ESP_LOGD(TAG, "stopped");
+            // TODO STA_STOP and STA_DISCONNECTED are different things
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_WIFI_DISCONNECTED_EVT, NULL, 0, portMAX_DELAY));
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
             ESP_LOGD(TAG, "disconnected");
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_WIFI_DISCONNECTED_EVT, NULL, 0, portMAX_DELAY));
             xEventGroupSetBits(evg, DISC_BIT);
             break;
         default:
@@ -84,6 +91,7 @@ esp_err_t dispod_wifi_network_up()
     uint16_t apCount;
     wifi_ap_record_t *list = NULL;
     int i = 0, j, f, match;
+    // int retry = 0;
     wifi_config_t wifi_config;
 
     EventGroupHandle_t evg = xEventGroupCreate();
@@ -110,7 +118,10 @@ esp_err_t dispod_wifi_network_up()
             while (!(xEventGroupWaitBits(evg, SCAN_BIT , pdFALSE, pdFALSE, portMAX_DELAY) & SCAN_BIT));
             apCount = 0;
             esp_wifi_scan_get_ap_num(&apCount);
-            if (!apCount) break;
+            if (!apCount) {
+                // retry++;
+                break;
+            }
             free(list);
             list = (wifi_ap_record_t *)malloc(sizeof(wifi_ap_record_t) * apCount);
             ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&apCount, list));

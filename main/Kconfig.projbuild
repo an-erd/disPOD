@@ -7,28 +7,29 @@ config DISPOD_USE_SPIFFS
         If SPIFFS is used the file system will be used to
         load fonts and images from there.
 
-config DISPOD_DISPLAY_TYPE
+config EXAMPLE_DISPLAY_TYPE
     int
-    default 0 if DISPOD_DISPLAY_TYPE0
-    default 1 if DISPOD_DISPLAY_TYPE1
-    default 2 if DISPOD_DISPLAY_TYPE2
-    default 3 if DISPOD_DISPLAY_TYPE3
+    default 0 if EXAMPLE_DISPLAY_TYPE0
+    default 1 if EXAMPLE_DISPLAY_TYPE1
+    default 2 if EXAMPLE_DISPLAY_TYPE2
+    default 3 if EXAMPLE_DISPLAY_TYPE3
 
     choice
         prompt "Select predefined display configuration"
-        default DISPOD_DISPLAY_TYPE3
+        default EXAMPLE_DISPLAY_TYPE0
         help
             Select predefined display configuration
 
-        config DISPOD_DISPLAY_TYPE0
+        config EXAMPLE_DISPLAY_TYPE0
             bool "None"
-        config DISPOD_DISPLAY_TYPE1
+        config EXAMPLE_DISPLAY_TYPE1
             bool "ESP-WROVER-KIT Display"
-        config DISPOD_DISPLAY_TYPE2
+        config EXAMPLE_DISPLAY_TYPE2
             bool "Adafruit TFT Feather display"
-        config DISPOD_DISPLAY_TYPE3
+        config EXAMPLE_DISPLAY_TYPE3
             bool "M5Stack TFT display"
     endchoice
+
 
 config USE_WIFI
     bool "Use wifi in disPOD"

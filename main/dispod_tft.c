@@ -76,22 +76,22 @@ void dispod_display_initialize()
 	font_forceFixed = 0;
 	gray_scale = 0;
     TFT_setGammaCurve(DEFAULT_GAMMA_CURVE);
-	TFT_setRotation(PORTRAIT);
+	TFT_setRotation(LANDSCAPE);
 	TFT_setFont(DEFAULT_FONT, NULL);
 	TFT_resetclipwin();
 }
 
 
-void initializeStatusScreenData(dispod_screen_info_t *params)
+void dispod_screen_data_initialize(dispod_screen_info_t *params)
 {
     dispod_screen_update_wifi(params, WIFI_NOT_CONNECTED, "n/a");
-    dispod_screen_update_ntp(params, NTP_TIME_NOT_SET);         // TODO where to deactivate?
-	dispod_screen_update_ble(params, BLE_NOT_CONNECTED, NULL);        // TODO where to deactivate?
-    dispod_screen_update_sd(params, SD_DEACTIVATED);            // TODO where to deactivate?
+    dispod_screen_update_ntp(params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
+	dispod_screen_update_ble(params, BLE_NOT_CONNECTED, NULL);      // TODO where to deactivate?
+    dispod_screen_update_sd(params, SD_DEACTIVATED);                // TODO where to deactivate?
     dispod_screen_update_button(params, BUTTON_A, true, "Retry Wifi");
     dispod_screen_update_button(params, BUTTON_B, true, "Retry Pod");
     dispod_screen_update_button(params, BUTTON_C, true, "Continue");
-    dispod_screen_update_statustext(params, false, "... none ...");
+    dispod_screen_update_statustext(params, true, "... none ...");
 }
 
 void dispod_screen_update_wifi(dispod_screen_info_t *params, display_wifi_status_t new_status, const char* new_ssid)
@@ -133,20 +133,22 @@ void dispod_screen_update_statustext(dispod_screen_info_t *params, bool new_show
         memcpy(params->status_text, "", strlen("")+1);
 }
 
-void dispod_screen_update_display   (dispod_screen_info_t *params)
+void dispod_screen_update_display   (dispod_screen_info_t *params, bool complete)
 {
 	uint16_t    textHeight, boxSize, xpos, ypos, xpos2;
     color_t     tmp_color;
+    // arg bool complete unused
 
 	// Preparation
     TFT_fillScreen(TFT_BLACK);
 	TFT_resetclipwin();
-    TFT_setFont(DEFAULT_FONT, NULL);    // TODO M5.Lcd.setFreeFont(FF17);
+    // TFT_setFont(DEFAULT_FONT, NULL);     // TODO M5.Lcd.setFreeFont(FF17);
+    TFT_setFont(DEJAVU18_FONT, NULL);       // DEJAVU18_FONT
     _fg = TFT_WHITE;
-	_bg = (color_t){ 64, 64, 64 };
+	_bg = TFT_BLACK;                        // (color_t){ 64, 64, 64 };
 
 	textHeight = TFT_getfontheight();
-	boxSize = textHeight - 8;
+	boxSize = textHeight - 4;
 	ESP_LOGI(TAG, "screen textHeight %u", textHeight);
 
 	// Title
@@ -161,6 +163,7 @@ void dispod_screen_update_display   (dispod_screen_info_t *params)
 	switch (params->wifi_status) {
 	case WIFI_DEACTIVATED:      tmp_color = TFT_LIGHTGREY;  break;
 	case WIFI_NOT_CONNECTED:    tmp_color = TFT_RED;        break;
+    case WIFI_SCANNING:         tmp_color = TFT_BLUE;       break;
 	case WIFI_CONNECTING:       tmp_color = TFT_YELLOW;     break;
     case WIFI_CONNECTED:        tmp_color = TFT_GREEN;      break;
 	default:                    tmp_color = TFT_PURPLE;     break;
@@ -218,20 +221,29 @@ void dispod_screen_update_display   (dispod_screen_info_t *params)
 	TFT_print("SD Card", xpos, ypos);
 
 	// 5) Status text line
-	// M5.Lcd.setTextDatum(TC_DATUM);
 	ypos += textHeight + YPAD;
+    ESP_LOGI(TAG, "5) status text litle, show %u x %u, y %u, text %s", (params->show_status_text?1:0), xpos, ypos, params->status_text);
     if(params->show_status_text){
-	    TFT_print(params->status_text, xpos, ypos);
+	    TFT_print(params->status_text, CENTER, ypos);
     } else {
         ;    // TODO no status text
     }
 
-	// Button label
-	ypos = 240 - XPAD;
+	// 6) Button label
+	ypos += textHeight + YPAD;          // ypos = 240 - XPAD;
+
+    xpos = X_BUTTON_A - TFT_getStringWidth(params->button_text[BUTTON_A])/2;
+    ESP_LOGI(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
 	if (params->show_button[BUTTON_A])
-		TFT_print(params->button_text[BUTTON_A], X_BUTTON_A, ypos);   // TODO top-center not top-left, aargh
+		TFT_print(params->button_text[BUTTON_A], xpos, ypos);
+
+    xpos = X_BUTTON_B - TFT_getStringWidth(params->button_text[BUTTON_B])/2;
+    ESP_LOGI(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
 	if (params->show_button[BUTTON_B])
-		TFT_print(params->button_text[BUTTON_B], X_BUTTON_B, ypos);
+		TFT_print(params->button_text[BUTTON_B], xpos, ypos);
+
+    xpos = X_BUTTON_C - TFT_getStringWidth(params->button_text[BUTTON_C])/2;
+    ESP_LOGI(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
 	if (params->show_button[BUTTON_C])
-		TFT_print(params->button_text[BUTTON_C], X_BUTTON_C, ypos);
+		TFT_print(params->button_text[BUTTON_C], xpos, ypos);
 }

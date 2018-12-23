@@ -1,0 +1,79 @@
+I (54) DISPOD: app_main() entered
+I (94) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
+I (325) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
+I (326) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
+I (328) DISPOD: initialize dispod
+
+D (351) event: created post for event WORKFLOW_EVENTS:28
+D (356) event: running post WORKFLOW_EVENTS:28 with handler 0x400d48b8 on loop 0x3ffba3e0
+D (357) event: posted WORKFLOW_EVENTS:28 to loop 0x3ffba3e0
+
+I (365) DISPOD: DISPOD_STARTUP_EVT
+D (374) event: created post for event WORKFLOW_EVENTS:29
+D (380) event: posted WORKFLOW_EVENTS:29 to loop 0x3ffba3e0
+D (385) event: running post WORKFLOW_EVENTS:29 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+I (394) DISPOD: DISPOD_BASIC_INIT_DONE_EVT
+
+D (1797) event: created post for event ACTIVITY_EVENTS:27
+D (1797) event: posted ACTIVITY_EVENTS:27 to loop 0x3ffba3e0
+D (1808) event: running post ACTIVITY_EVENTS:27 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+D (1797) event: created post for event WORKFLOW_EVENTS:30
+D (1802) event: posted WORKFLOW_EVENTS:30 to loop 0x3ffba3e0
+D (1929) event: running post WORKFLOW_EVENTS:30 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+I (1816) DISPOD: DISPOD_DISPLAY_UPDATE_EVT, complete 1
+I (1935) DISPOD: DISPOD_DISPLAY_INIT_DONE_EVT
+I (1940) DISPOD: connect to WiFi
+
+D (2247) event: SYSTEM_EVENT_STA_START
+D (2249) DISPOD_WIFI: started
+
+D (2251) event: created post for event ACTIVITY_EVENTS:2
+D (2257) event: posted ACTIVITY_EVENTS:2 to loop 0x3ffba3e0
+D (9486) event: running post ACTIVITY_EVENTS:2 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+D (4662) event: SYSTEM_EVENT_SCAN_DONE, status:0, number:5
+D (4662) DISPOD_WIFI: Scan done
+
+D (4662) event: created post for event ACTIVITY_EVENTS:3
+D (4665) event: posted ACTIVITY_EVENTS:3 to loop 0x3ffba3e0
+D (9505) event: running post ACTIVITY_EVENTS:3 with handler 0x400d48b8 on loop 0x3ffba3e0
+I (9513) DISPOD: unhandled event base/id ACTIVITY_EVENTS:3
+
+D (7793) event: SYSTEM_EVENT_STA_CONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, channel:1, authmode:3
+D (7824) DISPOD_WIFI: connected
+D (9449) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.2.155, mask:255.255.255.0, gw:192.168.2.1
+D (9461) DISPOD_WIFI: dhcp
+
+D (9463) event: created post for event ACTIVITY_EVENTS:4
+D (9469) event: posted ACTIVITY_EVENTS:4 to loop 0x3ffba3e0
+D (9519) event: running post ACTIVITY_EVENTS:4 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+D (9474) event: created post for event WORKFLOW_EVENTS:31
+D (9480) event: posted WORKFLOW_EVENTS:31 to loop 0x3ffba3e0
+D (9539) event: running post WORKFLOW_EVENTS:31 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+D (9494) event: created post for event ACTIVITY_EVENTS:27
+D (9499) event: posted ACTIVITY_EVENTS:27 to loop 0x3ffba3e0
+D (9988) event: running post ACTIVITY_EVENTS:27 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+D (9528) event: created post for event ACTIVITY_EVENTS:27
+D (9533) event: posted ACTIVITY_EVENTS:27 to loop 0x3ffba3e0
+D (9862) event: running post ACTIVITY_EVENTS:27 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+I (9547) DISPOD: DISPOD_WIFI_INIT_DONE_EVT
+
+D (9861) event: created post for event WORKFLOW_EVENTS:33
+D (9862) event: posted WORKFLOW_EVENTS:33 to loop 0x3ffba3e0
+D (10108) event: running post WORKFLOW_EVENTS:33 with handler 0x400d48b8 on loop 0x3ffba3e0
+
+I (9867) DISPOD_GATTC: esp_gattc_cb()
+I (9870) DISPOD: DISPOD_DISPLAY_UPDATE_EVT, complete 0
+I (9875) DISPOD_GATTC: REG_EVT
+I (9885) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
+I (9891) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
+I (9897) DISPOD_GATTC: scan start success
+
+I (9994) DISPOD: DISPOD_DISPLAY_UPDATE_EVT, complete 0

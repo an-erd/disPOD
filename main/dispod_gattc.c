@@ -71,7 +71,7 @@ static esp_ble_scan_params_t ble_scan_params = {
     .scan_filter_policy     = BLE_SCAN_FILTER_ALLOW_ALL,
     .scan_interval          = 0x800, // 0x800, // 0x50,
     .scan_window            = 0x600, // 0x600,// 0x30,
-    .scan_duplicate         = BLE_SCAN_DUPLICATE_ENABLE		// TODO: check, was BLE_SCAN_DUPLICATE_DISABLE
+    .scan_duplicate         = BLE_SCAN_DUPLICATE_ENABLE
 };
 
 struct gattc_profile_inst {

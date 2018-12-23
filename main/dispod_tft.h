@@ -22,6 +22,7 @@
 typedef enum {
     WIFI_DEACTIVATED,
     WIFI_NOT_CONNECTED,
+    WIFI_SCANNING,
     WIFI_CONNECTING,
     WIFI_CONNECTED
 } display_wifi_status_t;
@@ -73,6 +74,7 @@ void dispod_screen_update_button    (dispod_screen_info_t *params, uint8_t chang
 void dispod_screen_update_statustext(dispod_screen_info_t *params, bool new_show_text, char* new_status_text);
 
 // update TFT with the screen info data
-void dispod_screen_update_display   (dispod_screen_info_t *params);
+void dispod_screen_update_display   (dispod_screen_info_t *params, bool complete);
+
 
 #endif // __DISPOD_TFT_H__
