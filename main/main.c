@@ -32,7 +32,7 @@ esp_event_loop_handle_t dispod_loop_handle;
 runningValuesStruct_t running_values;
 
 // storing screen information
-dispod_screen_info_t dispod_screen_info;
+dispod_screen_status_t dispod_screen_info;
 
 // time to wait in
 const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
@@ -58,7 +58,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         dispod_screen_data_initialize(&dispod_screen_info);
         xEventGroupSetBits(dispod_event_group, DISPOD_SCREEN_STATUS_BIT);
         xEventGroupSetBits(dispod_event_group, DISPOD_SCREEN_COMPLETE_BIT);
-        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        // ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT | DISPOD_DISPLAY_COMPLETE_UPDATE_BIT);
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_DISPLAY_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_DISPLAY_INIT_DONE_EVT:
@@ -112,24 +113,28 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     // ACTIVITY_EVENTS
     case DISPOD_WIFI_SCANNING_EVT:
         dispod_screen_info.wifi_status = WIFI_SCANNING;
-        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        // ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+
         break;
     case DISPOD_WIFI_CONNECTING_BIT:
         dispod_screen_info.wifi_status = WIFI_CONNECTING;
-        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        // ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         break;
     case DISPOD_WIFI_CONNECTED_BIT:
         dispod_screen_info.wifi_status = WIFI_CONNECTED;
 
-        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        // ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, ACTIVITY_EVENTS, DISPOD_DISPLAY_UPDATE_EVT, NULL, 0, portMAX_DELAY));
+        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         break;
 
-
-
     case DISPOD_DISPLAY_UPDATE_EVT:
-        uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_SCREEN_COMPLETE_BIT, pdTRUE, pdFALSE, 0);
-        ESP_LOGI(TAG, "DISPOD_DISPLAY_UPDATE_EVT, complete %u", (uxBits & DISPOD_SCREEN_COMPLETE_BIT)?1:0);
-        dispod_screen_update_display(&dispod_screen_info, (uxBits & DISPOD_SCREEN_COMPLETE_BIT));
+        ESP_LOGI(TAG, "DISPOD_DISPLAY_UPDATE_EVT, MUST NOT RUN!");
+
+        // uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_SCREEN_COMPLETE_BIT, pdTRUE, pdFALSE, 0);
+        // ESP_LOGI(TAG, "DISPOD_DISPLAY_UPDATE_EVT, complete %u", (uxBits & DISPOD_SCREEN_COMPLETE_BIT)?1:0);
+        // dispod_screen_status_update_display(&dispod_screen_info, (uxBits & DISPOD_SCREEN_COMPLETE_BIT));
         break;
     default:
         ESP_LOGI(TAG, "unhandled event base/id %s:%d", base, id);
@@ -206,6 +211,8 @@ void app_main()
     // disPOD overall initialization
     ESP_LOGI(TAG, "initialize dispod");
     dispod_event_group = xEventGroupCreate();
+    dispod_display_evg = xEventGroupCreate();   // TODO just a test because later we got an assert() ?!
+
 
     esp_event_loop_args_t dispod_loop_args = {
         .queue_size = 5,
@@ -221,6 +228,10 @@ void app_main()
     // Register the handler for task iteration event.
     // TODO check last argument...
     ESP_ERROR_CHECK(esp_event_handler_register_with(dispod_loop_handle, ESP_EVENT_ANY_BASE, ESP_EVENT_ANY_ID, run_on_event, NULL));
+
+    // run the display task with the same priority as the current process
+    ESP_LOGI(TAG, "Starting dispod_screen_task()");
+    xTaskCreate(dispod_screen_task, "dispod_screen_task", 4096, &dispod_screen_info, uxTaskPriorityGet(NULL), NULL);
 
     // push a startup event in the loop
     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_EVT, NULL, 0, portMAX_DELAY));

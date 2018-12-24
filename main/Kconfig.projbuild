@@ -170,4 +170,40 @@ menu "Button"
         default 50
 endmenu
 
+menu "Running values"
+
+config RUNNING_MIN_INTERVAL_CADENCE
+    int "Lower target interval for cadence"
+    range 150 220
+    default 180
+config RUNNING_MAX_INTERVAL_CADENCE
+    int "Upper target interval for cadence"
+    range 150 220
+    default 184
+config RUNNING_MIN_INTERVAL_GCT
+    int "Lower target interval for GCT (ground contact time)"
+    range 100 250
+    default 180
+config RUNNING_MAX_INTERVAL_GCT
+    int "Upper target interval for GCT"
+    range 100 250
+    default 210
+config RUNNING_DISPLAY_STYLE
+    int
+    default 0 if RUNNING_DISPLAY_STYLE0
+    default 1 if RUNNING_DISPLAY_STYLE1
+    default 2 if RUNNING_DISPLAY_STYLE2
+
+    choice
+        prompt "Select visual or text or visual+text display option"
+        default RUNNING_DISPLAY_STYLE2
+        config RUNNING_DISPLAY_STYLE0
+            bool "Only visual presentation"
+        config RUNNING_DISPLAY_STYLE1
+            bool "Only text presentation"
+        config RUNNING_DISPLAY_STYLE2
+            bool "Visual and text presentation"
+    endchoice
+endmenu
+
 endmenu

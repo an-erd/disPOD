@@ -79,7 +79,7 @@ ESP_EVENT_DECLARE_BASE(WORKFLOW_EVENTS);
 extern esp_event_loop_handle_t dispod_loop_handle;
 
 // dispod screen data
-extern dispod_screen_info_t dispod_screen_info;
+extern dispod_screen_status_t dispod_screen_info;
 
 // global running values data struct
 extern runningValuesStruct_t running_values;

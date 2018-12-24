@@ -5,13 +5,50 @@
 #include "tftspi.h"
 #include "tft.h"
 #include "esp_log.h"
+#include "esp_event.h"
+#include "esp_event_loop.h"
+#include "esp_err.h"
+#include "freertos/event_groups.h"
 #include "driver/gpio.h"
 #include "dispod_tft.h"
 
 static const char* TAG = "DISPOD_TFT";
 
+// layout measures for status screen
+#define XPAD		    10
+#define YPAD		    10
+#define BOX_FRAME	    2
+#define X_BUTTON_A	    65          // display button x position (for center of button)
+#define X_BUTTON_B	    160
+#define X_BUTTON_C	    255
+
+// layout measures for running screen
+#define FIELD_MIN_X				50  // w/ and w/o value display, TODO
+#define FIELD_MAX_X				127
+#define FIELD_BASE_Y			8
+#define FIELD_HALFHEIGHT		5
+#define FIELD_WIDTH				(FIELD_MAX_X - FIELD_MIN_X)
+#define INDICATOR_MIN_X					50
+#define INDICATOR_MAX_X					127
+#define INDICATOR_ADJ_MIN_X				(INDICATOR_MIN_X + INDICATOR_TARGET_CIRCLE_RADIUS)
+#define INDICATOR_ADJ_MAX_X				(INDICATOR_MAX_X - INDICATOR_TARGET_CIRCLE_RADIUS)
+#define INDICATOR_BASE_Y				7
+#define INDICATOR_TARGET_CIRCLE_RADIUS	6
+//#define INDICATOR_INDEX_HALFHEIGHT		7
+//#define INDICATOR_INDEX_HALFWIDTH		4
+
+// Take from menuconfig
+#define MIN_INTERVAL_CADENCE		180
+#define MAX_INTERVAL_CADENCE		190
+#define MIN_INTERVAL_STANCETIME		200
+#define MAX_INTERVAL_STANCETIME		210
+
+
+// initialize HW display
 void dispod_display_initialize()
 {
+    ESP_LOGI(TAG, "dispod_display_initialize()");
+
     esp_err_t ret;
 
     // set display configuration, SPI devices
@@ -81,50 +118,56 @@ void dispod_display_initialize()
 	TFT_resetclipwin();
 }
 
-
-void dispod_screen_data_initialize(dispod_screen_info_t *params)
+// initialize all display structs
+void dispod_screen_data_initialize(dispod_screen_status_t *params)
 {
-    dispod_screen_update_wifi(params, WIFI_NOT_CONNECTED, "n/a");
-    dispod_screen_update_ntp(params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
-	dispod_screen_update_ble(params, BLE_NOT_CONNECTED, NULL);      // TODO where to deactivate?
-    dispod_screen_update_sd(params, SD_DEACTIVATED);                // TODO where to deactivate?
-    dispod_screen_update_button(params, BUTTON_A, true, "Retry Wifi");
-    dispod_screen_update_button(params, BUTTON_B, true, "Retry Pod");
-    dispod_screen_update_button(params, BUTTON_C, true, "Continue");
-    dispod_screen_update_statustext(params, true, "... none ...");
+    ESP_LOGI(TAG, "dispod_display_initialize()");
+    // dispod_display_evg = xEventGroupCreate();
+
+    // initialize dispod_screen_status_t struct
+    params->screen_to_show = SCREEN_STATUS;
+    dispod_screen_status_update_wifi(params, WIFI_NOT_CONNECTED, "n/a");
+    dispod_screen_status_update_ntp(params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
+	dispod_screen_status_update_ble(params, BLE_NOT_CONNECTED, NULL);      // TODO where to deactivate?
+    dispod_screen_status_update_sd(params, SD_DEACTIVATED);                // TODO where to deactivate?
+    dispod_screen_status_update_button(params, BUTTON_A, true, "Retry Wifi");
+    dispod_screen_status_update_button(params, BUTTON_B, true, "Retry Pod");
+    dispod_screen_status_update_button(params, BUTTON_C, true, "Continue");
+    dispod_screen_status_update_statustext(params, true, "... none ...");
 }
 
-void dispod_screen_update_wifi(dispod_screen_info_t *params, display_wifi_status_t new_status, const char* new_ssid)
+// functions to update status screen data
+void dispod_screen_status_update_wifi(dispod_screen_status_t *params, display_wifi_status_t new_status, const char* new_ssid)
 {
     params->wifi_status = new_status;
 	memcpy(params->wifi_ssid, new_ssid, strlen(new_ssid) + 1);
 }
 
-void dispod_screen_update_ntp(dispod_screen_info_t *params, display_ntp_status_t new_status)
+void dispod_screen_status_update_ntp(dispod_screen_status_t *params, display_ntp_status_t new_status)
 {
     params->ntp_status = new_status;
 }
 
-void dispod_screen_update_ble(dispod_screen_info_t *params, display_ble_status_t new_status, const char* new_name)
+void dispod_screen_status_update_ble(dispod_screen_status_t *params, display_ble_status_t new_status, const char* new_name)
 {
 	params->ble_status = new_status;
     if(new_name)
         memcpy(params->ble_name, new_name, strlen(new_name) + 1);
 }
 
-void dispod_screen_update_sd(dispod_screen_info_t *params, display_sd_status_t new_status)
+void dispod_screen_status_update_sd(dispod_screen_status_t *params, display_sd_status_t new_status)
 {
 		params->sd_status = new_status;
 }
 
-void dispod_screen_update_button(dispod_screen_info_t *params, uint8_t change_button, bool new_status, char* new_button_text)
+void dispod_screen_status_update_button(dispod_screen_status_t *params, uint8_t change_button, bool new_status, char* new_button_text)
 {
     params->show_button[change_button] = new_status;
     if(new_button_text)
         memcpy(params->button_text[change_button], new_button_text, strlen(new_button_text) + 1);
 }
 
-void dispod_screen_update_statustext(dispod_screen_info_t *params, bool new_show_text, char* new_status_text)
+void dispod_screen_status_update_statustext(dispod_screen_status_t *params, bool new_show_text, char* new_status_text)
 {
     params->show_status_text = new_show_text;
     if(new_status_text)
@@ -133,7 +176,7 @@ void dispod_screen_update_statustext(dispod_screen_info_t *params, bool new_show
         memcpy(params->status_text, "", strlen("")+1);
 }
 
-void dispod_screen_update_display   (dispod_screen_info_t *params, bool complete)
+void dispod_screen_status_update_display(dispod_screen_status_t *params, bool complete)
 {
 	uint16_t    textHeight, boxSize, xpos, ypos, xpos2;
     color_t     tmp_color;
@@ -222,7 +265,7 @@ void dispod_screen_update_display   (dispod_screen_info_t *params, bool complete
 
 	// 5) Status text line
 	ypos += textHeight + YPAD;
-    ESP_LOGI(TAG, "5) status text litle, show %u x %u, y %u, text %s", (params->show_status_text?1:0), xpos, ypos, params->status_text);
+    ESP_LOGD(TAG, "5) status text litle, show %u x %u, y %u, text %s", (params->show_status_text?1:0), xpos, ypos, params->status_text);
     if(params->show_status_text){
 	    TFT_print(params->status_text, CENTER, ypos);
     } else {
@@ -233,17 +276,233 @@ void dispod_screen_update_display   (dispod_screen_info_t *params, bool complete
 	ypos += textHeight + YPAD;          // ypos = 240 - XPAD;
 
     xpos = X_BUTTON_A - TFT_getStringWidth(params->button_text[BUTTON_A])/2;
-    ESP_LOGI(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
+    ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
 	if (params->show_button[BUTTON_A])
 		TFT_print(params->button_text[BUTTON_A], xpos, ypos);
 
     xpos = X_BUTTON_B - TFT_getStringWidth(params->button_text[BUTTON_B])/2;
-    ESP_LOGI(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
+    ESP_LOGD(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
 	if (params->show_button[BUTTON_B])
 		TFT_print(params->button_text[BUTTON_B], xpos, ypos);
 
     xpos = X_BUTTON_C - TFT_getStringWidth(params->button_text[BUTTON_C])/2;
-    ESP_LOGI(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
+    ESP_LOGD(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
 	if (params->show_button[BUTTON_C])
 		TFT_print(params->button_text[BUTTON_C], xpos, ypos);
+}
+
+
+
+
+
+
+static void dispod_screen_draw_fields(uint8_t line, uint8_t numLines, char* name, uint8_t numFields, uint8_t current);
+{
+	uint8_t yPad = (64 - numLines * 16) / numLines;
+	uint8_t yLine = size * 8 * line + line * yPad;
+
+	display.setTextSize(size);
+	display.setTextColor(color);
+	display.setCursor(0, yLine);
+	display.print(name);
+
+	uint8_t y0 = yLine + FIELD_BASE_Y;
+	// frame
+	display.drawRect(FIELD_MIN_X, y0 - FIELD_HALFHEIGHT, FIELD_WIDTH, 2 * FIELD_HALFHEIGHT, color);
+
+	// ticks
+	uint8_t deltaX = FIELD_WIDTH / numFields;
+	for (int i = 0; i < numFields; i++)
+		display.drawLine(FIELD_MIN_X + i * deltaX, y0 - FIELD_HALFHEIGHT, FIELD_MIN_X + i * deltaX, y0 + FIELD_HALFHEIGHT - 1, color);
+
+	// mark current
+	display.fillRect(FIELD_MIN_X + current * deltaX, y0 - FIELD_HALFHEIGHT, deltaX, 2 * FIELD_HALFHEIGHT, color);
+}
+
+
+void displayDrawIndicator(uint8_t line, uint8_t numLines, char* name,
+	int16_t valMin, int16_t valMax, int16_t curVal,
+	int16_t lowInterval, int16_t highInterval,
+	uint8_t color = 1, uint8_t size = 2)
+{
+#ifdef DEBUG_DISPOD
+	// make some checks:
+	// - indicator adjusted min/max to make place for circle (center <-> target)
+	if (INDICATOR_ADJ_MIN_X >= INDICATOR_ADJ_MAX_X)
+		DEBUGLOG("ERROR: displayDrawIndicator: Indicator min/max values inconsistent");
+	// - indicator adjusted min/max to make place for circle (center <-> target)
+	if (lowInterval >= highInterval)
+		DEBUGLOG("ERROR: displayDrawIndicator: low/high interval values inconsistent");
+#endif // DEBUG_DISPOD
+
+	// current values out of range -> move into range
+	uint8_t adjCurVal;
+	if (curVal < valMin)
+		adjCurVal = valMin;
+	if (curVal > valMax)
+		adjCurVal = valMax;
+
+	// calculate x base coordinates
+	uint8_t xLowInterval = map(lowInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
+	uint8_t xHighInterval = map(highInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
+	uint8_t xTarget = map(adjCurVal, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
+	// calculate y base coordinates
+	uint8_t yPad = (64 - numLines * 16) / numLines;		// stretch the lines if not all lines are used
+	uint8_t yLine = size * 8 * line + line * yPad;		// top left corner of the text line
+	uint8_t yBaseline = yLine + INDICATOR_BASE_Y;		// center/base line to display indicator
+
+	//DEBUGLOG("displayDrawIndicator: indMinX %u, indMaxX %u, indAdjMinX %u, indAdjMaxX %u, xLowInt %u, xHighInt %u, xTarget %u, yPad %u, yLine %u, yBaseLine %u\n",
+	//	INDICATOR_MIN_X, INDICATOR_MAX_X, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X, xLowInterval, xHighInterval, xTarget, yPad, yLine, yBaseline);
+
+	// check if the current value is in target interval
+	bool inInterval = (curVal >= lowInterval) && (curVal <= highInterval);
+
+	// show name, inverse if in target interval
+	display.setTextSize(size);
+	if (inInterval)
+		display.setTextColor(!color, color);
+	else
+		display.setTextColor(color);
+	display.setCursor(0, yLine);
+	display.print(name);
+
+	// baseline, from INDICATOR_MIN_X to INDICATOR_MAX_X
+	display.drawLine(INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, color);
+	//DEBUGLOG("displayDrawIndicator: drawLine %u, %u, %u, %u, %u\n", INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, color);
+
+	// show rounded rectangle (first fill w/background, then draw w/foreground color)
+	display.fillRoundRect(
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS,		// x0, y0 (top left corner)
+		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 1 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,							// w, h
+		INDICATOR_TARGET_CIRCLE_RADIUS, !color);														// radius, color
+	display.drawRoundRect(
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS,		// x0, y0 (top left corner)
+		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 1 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,							// w, h
+		INDICATOR_TARGET_CIRCLE_RADIUS, color);														// radius, color
+
+	// middle circle, filled = in target range
+	display.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, !color); // delete (background) first
+	if (inInterval) {
+		display.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, color);
+	}
+	else {
+		display.drawCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, color);
+	}
+}
+
+
+// OTA display update function
+#define BAR_PAD		3
+void updateDisplayOTAUpdate(otaUpdate_t otaUpdate, bool clearScreen)
+{
+	int textHeight;
+	int xpos, ypos;
+	int x0 = 20, x1 = 220, y0 = 60, y1 = 100;	// gauge corner
+	int mapx;
+
+	// Preparation
+	M5.Lcd.clear();
+	M5.Lcd.fillScreen(TFT_BLACK);
+	M5.Lcd.setFreeFont(FF17);
+	M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+	textHeight = m5.Lcd.fontHeight(GFXFF);
+	DEBUGLOG("M5 screen textHeight %u\n", textHeight);
+
+	// Title
+	M5.Lcd.setTextDatum(TC_DATUM);
+	xpos = M5.Lcd.width() / 2;
+	ypos = 10;
+	M5.Lcd.drawString("OTA Update...", xpos, ypos, GFXFF);
+
+	M5.Lcd.setTextDatum(TC_DATUM);
+	xpos = 160; // center
+	ypos = 180;
+	if (otaUpdate.otaUpdateError_) {
+		// Error Message
+		M5.Lcd.drawString(otaErrorNames[otaUpdate.otaUpdateErrorNr_], xpos, ypos, GFXFF);
+	}
+	else if (otaUpdate.otaUpdateEnd_) {
+		M5.Lcd.drawString("Done, rebooting...", xpos, ypos, GFXFF);
+	}
+	else {
+		if (clearScreen)
+			M5.Lcd.drawRect(x0, y0, x1, y1, TFT_WHITE);
+		mapx = map(otaUpdate.otaUpdateProgress_, 0, 100, 0, x1 - x0 - 2 * BAR_PAD);
+		M5.Lcd.fillRect(x0 + BAR_PAD, y0 + BAR_PAD, mapx, y1 - y0 - 2 * BAR_PAD, TFT_LIGHTGREY);
+	}
+}
+
+
+
+void updateDisplayWithRunningValues() {
+	valuesRSC_t values;
+
+	runningValues.updateDisplayValues(&values);
+#ifdef DEVICE_ESP32_LOLIN
+	display.clearDisplay();
+	display.setTextSize(2);
+	display.setTextColor(WHITE);
+	display.setCursor(0, 0);
+	displayDrawIndicator(0, 3, "Cad", MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+	displayDrawIndicator(1, 3, "GCT", 200, 240, values.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
+	displayDrawFields(2, 3, "Str", 3, values.str);
+	display.display();
+#endif
+	DEBUGLOG("Display: cad %3u stance %3u strike %1u\n", values.cad, values.GCT, values.str);
+}
+
+
+
+
+
+
+void dispod_screen_task(void *pvParameters)
+{
+    EventBits_t uxBits;
+    bool complete;
+    dispod_screen_status_t* params = (dispod_screen_status_t*)pvParameters;
+
+    for (;;)
+    {
+        while(!(xEventGroupWaitBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT,
+                pdTRUE, pdFALSE, portMAX_DELAY) & DISPOD_DISPLAY_UPDATE_BIT));
+        uxBits = xEventGroupWaitBits(dispod_display_evg, DISPOD_DISPLAY_COMPLETE_UPDATE_BIT,
+                pdTRUE, pdFALSE, 0);
+        ESP_LOGI(TAG, "uxBits = xEventGroupWaitBits(dispod_display_evg, DISPOD_DISPLAY_COMPLETE_UPDATE_BIT = %u", uxBits);
+        complete = (bool) (uxBits & DISPOD_DISPLAY_COMPLETE_UPDATE_BIT);
+        ESP_LOGI(TAG, "dispod_screen_task: DISPOD_DISPLAY_UPDATE_BIT, complete: %d", complete);
+
+        switch(params->screen_to_show){
+        case SCREEN_SPLASH:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_SPLASH - not available yet");
+            break;
+        case SCREEN_STATUS:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_STATUS");
+            dispod_screen_status_update_display(params, complete);
+            break;
+        case SCREEN_RUNNING:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_RUNNING - not available yet");
+            // dispod_screen_running_update_display(dispod_screen_status_t *params, bool complete);
+            break;
+        case SCREEN_CONFIG:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_CONFIG - not available yet");
+            break;
+        case SCREEN_OTA:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_OTA");
+            // dispod_screen_ota_update_display();
+            break;
+        case SCREEN_SCREENSAVER:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_SCREENSAVER - not available yet");
+            break;
+        case SCREEN_POWEROFF:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_POWEROFF - not available yet");
+            break;
+        case SCREEN_POWERON:
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_POWERON - not available yet");
+            break;
+        default:
+            ESP_LOGI(TAG, "dispod_screen_task: unhandled: %d", params->screen_to_show);
+            break;
+        }
+    }
 }
