@@ -96,7 +96,7 @@ static void dispod_screen_draw_fields       (uint8_t line, uint8_t numLines, cha
 static void dispod_screen_draw_indicator    (uint8_t line, uint8_t numLines, char* name,
 	                                         int16_t valMin, int16_t valMax, int16_t curVal,
 	                                        int16_t lowInterval, int16_t highInterval);
-static void dispod_screen_update_OTA        (otaUpdate_t otaUpdate, bool clearScreen);
+// static void dispod_screen_update_OTA        (otaUpdate_t otaUpdate, bool clearScreen);
 
 // update TFT with the status screen data
 static void dispod_screen_status_update_display    (dispod_screen_status_t *params, bool complete);

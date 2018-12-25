@@ -13,7 +13,7 @@
 #include "esp_gatt_defs.h"
 #include "esp_bt_main.h"
 
-#include "dispod_config.h"
+#include "dispod_main.h"
 #include "dispod_gattc.h"
 #include "dispod_runvalues.h"
 
@@ -273,7 +273,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
             }
         }
         break;
-    case ESP_GATTC_NOTIFY_EVT:
+    case ESP_GATTC_NOTIFY_EVT: {
         ESP_LOGI(GATTC_TAG, "ESP_GATTC_NOTIFY_EVT");
         if (p_data->notify.is_notify){
             ESP_LOGI(GATTC_TAG, "ESP_GATTC_NOTIFY_EVT, receive notify value:");
@@ -282,6 +282,9 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
         }
         ESP_LOGI(GATTC_TAG, "handle: %u", p_data->notify.handle);
         esp_log_buffer_hex(GATTC_TAG, p_data->notify.value, p_data->notify.value_len);
+
+        running_values_queue_element_t new_queue_element;
+        BaseType_t xStatus;
 
         switch(p_data->notify.handle){
         case NOTIFY_HANDLE_RSC:{
@@ -302,7 +305,10 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
 
 	        ESP_LOGI(GATTC_TAG, "0x2a53: F %2u S %2.1f C %3u Str %3u Dis %5u", p_data->notify.value[0], instSpeedF, instantaneousCadence, instantaneousStrideLength, totalDistance);
 
-            dispod_runvalues_update_RSCValues(&running_values, instantaneousCadence);
+            // dispod_runvalues_update_RSCValues(&running_values, instantaneousCadence);    // TODO
+            new_queue_element.id = ID_RSC;
+            new_queue_element.data.rsc = instantaneousCadence;
+            xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
             }
             break;
         case NOTIFY_HANDLE_CUSTOM:{
@@ -321,12 +327,17 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
 
             ESP_LOGI(GATTC_TAG, "0xFF00: F %2u Str %1u Swi %1u Imp %1u Sta%4u", p_data->notify.value[0], footStrike, footSwing, footImpact, stanceTime);
 
-            dispod_runvalues_update_customValues(&running_values, stanceTime, footStrike);
+            // dispod_runvalues_update_customValues(&running_values, stanceTime, footStrike); // TODO
+            new_queue_element.id = ID_CUSTOM;
+            new_queue_element.data.custom.GCT = stanceTime;
+            new_queue_element.data.custom.str = footStrike;
+            xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
             }
             break;
         default:
             break;
         }
+    }
     case ESP_GATTC_WRITE_DESCR_EVT:
         ESP_LOGI(GATTC_TAG, "ESP_GATTC_WRITE_DESCR_EVT");
         if (p_data->write.status != ESP_GATT_OK){

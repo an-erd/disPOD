@@ -7,6 +7,7 @@
 #define RUNNING_VALUES_UPDATE_RCS		BIT0
 #define RUNNING_VALUES_UPDATE_CUSTOM	BIT1
 
+// typedef to store the running values in
 typedef struct {
 	uint16_t	values[DISPOD_RUNVALUES_BUFFERLEN];
 	uint8_t		num_items;
@@ -33,6 +34,28 @@ typedef struct {
 	bool update_avail_RSC;
 	bool update_avail_custom;
 } runningValuesStruct_t;
+
+typedef enum {
+    ID_RSC,             // i.e. Cadence
+    ID_CUSTOM,          // i.e. GCT, strike
+} running_values_id_t;
+
+// union used to put received BLE packets into a queue for further work
+typedef union {
+    struct rsc_queue_element {
+        uint8_t     cadance;
+    } rsc;
+
+    struct custom_queue_element {
+        uint16_t    GCT;
+        uint8_t     str;
+    } custom;
+} running_values_element_t;
+
+typedef struct {
+    running_values_id_t         id;
+    running_values_element_t    data;
+} running_values_queue_element_t;
 
 void dispod_runvalues_initialize(runningValuesStruct_t *values);
 void dispod_runvalues_calculate_display_values(runningValuesStruct_t *values);

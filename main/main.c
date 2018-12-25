@@ -1,4 +1,4 @@
-// disPOD - connect to BLE to read MilestonePod data and display on M5Stack-Fire
+// disPOD - connect to MilestonePod via BLE and read data and display on M5Stack-Fire
 
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -8,19 +8,22 @@
 #include "esp_event_loop.h"
 #include "esp_err.h"
 #include "freertos/event_groups.h"
-
+#include "freertos/queue.h"
 #include "iot_button.h"
-#include "dispod_config.h"
+
+#include "dispod_main.h"
 #include "dispod_wifi.h"
 #include "dispod_gattc.h"
 #include "dispod_tft.h"
 #include "dispod_sntp.h"
 #include "dispod_ledc.h"
 #include "dispod_runvalues.h"
+#include "dispod_archiver.h"
 
-static const char* TAG      = "DISPOD";
+static const char* TAG = "DISPOD";
 
 // Event group
+//
 EventGroupHandle_t dispod_event_group;
 
 // Event loop
@@ -30,6 +33,9 @@ esp_event_loop_handle_t dispod_loop_handle;
 
 // Storing values from BLE running device
 runningValuesStruct_t running_values;
+
+// runvalues queue
+QueueHandle_t running_values_queue;
 
 // storing screen information
 dispod_screen_status_t dispod_screen_info;
@@ -213,6 +219,11 @@ void app_main()
     dispod_event_group = xEventGroupCreate();
     dispod_display_evg = xEventGroupCreate();   // TODO just a test because later we got an assert() ?!
 
+    // create running values queue to get BLE notification decoded and put into this queue
+    ESP_LOGI(TAG, "sizeof(running_values_queue_element_t) = %u", sizeof(running_values_queue_element_t));
+    running_values_queue = xQueueCreate( 5, sizeof( running_values_queue_element_t ) );
+
+    ESP_LOGI(TAG, "sizeof(buffer_element_t) = %u", sizeof(buffer_element_t));
 
     esp_event_loop_args_t dispod_loop_args = {
         .queue_size = 5,
@@ -233,7 +244,10 @@ void app_main()
     ESP_LOGI(TAG, "Starting dispod_screen_task()");
     xTaskCreate(dispod_screen_task, "dispod_screen_task", 4096, &dispod_screen_info, uxTaskPriorityGet(NULL), NULL);
 
+    // run the archiver task with the same priority as the current process
+    ESP_LOGI(TAG, "Starting dispod_archiver_task()");
+    xTaskCreate(dispod_archiver_task, "dispod_archiver_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
+
     // push a startup event in the loop
     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_EVT, NULL, 0, portMAX_DELAY));
-
 }

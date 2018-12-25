@@ -148,3 +148,6 @@ M5Stack-FIRE,  Chip is ESP32D0WDQ6 (revision 1)
 [D][BLEClient.cpp:162] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
 [W][disPOD.ino:602] my_gattc_event_handler(): custom gattc event handler, event: 9
 Preparation done, waiting for NOTIFY
+
+
+https://github.com/hamsternz/esp32_serial_log_to_sd/blob/master/main/gps_logger.c

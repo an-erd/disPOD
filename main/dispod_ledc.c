@@ -11,7 +11,7 @@
 #include "driver/ledc.h"
 #include "sdkconfig.h"
 
-#include "dispod_config.h"
+#include "dispod_main.h"
 #include "dispod_ledc.h"
 
 static const char* TAG = "DISPOD_LEDC";

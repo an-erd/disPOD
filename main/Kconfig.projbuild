@@ -204,6 +204,21 @@ config RUNNING_DISPLAY_STYLE
         config RUNNING_DISPLAY_STYLE2
             bool "Visual and text presentation"
     endchoice
+
+menu "SD Card storage"
+
+config SDCARD_FILE_NAME
+    string "Enter file name format for running value files"
+    default "runvals_%u.txt"
 endmenu
 
+config SDCARD_NUM_BUFFERS
+    int "Number of buffers for archiver"
+    default 5
+
+config SDCARD_BUFFER_SIZE
+    int "Size (=num of elements) of the buffers for archiver"
+    default 8192
+
+endmenu
 endmenu

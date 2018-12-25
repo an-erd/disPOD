@@ -1,7 +1,7 @@
 #include "esp_log.h"
 #include <stdlib.h>
 #include "dispod_runvalues.h"
-#include "dispod_config.h"
+#include "dispod_main.h"
 
 static const char* TAG = "DISPOD_RUNVALUES";
 

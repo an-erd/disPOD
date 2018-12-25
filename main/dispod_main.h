@@ -5,6 +5,9 @@
 #include "esp_event_loop.h"
 #include "esp_err.h"
 #include "freertos/event_groups.h"
+#include "freertos/queue.h"
+#include "sdkconfig.h"
+
 #include "dispod_runvalues.h"
 #include "dispod_tft.h"
 
@@ -29,10 +32,17 @@
 #define DISPOD_SCREEN_COMPLETE_BIT                  (BIT17)     // complete/first display update necessary
 EventGroupHandle_t dispod_event_group;
 
+// disPOD SD card event group
+#define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)
+#define DISPOD_SD_WRITE_CURRENT_BUFFER_EVT          (BIT1)
+#define DISPOD_SD_MOUNT_EVT                         (BIT2)
+#define DISPOD_SD_UNMOUNT_EVT                       (BIT3)
+EventGroupHandle_t dispod_sd_evg;
+
 // disPOD Client callback function events
 typedef enum {
     // activities -> events
-    DISPOD_WIFI_ACT_EVT = 0,                    /*!< When WIFI has been activated, the event comes */
+    DISPOD_WIFI_ACT_EVT = 0,                /*!< When WIFI has been activated, the event comes */
     DISPOD_WIFI_DEACT_EVT,                  /*!< When WIFI has been deactivated, the event comes */
     DISPOD_WIFI_SCANNING_EVT,               /*!< When WIFI is starting scanning, the event comes */
     DISPOD_WIFI_CONNECTING_EVT,             /*!< When WIFI is starting connecting, the event comes */
@@ -77,6 +87,10 @@ typedef enum {
 ESP_EVENT_DECLARE_BASE(ACTIVITY_EVENTS);
 ESP_EVENT_DECLARE_BASE(WORKFLOW_EVENTS);
 extern esp_event_loop_handle_t dispod_loop_handle;
+
+// queue for runnning values
+extern const TickType_t xTicksToWait;
+extern QueueHandle_t running_values_queue;
 
 // dispod screen data
 extern dispod_screen_status_t dispod_screen_info;
