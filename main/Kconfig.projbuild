@@ -209,7 +209,7 @@ menu "SD Card storage"
 
 config SDCARD_FILE_NAME
     string "Enter file name format for running value files"
-    default "runvals_%u.txt"
+    default "/sdcard/runvals_%u.txt"
 endmenu
 
 config SDCARD_NUM_BUFFERS

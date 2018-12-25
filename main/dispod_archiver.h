@@ -10,7 +10,7 @@ typedef struct {
     uint16_t GCT;
 } buffer_element_t;
 
-extern buffer_element_t buffers[][];
+extern buffer_element_t buffers[CONFIG_SDCARD_NUM_BUFFERS][CONFIG_SDCARD_BUFFER_SIZE];
 
 void dispod_archiver_task(void *pvParameters);
 
