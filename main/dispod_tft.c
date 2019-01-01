@@ -10,6 +10,7 @@
 #include "esp_err.h"
 #include "freertos/event_groups.h"
 #include "driver/gpio.h"
+#include "dispod_main.h"
 #include "dispod_tft.h"
 
 static const char* TAG = "DISPOD_TFT";
@@ -23,13 +24,13 @@ static const char* TAG = "DISPOD_TFT";
 #define X_BUTTON_C	    255
 
 // layout measures for running screen
-#define FIELD_MIN_X				50  // w/ and w/o value display, TODO
-#define FIELD_MAX_X				127
-#define FIELD_BASE_Y			8
-#define FIELD_HALFHEIGHT		5
-#define FIELD_WIDTH				(FIELD_MAX_X - FIELD_MIN_X)
-#define INDICATOR_MIN_X					50
-#define INDICATOR_MAX_X					127
+#define FIELD_MIN_X				        200
+#define FIELD_MAX_X				        310
+#define FIELD_BASE_Y			        8
+#define FIELD_HALFHEIGHT		        5
+#define FIELD_WIDTH				        (FIELD_MAX_X - FIELD_MIN_X)
+#define INDICATOR_MIN_X					200
+#define INDICATOR_MAX_X					310
 #define INDICATOR_ADJ_MIN_X				(INDICATOR_MIN_X + INDICATOR_TARGET_CIRCLE_RADIUS)
 #define INDICATOR_ADJ_MAX_X				(INDICATOR_MAX_X - INDICATOR_TARGET_CIRCLE_RADIUS)
 #define INDICATOR_BASE_Y				7
@@ -38,10 +39,10 @@ static const char* TAG = "DISPOD_TFT";
 //#define INDICATOR_INDEX_HALFWIDTH		4
 
 // Take from menuconfig
-#define MIN_INTERVAL_CADENCE		180
-#define MAX_INTERVAL_CADENCE		190
-#define MIN_INTERVAL_STANCETIME		200
-#define MAX_INTERVAL_STANCETIME		210
+#define MIN_INTERVAL_CADENCE		CONFIG_RUNNING_MIN_INTERVAL_CADENCE
+#define MAX_INTERVAL_CADENCE		CONFIG_RUNNING_MAX_INTERVAL_CADENCE
+#define MIN_INTERVAL_STANCETIME		CONFIG_RUNNING_MIN_INTERVAL_GCT
+#define MAX_INTERVAL_STANCETIME		CONFIG_RUNNING_MAX_INTERVAL_GCT
 
 
 // initialize HW display
@@ -176,7 +177,7 @@ void dispod_screen_status_update_statustext(dispod_screen_status_t *params, bool
         memcpy(params->status_text, "", strlen("")+1);
 }
 
-void dispod_screen_status_update_display(dispod_screen_status_t *params, bool complete)
+static void dispod_screen_status_update_display(dispod_screen_status_t *params, bool complete)
 {
 	uint16_t    textHeight, boxSize, xpos, ypos, xpos2;
     color_t     tmp_color;
@@ -185,7 +186,6 @@ void dispod_screen_status_update_display(dispod_screen_status_t *params, bool co
 	// Preparation
     TFT_fillScreen(TFT_BLACK);
 	TFT_resetclipwin();
-    // TFT_setFont(DEFAULT_FONT, NULL);     // TODO M5.Lcd.setFreeFont(FF17);
     TFT_setFont(DEJAVU18_FONT, NULL);       // DEJAVU18_FONT
     _fg = TFT_WHITE;
 	_bg = TFT_BLACK;                        // (color_t){ 64, 64, 64 };
@@ -291,40 +291,43 @@ void dispod_screen_status_update_display(dispod_screen_status_t *params, bool co
 		TFT_print(params->button_text[BUTTON_C], xpos, ypos);
 }
 
-
-
-
-
-
-static void dispod_screen_draw_fields(uint8_t line, uint8_t numLines, char* name, uint8_t numFields, uint8_t current);
+static void dispod_screen_draw_fields(uint8_t line, uint8_t numLines, char* name, uint8_t numFields, uint8_t current)
 {
-	uint8_t yPad = (64 - numLines * 16) / numLines;
-	uint8_t yLine = size * 8 * line + line * yPad;
+    uint16_t    textHeight;
+    uint16_t    xPad = 10, yPad = 5, yLine;
 
-	display.setTextSize(size);
-	display.setTextColor(color);
-	display.setCursor(0, yLine);
-	display.print(name);
+	// Preparation
+	TFT_resetclipwin();
+    TFT_setFont(DEJAVU18_FONT, NULL);
+    _fg = TFT_WHITE;
+	_bg = TFT_BLACK;
+
+	textHeight = TFT_getfontheight();
+    yLine = (textHeight  + yPad) * line;
+
+    // field title
+    TFT_print(name, xPad, yLine);
 
 	uint8_t y0 = yLine + FIELD_BASE_Y;
 	// frame
-	display.drawRect(FIELD_MIN_X, y0 - FIELD_HALFHEIGHT, FIELD_WIDTH, 2 * FIELD_HALFHEIGHT, color);
+	TFT_drawRect(FIELD_MIN_X, y0 - FIELD_HALFHEIGHT, FIELD_WIDTH, 2 * FIELD_HALFHEIGHT, TFT_WHITE);
 
 	// ticks
 	uint8_t deltaX = FIELD_WIDTH / numFields;
 	for (int i = 0; i < numFields; i++)
-		display.drawLine(FIELD_MIN_X + i * deltaX, y0 - FIELD_HALFHEIGHT, FIELD_MIN_X + i * deltaX, y0 + FIELD_HALFHEIGHT - 1, color);
+		TFT_drawLine(FIELD_MIN_X + i * deltaX, y0 - FIELD_HALFHEIGHT, FIELD_MIN_X + i * deltaX, y0 + FIELD_HALFHEIGHT - 1, TFT_WHITE);
 
 	// mark current
-	display.fillRect(FIELD_MIN_X + current * deltaX, y0 - FIELD_HALFHEIGHT, deltaX, 2 * FIELD_HALFHEIGHT, color);
+	TFT_fillRect(FIELD_MIN_X + current * deltaX, y0 - FIELD_HALFHEIGHT, deltaX, 2 * FIELD_HALFHEIGHT, TFT_WHITE);
 }
 
-
-void displayDrawIndicator(uint8_t line, uint8_t numLines, char* name,
+static void dispod_screen_draw_indicator(uint8_t line, uint8_t numLines, char* name,
 	int16_t valMin, int16_t valMax, int16_t curVal,
-	int16_t lowInterval, int16_t highInterval,
-	uint8_t color = 1, uint8_t size = 2)
+	int16_t lowInterval, int16_t highInterval)
 {
+    uint16_t    textHeight;
+    uint16_t    xPad = 10, yPad = 5, yLine;
+
 #ifdef DEBUG_DISPOD
 	// make some checks:
 	// - indicator adjusted min/max to make place for circle (center <-> target)
@@ -335,21 +338,28 @@ void displayDrawIndicator(uint8_t line, uint8_t numLines, char* name,
 		DEBUGLOG("ERROR: displayDrawIndicator: low/high interval values inconsistent");
 #endif // DEBUG_DISPOD
 
+	// Preparation
+	TFT_resetclipwin();
+    TFT_setFont(DEJAVU18_FONT, NULL);
+    _fg = TFT_WHITE;
+	_bg = TFT_BLACK;
+
+	textHeight = TFT_getfontheight();
+    yLine = (textHeight  + yPad) * line;
+
 	// current values out of range -> move into range
-	uint8_t adjCurVal;
+	uint8_t adjCurVal = curVal;
 	if (curVal < valMin)
 		adjCurVal = valMin;
 	if (curVal > valMax)
 		adjCurVal = valMax;
 
 	// calculate x base coordinates
-	uint8_t xLowInterval = map(lowInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
-	uint8_t xHighInterval = map(highInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
-	uint8_t xTarget = map(adjCurVal, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
+	uint16_t xLowInterval = map(lowInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
+	uint16_t xHighInterval = map(highInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
+	uint16_t xTarget = map(adjCurVal, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
 	// calculate y base coordinates
-	uint8_t yPad = (64 - numLines * 16) / numLines;		// stretch the lines if not all lines are used
-	uint8_t yLine = size * 8 * line + line * yPad;		// top left corner of the text line
-	uint8_t yBaseline = yLine + INDICATOR_BASE_Y;		// center/base line to display indicator
+	uint16_t yBaseline = yLine + INDICATOR_BASE_Y;		// center/base line to display indicator
 
 	//DEBUGLOG("displayDrawIndicator: indMinX %u, indMaxX %u, indAdjMinX %u, indAdjMaxX %u, xLowInt %u, xHighInt %u, xTarget %u, yPad %u, yLine %u, yBaseLine %u\n",
 	//	INDICATOR_MIN_X, INDICATOR_MAX_X, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X, xLowInterval, xHighInterval, xTarget, yPad, yLine, yBaseline);
@@ -358,102 +368,90 @@ void displayDrawIndicator(uint8_t line, uint8_t numLines, char* name,
 	bool inInterval = (curVal >= lowInterval) && (curVal <= highInterval);
 
 	// show name, inverse if in target interval
-	display.setTextSize(size);
 	if (inInterval)
-		display.setTextColor(!color, color);
+		_fg = TFT_GREEN;
 	else
-		display.setTextColor(color);
-	display.setCursor(0, yLine);
-	display.print(name);
+		_fg = TFT_GREEN;
+    TFT_print(name, xPad, yLine);
+    _fg = TFT_WHITE;
 
 	// baseline, from INDICATOR_MIN_X to INDICATOR_MAX_X
-	display.drawLine(INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, color);
+	TFT_drawLine(INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, TFT_WHITE);
 	//DEBUGLOG("displayDrawIndicator: drawLine %u, %u, %u, %u, %u\n", INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, color);
 
 	// show rounded rectangle (first fill w/background, then draw w/foreground color)
-	display.fillRoundRect(
+	TFT_fillRoundRect(
 		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS,		// x0, y0 (top left corner)
 		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 1 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,							// w, h
-		INDICATOR_TARGET_CIRCLE_RADIUS, !color);														// radius, color
-	display.drawRoundRect(
+		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK);														// radius, color
+	TFT_drawRoundRect(
 		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS,		// x0, y0 (top left corner)
 		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 1 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,							// w, h
-		INDICATOR_TARGET_CIRCLE_RADIUS, color);														// radius, color
+		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);														// radius, color
 
 	// middle circle, filled = in target range
-	display.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, !color); // delete (background) first
+	TFT_fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK); // delete (background) first
 	if (inInterval) {
-		display.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, color);
+		TFT_fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);
 	}
 	else {
-		display.drawCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, color);
+		TFT_drawCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);
 	}
 }
 
 
 // OTA display update function
-#define BAR_PAD		3
-void updateDisplayOTAUpdate(otaUpdate_t otaUpdate, bool clearScreen)
+/*#define BAR_PAD		3
+static void dispod_screen_ota_update_display(otaUpdate_t otaUpdate, bool clearScreen)
 {
-	int textHeight;
-	int xpos, ypos;
-	int x0 = 20, x1 = 220, y0 = 60, y1 = 100;	// gauge corner
+	int ypos;
+	int x0 = 20, x1 = 300, y0 = 60, y1 = 100;	// gauge corner
 	int mapx;
 
 	// Preparation
-	M5.Lcd.clear();
-	M5.Lcd.fillScreen(TFT_BLACK);
-	M5.Lcd.setFreeFont(FF17);
-	M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-	textHeight = m5.Lcd.fontHeight(GFXFF);
-	DEBUGLOG("M5 screen textHeight %u\n", textHeight);
+    TFT_fillScreen(TFT_BLACK);
+	TFT_resetclipwin();
+    TFT_setFont(DEJAVU18_FONT, NULL);       // DEJAVU18_FONT
+    _fg = TFT_WHITE;
+	_bg = TFT_BLACK;                        // (color_t){ 64, 64, 64 };
 
 	// Title
-	M5.Lcd.setTextDatum(TC_DATUM);
-	xpos = M5.Lcd.width() / 2;
 	ypos = 10;
-	M5.Lcd.drawString("OTA Update...", xpos, ypos, GFXFF);
+    TFT_print("OTA Update...", CENTER, ypos);
 
-	M5.Lcd.setTextDatum(TC_DATUM);
-	xpos = 160; // center
 	ypos = 180;
 	if (otaUpdate.otaUpdateError_) {
 		// Error Message
-		M5.Lcd.drawString(otaErrorNames[otaUpdate.otaUpdateErrorNr_], xpos, ypos, GFXFF);
+		// TFT_print(otaErrorNames[otaUpdate.otaUpdateErrorNr_], CENTER, ypos);
 	}
 	else if (otaUpdate.otaUpdateEnd_) {
-		M5.Lcd.drawString("Done, rebooting...", xpos, ypos, GFXFF);
+		TFT_print("Done, rebooting...", CENTER, ypos);
 	}
 	else {
 		if (clearScreen)
-			M5.Lcd.drawRect(x0, y0, x1, y1, TFT_WHITE);
+			TFT_drawRect(x0, y0, x1, y1, TFT_WHITE);
 		mapx = map(otaUpdate.otaUpdateProgress_, 0, 100, 0, x1 - x0 - 2 * BAR_PAD);
-		M5.Lcd.fillRect(x0 + BAR_PAD, y0 + BAR_PAD, mapx, y1 - y0 - 2 * BAR_PAD, TFT_LIGHTGREY);
+		TFT_fillRect(x0 + BAR_PAD, y0 + BAR_PAD, mapx, y1 - y0 - 2 * BAR_PAD, TFT_LIGHTGREY);
 	}
 }
-
-
+*/
 
 void updateDisplayWithRunningValues() {
-	valuesRSC_t values;
+	runValuesRSC_t values;
+    // dispod_runvalues_update_display_values(&values);
 
-	runningValues.updateDisplayValues(&values);
-#ifdef DEVICE_ESP32_LOLIN
-	display.clearDisplay();
-	display.setTextSize(2);
-	display.setTextColor(WHITE);
-	display.setCursor(0, 0);
-	displayDrawIndicator(0, 3, "Cad", MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
-	displayDrawIndicator(1, 3, "GCT", 200, 240, values.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
-	displayDrawFields(2, 3, "Str", 3, values.str);
-	display.display();
-#endif
-	DEBUGLOG("Display: cad %3u stance %3u strike %1u\n", values.cad, values.GCT, values.str);
+	// Preparation
+    TFT_fillScreen(TFT_BLACK);
+	TFT_resetclipwin();
+    TFT_setFont(DEJAVU18_FONT, NULL);       // DEJAVU18_FONT
+    _fg = TFT_WHITE;
+	_bg = TFT_BLACK;                        // (color_t){ 64, 64, 64 };
+
+	dispod_screen_draw_indicator(0, 3, "Cad", MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+	dispod_screen_draw_indicator(1, 3, "GCT", 200, 240, values.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
+	dispod_screen_draw_fields(2, 3, "Str", 3, values.str);
+	ESP_LOGI(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u\n", values.cad, values.GCT, values.str);
 }
-
-
-
-
 
 
 void dispod_screen_task(void *pvParameters)

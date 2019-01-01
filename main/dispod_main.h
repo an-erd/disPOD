@@ -119,6 +119,24 @@ extern runningValuesStruct_t running_values;
 // UART
 #define USE_SERIAL Serial
 
+// OTA error codes and update status
+const char* otaErrorNames[] = {
+	"Error: Auth Failed",		// OTA_AUTH_ERROR
+	"Error: Begin Failed",		// OTA_BEGIN_ERROR
+	"Error: Connect Failed",	// OTA_CONNECT_ERROR
+	"Error: Receive Failed",	// OTA_RECEIVE_ERROR
+	"Error: End Failed",		// OTA_END_ERROR
+};
+
+typedef struct {
+	bool		chg_;
+	bool		otaUpdateStarted_;
+	bool		otaUpdateEnd_;
+	unsigned int otaUpdateProgress_;
+	bool		otaUpdateError_;
+	int			otaUpdateErrorNr_;
+} otaUpdate_t;
+
 // missing functions
 #define min(a,b) \
     ({ __typeof__ (a) _a = (a); \

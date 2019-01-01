@@ -1,6 +1,8 @@
 #ifndef __DISPOD_TFT_H__
 #define __DISPOD_TFT_H__
 
+#include "dispod_main.h"
+
 #define SPI_BUS TFT_HSPI_HOST       // spi bus to use TFT_VSPI_HOST or TFT_HSPI_HOST
 
 
@@ -91,17 +93,17 @@ void dispod_screen_status_update_sd         (dispod_screen_status_t *params, dis
 void dispod_screen_status_update_button     (dispod_screen_status_t *params, uint8_t change_button, bool new_status, char* new_button_text);
 void dispod_screen_status_update_statustext (dispod_screen_status_t *params, bool new_show_text, char* new_status_text);
 
-// functins to draw interval fields, indicator bar, ota progress bar
-static void dispod_screen_draw_fields       (uint8_t line, uint8_t numLines, char* name, uint8_t numFields, uint8_t current);
-static void dispod_screen_draw_indicator    (uint8_t line, uint8_t numLines, char* name,
-	                                         int16_t valMin, int16_t valMax, int16_t curVal,
-	                                        int16_t lowInterval, int16_t highInterval);
-// static void dispod_screen_update_OTA        (otaUpdate_t otaUpdate, bool clearScreen);
+// // functins to draw interval fields, indicator bar, ota progress bar
+// static void dispod_screen_draw_fields       (uint8_t line, uint8_t numLines, char* name, uint8_t numFields, uint8_t current);
+// static void dispod_screen_draw_indicator    (uint8_t line, uint8_t numLines, char* name,
+// 	                                         int16_t valMin, int16_t valMax, int16_t curVal,
+// 	                                        int16_t lowInterval, int16_t highInterval);
+// // static void dispod_screen_update_OTA        (otaUpdate_t otaUpdate, bool clearScreen);
 
-// update TFT with the status screen data
-static void dispod_screen_status_update_display    (dispod_screen_status_t *params, bool complete);
-static void dispod_screen_running_update_display   (dispod_screen_status_t *params, bool complete);
-static void dispod_screen_ota_update_display       (dispod_screen_status_t *params, bool complete);
+// // update TFT with the status screen data
+// static void dispod_screen_status_update_display    (dispod_screen_status_t *params, bool complete);
+// static void dispod_screen_running_update_display   (dispod_screen_status_t *params, bool complete);
+// // static void dispod_screen_ota_update_display       (otaUpdate_t otaUpdate, bool clearScreen);
 
 // function to run in a separate process to update the display using event groups
 void dispod_screen_task(void *pvParameters);

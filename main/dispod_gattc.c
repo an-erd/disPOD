@@ -307,8 +307,10 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
 
             // dispod_runvalues_update_RSCValues(&running_values, instantaneousCadence);    // TODO
             new_queue_element.id = ID_RSC;
-            new_queue_element.data.rsc = instantaneousCadence;
+            new_queue_element.data.rsc.cadance = instantaneousCadence;
             xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
+            if(xStatus != pdTRUE )
+                ESP_LOGW(GATTC_TAG, "ESP_GATTC_NOTIFY_EVT: NOTIFY_HANDLE_RSC: cannot send to queue");
             }
             break;
         case NOTIFY_HANDLE_CUSTOM:{
@@ -332,6 +334,8 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
             new_queue_element.data.custom.GCT = stanceTime;
             new_queue_element.data.custom.str = footStrike;
             xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
+            if(xStatus != pdTRUE )
+                ESP_LOGW(GATTC_TAG, "ESP_GATTC_NOTIFY_EVT: NOTIFY_HANDLE_RSC: cannot send to queue");
             }
             break;
         default:
