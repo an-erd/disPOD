@@ -18,6 +18,7 @@
 #include "dispod_sntp.h"
 #include "dispod_ledc.h"
 #include "dispod_runvalues.h"
+#include "dispod_update.h"
 #include "dispod_archiver.h"
 
 static const char* TAG = "DISPOD";
@@ -46,12 +47,22 @@ const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
 // temp return value from xEventGroupWaitBits, ... functions
 EventBits_t uxBits;
 
+// temp to don't have it twice
+const char* otaErrorNames[] = {
+	"Error: Auth Failed",		// OTA_AUTH_ERROR
+	"Error: Begin Failed",		// OTA_BEGIN_ERROR
+	"Error: Connect Failed",	// OTA_CONNECT_ERROR
+	"Error: Receive Failed",	// OTA_RECEIVE_ERROR
+	"Error: End Failed",		// OTA_END_ERROR
+};
+
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
     switch(id){
     case DISPOD_STARTUP_EVT:
         ESP_LOGI(TAG, "DISPOD_STARTUP_EVT");
         dispod_runvalues_initialize(&running_values);
+        dispod_archiver_initialize();
         xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
         xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
         xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
@@ -221,7 +232,7 @@ void app_main()
 
     // create running values queue to get BLE notification decoded and put into this queue
     ESP_LOGI(TAG, "sizeof(running_values_queue_element_t) = %u", sizeof(running_values_queue_element_t));
-    running_values_queue = xQueueCreate( 5, sizeof( running_values_queue_element_t ) );
+    running_values_queue = xQueueCreate( 10, sizeof( running_values_queue_element_t ) );
 
     ESP_LOGI(TAG, "sizeof(buffer_element_t) = %u", sizeof(buffer_element_t));
 
@@ -243,6 +254,10 @@ void app_main()
     // run the display task with the same priority as the current process
     ESP_LOGI(TAG, "Starting dispod_screen_task()");
     xTaskCreate(dispod_screen_task, "dispod_screen_task", 4096, &dispod_screen_info, uxTaskPriorityGet(NULL), NULL);
+
+    // run the updater task with the same priority as the current process
+    ESP_LOGI(TAG, "Starting dispod_update_task()");
+    xTaskCreate(dispod_update_task, "dispod_update_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
 
     // run the archiver task with the same priority as the current process
     ESP_LOGI(TAG, "Starting dispod_archiver_task()");

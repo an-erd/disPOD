@@ -44,7 +44,6 @@ static const char* TAG = "DISPOD_TFT";
 #define MIN_INTERVAL_STANCETIME		CONFIG_RUNNING_MIN_INTERVAL_GCT
 #define MAX_INTERVAL_STANCETIME		CONFIG_RUNNING_MAX_INTERVAL_GCT
 
-
 // initialize HW display
 void dispod_display_initialize()
 {
@@ -436,9 +435,8 @@ static void dispod_screen_ota_update_display(otaUpdate_t otaUpdate, bool clearSc
 }
 */
 
-void updateDisplayWithRunningValues() {
-	runValuesRSC_t values;
-    // dispod_runvalues_update_display_values(&values);
+void dispod_screen_running_update_display() {
+	runningValuesStruct_t* values = &running_values;
 
 	// Preparation
     TFT_fillScreen(TFT_BLACK);
@@ -447,12 +445,11 @@ void updateDisplayWithRunningValues() {
     _fg = TFT_WHITE;
 	_bg = TFT_BLACK;                        // (color_t){ 64, 64, 64 };
 
-	dispod_screen_draw_indicator(0, 3, "Cad", MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
-	dispod_screen_draw_indicator(1, 3, "GCT", 200, 240, values.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
-	dispod_screen_draw_fields(2, 3, "Str", 3, values.str);
-	ESP_LOGI(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u\n", values.cad, values.GCT, values.str);
+	dispod_screen_draw_indicator(0, 3, "Cad", MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+	dispod_screen_draw_indicator(1, 3, "GCT", 200, 240, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
+	dispod_screen_draw_fields(2, 3, "Str", 3, values->values_to_display.str);
+	ESP_LOGI(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u\n", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
 }
-
 
 void dispod_screen_task(void *pvParameters)
 {

@@ -1,5 +1,5 @@
-#ifndef __DISPOD_CONFIG_H__
-#define __DISPOD_CONFIG_H__
+#ifndef __DISPOD_MAIN_H__
+#define __DISPOD_MAIN_H__
 
 #include "esp_event.h"
 #include "esp_event_loop.h"
@@ -33,8 +33,8 @@
 EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
-#define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)
-#define DISPOD_SD_WRITE_CURRENT_BUFFER_EVT          (BIT1)
+#define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write only completed buffers
+// #define DISPOD_SD_WRITE_ALL_BUFFER_EVT              (BIT1)      // write all buffers
 #define DISPOD_SD_MOUNT_EVT                         (BIT2)
 #define DISPOD_SD_UNMOUNT_EVT                       (BIT3)
 EventGroupHandle_t dispod_sd_evg;
@@ -120,13 +120,7 @@ extern runningValuesStruct_t running_values;
 #define USE_SERIAL Serial
 
 // OTA error codes and update status
-const char* otaErrorNames[] = {
-	"Error: Auth Failed",		// OTA_AUTH_ERROR
-	"Error: Begin Failed",		// OTA_BEGIN_ERROR
-	"Error: Connect Failed",	// OTA_CONNECT_ERROR
-	"Error: Receive Failed",	// OTA_RECEIVE_ERROR
-	"Error: End Failed",		// OTA_END_ERROR
-};
+extern const char* otaErrorNames[];
 
 typedef struct {
 	bool		chg_;
@@ -156,4 +150,4 @@ typedef struct {
         __typeof__ (out_max) _out_max = (out_max); \
         (_x - _in_min) * (_out_max - _out_min) / (_in_max - _in_min) + _out_min; })
 
-#endif // __DISPOD_CONFIG_H__
+#endif // __DISPOD_MAIN_H__
