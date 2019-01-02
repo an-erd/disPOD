@@ -64,7 +64,8 @@
         "esp_event.h": "c",
         "esp_event_loop.h": "c",
         "iot_ota.h": "c",
-        "dispod_main.h": "c"
+        "dispod_main.h": "c",
+        "dispod_runvalues.h": "c"
     },
 	"files.exclude": {
 		"**/.git": true,

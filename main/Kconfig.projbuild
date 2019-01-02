@@ -220,5 +220,18 @@ config SDCARD_BUFFER_SIZE
     int "Size (=num of elements) of the buffers for archiver"
     default 8192
 
+config SDCARD_PIN_MISO
+    int "MISO PIN"
+    default 19
+config SDCARD_PIN_MOSI
+    int "MOSI PIN"
+    default 23
+config SDCARD_PIN_CLK
+    int "CLK PIN"
+    default 18
+config SDCARD_PIN_CS
+    int "CS PIN"
+    default 4
+
 endmenu
 endmenu
