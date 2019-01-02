@@ -150,4 +150,5 @@ M5Stack-FIRE,  Chip is ESP32D0WDQ6 (revision 1)
 Preparation done, waiting for NOTIFY
 
 
-https://github.com/hamsternz/esp32_serial_log_to_sd/blob/master/main/gps_logger.c
+Queue and event group       https://github.com/hamsternz/esp32_serial_log_to_sd/blob/master/main/gps_logger.c
+LCD                         https://github.com/espressif/esp-iot-solution/tree/master/components/spi_devices/lcd
