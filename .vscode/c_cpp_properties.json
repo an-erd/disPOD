@@ -41,7 +41,9 @@
                 "${workspaceFolder}/components/button/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/sdmmc/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/fatfs/src",
-                "C:/msys32/home/AKAEM/esp/esp-idf/components/wear_levelling/include"
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/wear_levelling/include",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/vfs/include",
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/newlib/platform_include"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {

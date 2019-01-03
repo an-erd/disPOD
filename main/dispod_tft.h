@@ -5,21 +5,14 @@
 
 #define SPI_BUS TFT_HSPI_HOST       // spi bus to use TFT_VSPI_HOST or TFT_HSPI_HOST
 
-
-
-// buttons for array access
+// buttons for array access     // TODO put in dispod_main.h
 #define BUTTON_A        0
 #define BUTTON_B        1
 #define BUTTON_C        2
 #define NUM_BUTTONS     3
 
 // disPOD display event group
-#define DISPOD_DISPLAY_UPDATE_BIT               (BIT0)
-#define DISPOD_DISPLAY_COMPLETE_UPDATE_BIT      (BIT1)      // if UPDATE & COMPLETE -> redraw display completely
-#define DISPOD_DISPLAY_CHANGESCREEN_BIT         (BIT2)
-#define DISPOD_DISPLAY_SCREEN_SCREENSAVER_BIT   (BIT3)
-#define DISPOD_DISPLAY_SCREEN_POWEROFF_BIT      (BIT4)
-#define DISPOD_DISPLAY_SCREEN_POWERON_BIT       (BIT5)
+#define DISPOD_DISPLAY_UPDATE_BIT           (BIT0)  // display needs an update -> display task
 EventGroupHandle_t dispod_display_evg;
 
 typedef enum {
@@ -62,7 +55,6 @@ typedef enum {
     SD_AVAILABLE
 } display_sd_status_t;
 
-
 // status screen values
 typedef struct {
     display_screen_t        current_screen;
@@ -83,7 +75,7 @@ typedef struct {
 void dispod_display_initialize();
 
 // initialize all display structs
-void dispod_screen_data_initialize          (dispod_screen_status_t *params);
+void dispod_screen_status_initialize          (dispod_screen_status_t *params);
 
 // functions to update status screen data
 void dispod_screen_status_update_wifi       (dispod_screen_status_t *params, display_wifi_status_t new_status, const char* new_ssid);

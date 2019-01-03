@@ -152,3 +152,4 @@ Preparation done, waiting for NOTIFY
 
 Queue and event group       https://github.com/hamsternz/esp32_serial_log_to_sd/blob/master/main/gps_logger.c
 LCD                         https://github.com/espressif/esp-iot-solution/tree/master/components/spi_devices/lcd
+get around flickering w/    https://www.reddit.com/r/esp32/comments/87kp1e/your_experience_with_spi_connected_lcds/

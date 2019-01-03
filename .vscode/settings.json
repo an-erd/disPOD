@@ -65,7 +65,10 @@
         "esp_event_loop.h": "c",
         "iot_ota.h": "c",
         "dispod_main.h": "c",
-        "dispod_runvalues.h": "c"
+        "dispod_runvalues.h": "c",
+        "dispod_archiver.h": "c",
+        "esp_wifi.h": "c",
+        "esp_wifi_types.h": "c"
     },
 	"files.exclude": {
 		"**/.git": true,

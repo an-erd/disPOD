@@ -1,12 +1,5 @@
 menu "disPOD Configuration"
 
-config DISPOD_USE_SPIFFS
-    bool "Use SPIFFS file system in disPOD"
-    default n
-    help
-        If SPIFFS is used the file system will be used to
-        load fonts and images from there.
-
 config EXAMPLE_DISPLAY_TYPE
     int
     default 0 if EXAMPLE_DISPLAY_TYPE0

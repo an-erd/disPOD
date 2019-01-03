@@ -119,10 +119,9 @@ void dispod_display_initialize()
 }
 
 // initialize all display structs
-void dispod_screen_data_initialize(dispod_screen_status_t *params)
+void dispod_screen_status_initialize(dispod_screen_status_t *params)
 {
-    ESP_LOGI(TAG, "dispod_display_initialize()");
-    // dispod_display_evg = xEventGroupCreate();
+    ESP_LOGI(TAG, "dispod_screen_status_initialize()");
 
     // initialize dispod_screen_status_t struct
     params->screen_to_show = SCREEN_STATUS;
@@ -453,19 +452,18 @@ void dispod_screen_running_update_display() {
 
 void dispod_screen_task(void *pvParameters)
 {
-    EventBits_t uxBits;
+    // EventBits_t uxBits;
     bool complete;
     dispod_screen_status_t* params = (dispod_screen_status_t*)pvParameters;
+
+    ESP_LOGI(TAG, "dispod_screen_task: started");
 
     for (;;)
     {
         while(!(xEventGroupWaitBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT,
                 pdTRUE, pdFALSE, portMAX_DELAY) & DISPOD_DISPLAY_UPDATE_BIT));
-        uxBits = xEventGroupWaitBits(dispod_display_evg, DISPOD_DISPLAY_COMPLETE_UPDATE_BIT,
-                pdTRUE, pdFALSE, 0);
-        ESP_LOGI(TAG, "uxBits = xEventGroupWaitBits(dispod_display_evg, DISPOD_DISPLAY_COMPLETE_UPDATE_BIT = %u", uxBits);
-        complete = (bool) (uxBits & DISPOD_DISPLAY_COMPLETE_UPDATE_BIT);
-        ESP_LOGI(TAG, "dispod_screen_task: DISPOD_DISPLAY_UPDATE_BIT, complete: %d", complete);
+
+        ESP_LOGI(TAG, "dispod_screen_task: update display, screen_to_show %u", (uint8_t) params->screen_to_show);
 
         switch(params->screen_to_show){
         case SCREEN_SPLASH:

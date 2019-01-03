@@ -15,7 +15,8 @@
 // #define DISPOD_ESP_WIFI_PASS        CONFIG_ESP_WIFI_PASSWORD
 // #define DISPOD_ESP_MAXIMUM_RETRY    CONFIG_ESP_MAXIMUM_RETRY
 
-esp_err_t dispod_wifi_network_up();
+// esp_err_t dispod_wifi_network_up();
+void wifi_init_sta();
 // void initialize_wifi(void);
 // void stop_wifi(();
 
