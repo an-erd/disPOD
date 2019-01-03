@@ -199,7 +199,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 
 	// 1) WiFi
 	xpos = XPAD;
-	ypos += textHeight + 5;
+	ypos += textHeight + 15;
     TFT_drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
 	switch (params->wifi_status) {
 	case WIFI_DEACTIVATED:      tmp_color = TFT_LIGHTGREY;  break;
@@ -245,7 +245,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 	}
     TFT_fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
 	xpos += boxSize + XPAD;
-	TFT_print(params->ble_name, xpos, ypos);
+	TFT_print("MilestonePod", xpos, ypos);
 
 	// 4) SD Card storage
 	xpos = XPAD;

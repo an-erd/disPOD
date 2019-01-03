@@ -34,6 +34,16 @@ void dispod_sntp_check_time()
         time(&now);
     }
 
+
+    char strftime_buf[64];
+
+    // Set timezone to German time and print local time
+    setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
+    tzset();
+    localtime_r(&now, &timeinfo);
+    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+    ESP_LOGI(TAG, "The current local date/time is: %s", strftime_buf);
+
     if (timeinfo.tm_year >= (2016 - 1900)) {
         ESP_LOGI(TAG, "Time set yet.");
 
@@ -51,15 +61,6 @@ void dispod_sntp_check_time()
         dispod_screen_status_update_ntp(&dispod_screen_status, NTP_TIME_NOT_SET);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
     }
-
-    char strftime_buf[64];
-
-    // Set timezone to German time and print local time
-    setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
-    tzset();
-    localtime_r(&now, &timeinfo);
-    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    ESP_LOGI(TAG, "The current local date/time is: %s", strftime_buf);
 }
 
 static void s_initialize_sntp()

@@ -1,33 +1,7 @@
 Toolchain path: /opt/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
 Toolchain version: crosstool-ng-1.22.0-80-g6c4433a5
 Compiler version: 5.2.0
-App "dispod" version: 4baccb3-dirty
-CC build/main/dispod_wifi.o
-CC build/main/dispod_tft.o
-AR build/main/libmain.a
 Python requirements from C:/msys32/home/AKAEM/esp/esp-idf/requirements.txt are satisfied.
-Generating libmain.a.sections_info
-Generating esp32.common.ld
-LD build/dispod.elf
-esptool.py v2.6-beta1
-Flashing app to serial port COM6, offset 0x10000...
-esptool.py v2.6-beta1
-Serial port COM6
-Connecting....
-Chip is ESP32D0WDQ6 (revision 1)
-Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
-MAC: 84:0d:8e:25:92:34
-Uploading stub...
-Running stub...
-Stub running...
-Configuring flash size...
-Auto-detected Flash size: 16MB
-Compressed 1135712 bytes to 690489...
-Wrote 1135712 bytes (690489 compressed) at 0x00010000 in 61.1 seconds (effective 148.6 kbit/s)...
-Hash of data verified.
-
-Leaving...
-Hard resetting via RTS pin...
 MONITOR
 --- idf_monitor on COM6 115200 ---
 --- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
@@ -45,37 +19,37 @@ entry 0x40080728
 I (28) boot: ESP-IDF v3.3-beta1-dirty 2nd stage bootloader
 I (28) boot: compile time 13:58:23
 I (28) boot: Enabling RNG early entropy source...
-I (34) boot: SPI Speed      : 40MHz
+I (33) boot: SPI Speed      : 40MHz
 I (38) boot: SPI Mode       : DIO
 I (42) boot: SPI Flash Size : 16MB
 I (46) boot: Partition Table:
 I (49) boot: ## Label            Usage          Type ST Offset   Length
 I (57) boot:  0 nvs              WiFi data        01 02 00009000 00005000
 I (64) boot:  1 otadata          OTA data         01 00 0000e000 00002000
-I (72) boot:  2 app0             OTA app          00 10 00010000 00640000
+I (71) boot:  2 app0             OTA app          00 10 00010000 00640000
 I (79) boot:  3 app1             OTA app          00 11 00650000 00640000
-I (87) boot:  4 eeprom           Unknown data     01 99 00c90000 00001000
+I (86) boot:  4 eeprom           Unknown data     01 99 00c90000 00001000
 I (94) boot:  5 spiffs           Unknown data     01 82 00c91000 0036f000
-I (102) boot: End of partition table
+I (101) boot: End of partition table
 I (106) boot: No factory image, trying OTA 0
-I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x361d8 (221656) map
-I (197) esp_image: segment 1: paddr=0x00046200 vaddr=0x3ff80000 size=0x00000 (     0) load
-I (197) esp_image: segment 2: paddr=0x00046208 vaddr=0x3ff80000 size=0x00000 (     0) load
-I (203) esp_image: segment 3: paddr=0x00046210 vaddr=0x3ffbdb60 size=0x06444 ( 25668) load
-I (222) esp_image: segment 4: paddr=0x0004c65c vaddr=0x3ffc3fa4 size=0x00000 (     0) load
-I (222) esp_image: segment 5: paddr=0x0004c664 vaddr=0x40080000 size=0x00400 (  1024) load
+I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x36240 (221760) map
+I (196) esp_image: segment 1: paddr=0x00046268 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (197) esp_image: segment 2: paddr=0x00046270 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (203) esp_image: segment 3: paddr=0x00046278 vaddr=0x3ffbdb60 size=0x06444 ( 25668) load
+I (222) esp_image: segment 4: paddr=0x0004c6c4 vaddr=0x3ffc3fa4 size=0x00000 (     0) load
+I (222) esp_image: segment 5: paddr=0x0004c6cc vaddr=0x40080000 size=0x00400 (  1024) load
 0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
 
-I (231) esp_image: segment 6: paddr=0x0004ca6c vaddr=0x40080400 size=0x035a4 ( 13732) load
-I (245) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xbaed8 (765656) map
+I (230) esp_image: segment 6: paddr=0x0004cad4 vaddr=0x40080400 size=0x0353c ( 13628) load
+I (244) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xbb0ac (766124) map
 0x400d0018: _flash_cache_start at ??:?
 
-I (513) esp_image: segment 8: paddr=0x0010aef8 vaddr=0x400839a4 size=0x1a52c (107820) load
-0x400839a4: esp_crosscore_isr at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/crosscore_int.c:64
+I (513) esp_image: segment 8: paddr=0x0010b0cc vaddr=0x4008393c size=0x1a594 (107924) load
+0x4008393c: esp_timer_impl_update_apb_freq at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/esp_timer_esp32.c:340
 
-I (556) esp_image: segment 9: paddr=0x0012542c vaddr=0x400c0000 size=0x00000 (     0) load
-I (556) esp_image: segment 10: paddr=0x00125434 vaddr=0x50000000 size=0x00000 (     0) load
-I (563) esp_image: segment 11: paddr=0x0012543c vaddr=0x50000000 size=0x00000 (     0) load
+I (556) esp_image: segment 9: paddr=0x00125668 vaddr=0x400c0000 size=0x00000 (     0) load
+I (556) esp_image: segment 10: paddr=0x00125670 vaddr=0x50000000 size=0x00000 (     0) load
+I (563) esp_image: segment 11: paddr=0x00125678 vaddr=0x50000000 size=0x00000 (     0) load
 I (589) boot: Loaded app from partition at offset 0x10000
 I (590) boot: Disabling RNG early entropy source...
 I (590) spiram: Found 32MBit SPI RAM device
@@ -84,8 +58,8 @@ I (600) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
 I (607) cpu_start: Pro cpu up.
 I (611) cpu_start: Application information:
 I (616) cpu_start: Project name:     dispod
-I (621) cpu_start: App version:      4baccb3-dirty
-I (626) cpu_start: Compile time:     18:48:53
+I (621) cpu_start: App version:      2c11b36-dirty
+I (626) cpu_start: Compile time:     20:13:35
 I (631) cpu_start: Compile date:     Jan  3 2019
 I (636) cpu_start: ESP-IDF:          v3.3-beta1-dirty
 I (642) cpu_start: Starting app cpu, entry point is 0x40081540
@@ -93,8 +67,8 @@ I (642) cpu_start: Starting app cpu, entry point is 0x40081540
 
 I (0) cpu_start: App cpu up.
 I (1528) spiram: SPI SRAM memory test OK
-D (1530) memory_layout: Checking 12 reserved memory ranges:
-D (1530) memory_layout: Reserved memory range 0x3f800000 - 0x3fc00000
+D (1529) memory_layout: Checking 12 reserved memory ranges:
+D (1529) memory_layout: Reserved memory range 0x3f800000 - 0x3fc00000
 D (1533) memory_layout: Reserved memory range 0x3ffae000 - 0x3ffae6e0
 D (1540) memory_layout: Reserved memory range 0x3ffae6e0 - 0x3ffaff10
 D (1546) memory_layout: Reserved memory range 0x3ffb0000 - 0x3ffb6388
@@ -116,16 +90,16 @@ D (1618) memory_layout: Available memory region 0x3ffb6388 - 0x3ffb8000
 D (1624) memory_layout: Available memory region 0x3ffb9a20 - 0x3ffbdb28
 D (1631) memory_layout: Available memory region 0x3ffbdb5c - 0x3ffbdb60
 D (1638) memory_layout: Available memory region 0x3ffc6df0 - 0x3ffc8000
-D (1645) memory_layout: Available memory region 0x3ffc8000 - 0x3ffca000
+D (1644) memory_layout: Available memory region 0x3ffc8000 - 0x3ffca000
 D (1651) memory_layout: Available memory region 0x3ffca000 - 0x3ffcc000
 D (1658) memory_layout: Available memory region 0x3ffcc000 - 0x3ffce000
-D (1665) memory_layout: Available memory region 0x3ffce000 - 0x3ffd0000
+D (1664) memory_layout: Available memory region 0x3ffce000 - 0x3ffd0000
 D (1671) memory_layout: Available memory region 0x3ffd0000 - 0x3ffd2000
 D (1678) memory_layout: Available memory region 0x3ffd2000 - 0x3ffd4000
-D (1685) memory_layout: Available memory region 0x3ffd4000 - 0x3ffd6000
+D (1684) memory_layout: Available memory region 0x3ffd4000 - 0x3ffd6000
 D (1691) memory_layout: Available memory region 0x3ffd6000 - 0x3ffd8000
 D (1698) memory_layout: Available memory region 0x3ffd8000 - 0x3ffda000
-D (1705) memory_layout: Available memory region 0x3ffda000 - 0x3ffdc000
+D (1704) memory_layout: Available memory region 0x3ffda000 - 0x3ffdc000
 D (1711) memory_layout: Available memory region 0x3ffdc000 - 0x3ffde000
 D (1718) memory_layout: Available memory region 0x3ffde000 - 0x3ffe0000
 D (1725) memory_layout: Available memory region 0x3ffe0440 - 0x3ffe3f20
@@ -135,27 +109,27 @@ D (1745) memory_layout: Available memory region 0x3fff0000 - 0x3fff8000
 D (1751) memory_layout: Available memory region 0x3fff8000 - 0x3fffc000
 D (1758) memory_layout: Available memory region 0x3fffc000 - 0x40000000
 D (1765) memory_layout: Available memory region 0x4009ded0 - 0x4009e000
-D (1772) memory_layout: Available memory region 0x4009e000 - 0x400a0000
+D (1771) memory_layout: Available memory region 0x4009e000 - 0x400a0000
 I (1778) heap_init: Initializing. RAM available for dynamic allocation:
-D (1786) heap_init: New heap initialised at 0x3ffaff10
-I (1791) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
+D (1785) heap_init: New heap initialised at 0x3ffaff10
+I (1790) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
 D (1797) heap_init: New heap initialised at 0x3ffb6388
 I (1802) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
 D (1808) heap_init: New heap initialised at 0x3ffb9a20
 I (1813) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
-I (1820) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
+I (1819) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
 D (1826) heap_init: New heap initialised at 0x3ffc6df0
 I (1831) heap_init: At 3FFC6DF0 len 00019210 (100 KiB): DRAM
 I (1837) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
 I (1844) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
 D (1850) heap_init: New heap initialised at 0x4009ded0
-I (1856) heap_init: At 4009DED0 len 00002130 (8 KiB): IRAM
+I (1855) heap_init: At 4009DED0 len 00002130 (8 KiB): IRAM
 I (1862) cpu_start: Pro cpu start user code
-I (1867) spiram: Adding pool of 4090K of external SPI memory to heap allocator
-D (1882) clk: RTC_SLOW_CLK calibration value: 3292237
+I (1866) spiram: Adding pool of 4090K of external SPI memory to heap allocator
+D (1882) clk: RTC_SLOW_CLK calibration value: 3315046
 D (102) intr_alloc: Connected src 46 to int 2 (cpu 0)
-D (103) intr_alloc: Connected src 57 to int 3 (cpu 0)
-D (104) intr_alloc: Connected src 24 to int 9 (cpu 0)
+D (102) intr_alloc: Connected src 57 to int 3 (cpu 0)
+D (103) intr_alloc: Connected src 24 to int 9 (cpu 0)
 I (108) cpu_start: Starting scheduler on PRO CPU.
 D (0) intr_alloc: Connected src 25 to int 2 (cpu 1)
 I (4) cpu_start: Starting scheduler on APP CPU.
@@ -166,517 +140,572 @@ D (151) spiram: Allocating block of size 32768 bytes
 D (156) intr_alloc: Connected src 16 to int 12 (cpu 0)
 I (162) DISPOD: app_main() entered
 D (175) nvs: nvs_flash_init_custom partition=nvs start=9 count=5
-I (206) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
-I (442) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
-I (442) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
-I (444) DISPOD: initialize dispod
-D (448) event: created task for loop 0x3ffba1d4
-D (448) event: running task for loop 0x3ffba1d4
-D (454) event: created event loop 0x3ffba1d4
-D (462) event: registered handler 0x400d4f90 for event any:-1
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+I (208) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
+I (443) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
+I (443) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
+I (445) DISPOD: initialize dispod
+D (449) event: created task for loop 0x3ffba1d4
+D (449) event: running task for loop 0x3ffba1d4
+D (455) event: created event loop 0x3ffba1d4
+D (463) event: registered handler 0x400d4fb4 for event any:-1
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-I (467) DISPOD: Starting dispod_screen_task()
-I (472) DISPOD: Starting dispod_update_task()
-I (472) DISPOD_TFT: dispod_screen_task: started
-I (478) DISPOD: Starting dispod_archiver_task()
-I (478) DISPOD_UPDATER: dispod_update_task: started
-D (489) event: created post for event WORKFLOW_EVENTS:0
-I (489) DISPOD_ARCHIVER: dispod_archiver_task: started
-D (500) event: running post WORKFLOW_EVENTS:0 with handler 0x400d4f90 on loop 0x3ffba1d4
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+I (468) DISPOD: Starting dispod_screen_task()
+I (473) DISPOD: Starting dispod_update_task()
+I (473) DISPOD_TFT: dispod_screen_task: started
+I (479) DISPOD: Starting dispod_archiver_task()
+I (479) DISPOD_UPDATER: dispod_update_task: started
+D (490) event: created post for event WORKFLOW_EVENTS:0
+I (490) DISPOD_ARCHIVER: dispod_archiver_task: started
+D (501) event: running post WORKFLOW_EVENTS:0 with handler 0x400d4fb4 on loop 0x3ffba1d4
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-D (501) event: posted WORKFLOW_EVENTS:0 to loop 0x3ffba1d4
-I (513) DISPOD: DISPOD_STARTUP_EVT
-D (522) event: created post for event WORKFLOW_EVENTS:1
-D (528) event: posted WORKFLOW_EVENTS:1 to loop 0x3ffba1d4
-D (533) event: running post WORKFLOW_EVENTS:1 with handler 0x400d4f90 on loop 0x3ffba1d4
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+D (502) event: posted WORKFLOW_EVENTS:0 to loop 0x3ffba1d4
+I (514) DISPOD: DISPOD_STARTUP_EVT
+D (523) event: created post for event WORKFLOW_EVENTS:1
+D (529) event: posted WORKFLOW_EVENTS:1 to loop 0x3ffba1d4
+D (534) event: running post WORKFLOW_EVENTS:1 with handler 0x400d4fb4 on loop 0x3ffba1d4
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-I (541) DISPOD: DISPOD_BASIC_INIT_DONE_EVT
-I (546) DISPOD_TFT: dispod_display_initialize()
-I (1051) DISPOD_TFT: Display config, Pins used: miso=19, mosi=23, sck=18, cs=14
-I (1051) DISPOD_TFT: SPI: display device added to spi bus (1)
-I (1054) DISPOD_TFT: SPI: attached display device, speed=8000000
-I (1061) DISPOD_TFT: SPI: bus uses native pins: false
-I (1066) DISPOD_TFT: SPI: display init...
-I (1872) DISPOD_TFT: OK
-I (1878) DISPOD_TFT: SPI: Max rd speed = 1000000
-I (1878) DISPOD_TFT: SPI: Changed speed to 26666666
-I (1949) DISPOD_TFT: dispod_screen_status_initialize()
-I (1949) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (1949) event: created post for event WORKFLOW_EVENTS:2
-I (1951) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (1956) event: posted WORKFLOW_EVENTS:2 to loop 0x3ffba1d4
-D (1968) event: running post WORKFLOW_EVENTS:2 with handler 0x400d4f90 on loop 0x3ffba1d4
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+I (542) DISPOD: DISPOD_BASIC_INIT_DONE_EVT
+I (547) DISPOD_TFT: dispod_display_initialize()
+I (1052) DISPOD_TFT: Display config, Pins used: miso=19, mosi=23, sck=18, cs=14
+I (1052) DISPOD_TFT: SPI: display device added to spi bus (1)
+I (1055) DISPOD_TFT: SPI: attached display device, speed=8000000
+I (1062) DISPOD_TFT: SPI: bus uses native pins: false
+I (1067) DISPOD_TFT: SPI: display init...
+I (1873) DISPOD_TFT: OK
+I (1879) DISPOD_TFT: SPI: Max rd speed = 1000000
+I (1879) DISPOD_TFT: SPI: Changed speed to 26666666
+I (1950) DISPOD_TFT: dispod_screen_status_initialize()
+I (1950) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (1950) event: created post for event WORKFLOW_EVENTS:2
+I (1952) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (1957) event: posted WORKFLOW_EVENTS:2 to loop 0x3ffba1d4
+D (1969) event: running post WORKFLOW_EVENTS:2 with handler 0x400d4fb4 on loop 0x3ffba1d4
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-I (1976) DISPOD: DISPOD_DISPLAY_INIT_DONE_EVT
-I (1981) DISPOD: connect to WiFi
-D (1986) nvs: nvs_open_from_partition misc 1
-D (1989) nvs: nvs_get_str_or_blob log
-D (1993) nvs: nvs_erase_key log
+I (1977) DISPOD: DISPOD_DISPLAY_INIT_DONE_EVT
+I (1982) DISPOD: connect to WiFi
+D (1987) nvs: nvs_open_from_partition misc 1
+D (1990) nvs: nvs_get_str_or_blob log
+D (1994) nvs: nvs_erase_key log
 
-I (2033) DISPOD_TFT: screen textHeight 18
-D (2047) DISPOD_TFT: 5) status text litle, show 1 x 34, y 115, text ... none ...
-D (2050) DISPOD_TFT: 6) button label, show A 1 x 14, y 143, text Retry Wifi
-D (2053) DISPOD_TFT: 6) button label, show B 1 x 111, y 143, text Retry Pod
-D (2060) DISPOD_TFT: 6) button label, show C 1 x 212, y 143, text Continue
-D (2068) nvs: nvs_get_str_or_blob log
-D (2069) nvs: nvs_set_blob log 24
-I (2073) wifi: wifi driver task: 3ffd6428, prio:23, stack:3584, core=0
-I (2078) wifi: wifi firmware version: 328353e
-I (2082) wifi: config NVS flash: enabled
-I (2086) wifi: config nano formating: disabled
-I (2090) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-I (2099) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-D (2110) nvs: nvs_open_from_partition nvs.net80211 1
-D (2114) nvs: nvs_get opmode 1
-D (2118) nvs: nvs_get_str_or_blob sta.ssid
-D (2122) nvs: nvs_get_str_or_blob sta.mac
-D (2126) nvs: nvs_get sta.authmode 1
-D (2129) nvs: nvs_get_str_or_blob sta.pswd
-D (2134) nvs: nvs_get_str_or_blob sta.pmk
-D (2138) nvs: nvs_get sta.chan 1
-D (2141) nvs: nvs_get auto.conn 1
-D (2144) nvs: nvs_get bssid.set 1
-D (2148) nvs: nvs_get_str_or_blob sta.bssid
-D (2152) nvs: nvs_get sta.lis_intval 2
-D (2156) nvs: nvs_get sta.phym 1
-D (2159) nvs: nvs_get sta.phybw 1
-D (2162) nvs: nvs_get_str_or_blob sta.apsw
-D (2167) nvs: nvs_get_str_or_blob sta.apinfo
-D (2173) nvs: nvs_get sta.scan_method 1
-D (2175) nvs: nvs_get sta.sort_method 1
-D (2179) nvs: nvs_get sta.minrssi 1
-D (2182) nvs: nvs_get sta.minauth 1
-D (2186) nvs: nvs_get_str_or_blob ap.ssid
-D (2190) nvs: nvs_get_str_or_blob ap.mac
-D (2194) nvs: nvs_get_str_or_blob ap.passwd
-D (2199) nvs: nvs_get_str_or_blob ap.pmk
-D (2202) nvs: nvs_get ap.chan 1
-D (2205) nvs: nvs_get ap.authmode 1
-D (2209) nvs: nvs_get ap.hidden 1
-D (2212) nvs: nvs_get ap.max.conn 1
-D (2216) nvs: nvs_get bcn.interval 2
-D (2219) nvs: nvs_get ap.phym 1
-D (2223) nvs: nvs_get ap.phybw 1
-D (2226) nvs: nvs_get ap.sndchan 1
-D (2229) nvs: nvs_get lorate 1
-D (2233) nvs: nvs_set_blob sta.mac 6
-D (2238) nvs: nvs_set_blob ap.mac 6
-I (2242) wifi: Init dynamic tx buffer num: 32
-I (2244) wifi: Init data frame dynamic rx buffer num: 32
-I (2249) wifi: Init management frame dynamic rx buffer num: 32
-I (2254) wifi: Init static tx buffer num: 16
-I (2259) wifi: Init static rx buffer size: 1600
-I (2263) wifi: Init static rx buffer num: 10
-I (2266) wifi: Init dynamic rx buffer num: 32
-D (2272) nvs: nvs_set_blob sta.ssid 36
-D (2277) nvs: nvs_set_blob sta.pswd 65
-D (2280) nvs: nvs_set bssid.set 1 0
-D (2282) nvs: nvs_set sta.lis_intval 2 3
-D (2286) nvs: nvs_set sta.scan_method 1 0
-D (2291) nvs: nvs_set sta.sort_method 1 0
-D (2295) nvs: nvs_set sta.minrssi 1 -127
-D (2299) nvs: nvs_set sta.minauth 1 0
-D (2302) nvs: nvs_set_blob sta.apsw 2
-D (2307) nvs: nvs_set_blob sta.apinfo 700
-D (2314) RTC_MODULE: Wi-Fi takes adc2 lock.
-D (2314) nvs: nvs_open_from_partition phy 0
-D (2318) nvs: nvs_get cal_version 4
-D (2322) nvs: nvs_get_str_or_blob cal_mac
-D (2326) nvs: nvs_get_str_or_blob cal_data
-D (2335) nvs: nvs_close 3
-I (2406) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
-I (2408) wifi: mode : sta (84:0d:8e:25:92:34)
-I (2409) DISPOD_WIFI: wifi_init_sta finished.
-D (2409) event: SYSTEM_EVENT_STA_START
-D (2411) event: created post for event WORKFLOW_EVENTS:3
-D (2421) event: posted WORKFLOW_EVENTS:3 to loop 0x3ffba1d4
-D (2426) event: running post WORKFLOW_EVENTS:3 with handler 0x400d4f90 on loop 0x3ffba1d4
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+I (2034) DISPOD_TFT: screen textHeight 18
+D (2052) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (2055) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (2059) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (2065) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+D (2073) nvs: nvs_get_str_or_blob log
+D (2074) nvs: nvs_set_blob log 24
+I (2078) wifi: wifi driver task: 3ffd63a4, prio:23, stack:3584, core=0
+I (2083) wifi: wifi firmware version: 328353e
+I (2087) wifi: config NVS flash: enabled
+I (2091) wifi: config nano formating: disabled
+I (2095) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (2105) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+D (2115) nvs: nvs_open_from_partition nvs.net80211 1
+D (2119) nvs: nvs_get opmode 1
+D (2123) nvs: nvs_get_str_or_blob sta.ssid
+D (2127) nvs: nvs_get_str_or_blob sta.mac
+D (2131) nvs: nvs_get sta.authmode 1
+D (2134) nvs: nvs_get_str_or_blob sta.pswd
+D (2139) nvs: nvs_get_str_or_blob sta.pmk
+D (2143) nvs: nvs_get sta.chan 1
+D (2146) nvs: nvs_get auto.conn 1
+D (2149) nvs: nvs_get bssid.set 1
+D (2153) nvs: nvs_get_str_or_blob sta.bssid
+D (2157) nvs: nvs_get sta.lis_intval 2
+D (2161) nvs: nvs_get sta.phym 1
+D (2164) nvs: nvs_get sta.phybw 1
+D (2168) nvs: nvs_get_str_or_blob sta.apsw
+D (2172) nvs: nvs_get_str_or_blob sta.apinfo
+D (2178) nvs: nvs_get sta.scan_method 1
+D (2180) nvs: nvs_get sta.sort_method 1
+D (2184) nvs: nvs_get sta.minrssi 1
+D (2187) nvs: nvs_get sta.minauth 1
+D (2191) nvs: nvs_get_str_or_blob ap.ssid
+D (2195) nvs: nvs_get_str_or_blob ap.mac
+D (2199) nvs: nvs_get_str_or_blob ap.passwd
+D (2204) nvs: nvs_get_str_or_blob ap.pmk
+D (2208) nvs: nvs_get ap.chan 1
+D (2211) nvs: nvs_get ap.authmode 1
+D (2214) nvs: nvs_get ap.hidden 1
+D (2217) nvs: nvs_get ap.max.conn 1
+D (2221) nvs: nvs_get bcn.interval 2
+D (2225) nvs: nvs_get ap.phym 1
+D (2228) nvs: nvs_get ap.phybw 1
+D (2231) nvs: nvs_get ap.sndchan 1
+D (2235) nvs: nvs_get lorate 1
+D (2238) nvs: nvs_set_blob sta.mac 6
+D (2243) nvs: nvs_set_blob ap.mac 6
+I (2247) wifi: Init dynamic tx buffer num: 32
+I (2249) wifi: Init data frame dynamic rx buffer num: 32
+I (2254) wifi: Init management frame dynamic rx buffer num: 32
+I (2259) wifi: Init static tx buffer num: 16
+I (2264) wifi: Init static rx buffer size: 1600
+I (2268) wifi: Init static rx buffer num: 10
+I (2272) wifi: Init dynamic rx buffer num: 32
+D (2277) nvs: nvs_set_blob sta.ssid 36
+D (2282) nvs: nvs_set_blob sta.pswd 65
+D (2285) nvs: nvs_set bssid.set 1 0
+D (2288) nvs: nvs_set sta.lis_intval 2 3
+D (2292) nvs: nvs_set sta.scan_method 1 0
+D (2296) nvs: nvs_set sta.sort_method 1 0
+D (2300) nvs: nvs_set sta.minrssi 1 -127
+D (2304) nvs: nvs_set sta.minauth 1 0
+D (2308) nvs: nvs_set_blob sta.apsw 2
+D (2312) nvs: nvs_set_blob sta.apinfo 700
+D (2319) RTC_MODULE: Wi-Fi takes adc2 lock.
+D (2319) nvs: nvs_open_from_partition phy 0
+D (2323) nvs: nvs_get cal_version 4
+D (2327) nvs: nvs_get_str_or_blob cal_mac
+D (2331) nvs: nvs_get_str_or_blob cal_data
+D (2340) nvs: nvs_close 3
+I (2412) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
+I (2414) wifi: mode : sta (84:0d:8e:25:92:34)
+I (2415) DISPOD_WIFI: wifi_init_sta finished.
+D (2415) event: SYSTEM_EVENT_STA_START
+D (2417) event: created post for event WORKFLOW_EVENTS:3
+I (2424) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (2427) event: posted WORKFLOW_EVENTS:3 to loop 0x3ffba1d4
+I (2434) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (2440) event: running post WORKFLOW_EVENTS:3 with handler 0x400d4fb4 on loop 0x3ffba1d4
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-I (2434) DISPOD: DISPOD_WIFI_INIT_DONE_EVT
-I (2538) wifi: new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
-I (3234) wifi: state: init -> auth (b0)
-I (3242) wifi: state: auth -> assoc (0)
-I (3248) wifi: state: assoc -> run (10)
-I (3266) wifi: connected with W12, channel 1, bssid = ec:08:6b:8a:ae:3a
-D (3267) nvs: nvs_set sta.chan 1 1
-D (3269) nvs: nvs_set_blob sta.apinfo 700
-I (3274) wifi: pm start, type: 1
+I (2454) DISPOD: DISPOD_WIFI_INIT_DONE_EVT
+I (2517) DISPOD_TFT: screen textHeight 18
+D (2534) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (2537) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (2540) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+I (2544) wifi: new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+D (2547) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+I (3246) wifi: state: init -> auth (b0)
+I (3252) wifi: state: auth -> assoc (0)
+I (3272) wifi: state: assoc -> run (10)
+I (3298) wifi: connected with W12, channel 1, bssid = ec:08:6b:8a:ae:3a
+D (3299) nvs: nvs_set sta.chan 1 1
+D (3301) nvs: nvs_set_blob sta.apinfo 700
+I (3347) wifi: pm start, type: 1
 
-D (3274) event: SYSTEM_EVENT_STA_CONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, channel:1, authmode:3
-D (3284) tcpip_adapter: dhcp client init ip/mask/gw to all-0
-D (3289) tcpip_adapter: if0 start ip lost tmr: enter
-D (3294) tcpip_adapter: if0 start ip lost tmr: no need start because netif=0x3ffdfec8 interval=120 ip=0
-D (3304) tcpip_adapter: dhcp client start successfully
-D (4009) tcpip_adapter: if0 dhcpc cb
-D (4010) tcpip_adapter: if0 ip changed=1
-D (4010) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.2.155, mask:255.255.255.0, gw:192.168.2.1
-I (4015) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
-I (4022) DISPOD_WIFI: got ip:192.168.2.155
-D (4027) event: created post for event WORKFLOW_EVENTS:4
-D (4033) event: posted WORKFLOW_EVENTS:4 to loop 0x3ffba1d4
-D (4033) event: running post WORKFLOW_EVENTS:4 with handler 0x400d4f90 on loop 0x3ffba1d4
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+D (3348) event: SYSTEM_EVENT_STA_CONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, channel:1, authmode:3
+D (3350) tcpip_adapter: dhcp client init ip/mask/gw to all-0
+D (3355) tcpip_adapter: if0 start ip lost tmr: enter
+D (3361) tcpip_adapter: if0 start ip lost tmr: no need start because netif=0x3ffdfec8 interval=120 ip=0
+D (3371) tcpip_adapter: dhcp client start successfully
+D (3991) tcpip_adapter: if0 dhcpc cb
+D (3991) tcpip_adapter: if0 ip changed=1
+D (3991) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.2.155, mask:255.255.255.0, gw:192.168.2.1
+I (3996) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
+I (4004) DISPOD_WIFI: got ip:192.168.2.155
+I (4008) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (4009) event: created post for event WORKFLOW_EVENTS:4
+I (4016) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (4021) event: posted WORKFLOW_EVENTS:4 to loop 0x3ffba1d4
+D (4021) event: running post WORKFLOW_EVENTS:4 with handler 0x400d4fb4 on loop 0x3ffba1d4
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-I (4046) DISPOD: DISPOD_WIFI_GOT_IP_EVT
-I (4051) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (4051) DISPOD: WiFi connected, update NTP
-I (4059) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (4064) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
-I (4076) DISPOD_SNTP: Initializing SNTP
-I (4082) DISPOD_SNTP: Waiting for system time to be set... (1/10)
-I (4141) DISPOD_TFT: screen textHeight 18
-D (4155) DISPOD_TFT: 5) status text litle, show 1 x 34, y 115, text ... none ...
-D (4158) DISPOD_TFT: 6) button label, show A 1 x 14, y 143, text Retry Wifi
-D (4162) DISPOD_TFT: 6) button label, show B 1 x 111, y 143, text Retry Pod
-D (4169) DISPOD_TFT: 6) button label, show C 1 x 212, y 143, text Continue
-I (6088) DISPOD_SNTP: The current local date/time is: Thu Jan  3 19:49:21 2019
-D (6088) event: created post for event WORKFLOW_EVENTS:5
-D (6090) event: posted WORKFLOW_EVENTS:5 to loop 0x3ffba1d4
-D (6096) event: running post WORKFLOW_EVENTS:5 with handler 0x400d4f90 on loop 0x3ffba1d4
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+I (4041) DISPOD: DISPOD_WIFI_GOT_IP_EVT
+I (4045) DISPOD: WiFi connected, update NTP
+I (4050) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
+I (4057) DISPOD_SNTP: Initializing SNTP
+I (4064) DISPOD_SNTP: Waiting for system time to be set... (1/10)
+I (4097) DISPOD_TFT: screen textHeight 18
+D (4115) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (4118) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (4122) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (4129) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+I (4135) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (4140) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (4216) DISPOD_TFT: screen textHeight 18
+D (4234) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (4237) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (4240) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (4247) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+I (6069) DISPOD_SNTP: The current local date/time is: Thu Jan  3 21:05:35 2019
+I (6069) DISPOD_SNTP: Time set yet.
+I (6071) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (6071) event: created post for event WORKFLOW_EVENTS:5
+I (6078) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (6083) event: posted WORKFLOW_EVENTS:5 to loop 0x3ffba1d4
+D (6095) event: running post WORKFLOW_EVENTS:5 with handler 0x400d4fb4 on loop 0x3ffba1d4
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-I (6104) DISPOD: DISPOD_NTP_INIT_DONE_EVT
-D (6109) BTDM_INIT: Release DRAM [0x3ffb2730] - [0x3ffb6388]
-I (6115) BTDM_INIT: BT controller compile version [97a362b]
-D (6121) BTDM_INIT: .data initialise [0x3ffae6e0] <== [0x4000d890]
-D (6127) BTDM_INIT: .bss initialise [0x3ffb0000] - [0x3ffb09a8]
-D (6133) BTDM_INIT: .bss initialise [0x3ffb09a8] - [0x3ffb1ddc]
-D (6139) BTDM_INIT: .bss initialise [0x3ffb1ddc] - [0x3ffb2730]
-D (6145) BTDM_INIT: .bss initialise [0x3ffb8000] - [0x3ffb9a20]
-D (6151) BTDM_INIT: .bss initialise [0x3ffbdb28] - [0x3ffbdb5c]
-I (6158) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-D (6169) nvs: nvs_open_from_partition phy 0
-D (6171) nvs: nvs_get cal_version 4
-D (6175) nvs: nvs_get_str_or_blob cal_mac
-D (6179) nvs: nvs_get_str_or_blob cal_data
-D (6192) nvs: nvs_close 4
-D (6420) event: created post for event WORKFLOW_EVENTS:6
-D (6420) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba1d4
-D (6420) event: running post WORKFLOW_EVENTS:6 with handler 0x400d4f90 on loop 0x3ffba1d4
-0x400d4f90: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
+I (6103) DISPOD: DISPOD_NTP_INIT_DONE_EVT
+D (6108) BTDM_INIT: Release DRAM [0x3ffb2730] - [0x3ffb6388]
+I (6113) BTDM_INIT: BT controller compile version [97a362b]
+D (6120) BTDM_INIT: .data initialise [0x3ffae6e0] <== [0x4000d890]
+D (6126) BTDM_INIT: .bss initialise [0x3ffb0000] - [0x3ffb09a8]
+D (6132) BTDM_INIT: .bss initialise [0x3ffb09a8] - [0x3ffb1ddc]
+D (6138) BTDM_INIT: .bss initialise [0x3ffb1ddc] - [0x3ffb2730]
+D (6144) BTDM_INIT: .bss initialise [0x3ffb8000] - [0x3ffb9a20]
+D (6150) BTDM_INIT: .bss initialise [0x3ffbdb28] - [0x3ffbdb5c]
+I (6156) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (6160) DISPOD_TFT: screen textHeight 18
+D (6167) nvs: nvs_open_from_partition phy 0
+D (6174) nvs: nvs_get cal_version 4
+D (6178) nvs: nvs_get_str_or_blob cal_mac
+D (6182) nvs: nvs_get_str_or_blob cal_data
+D (6190) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (6199) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (6200) nvs: nvs_close 4
+D (6202) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (6212) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+D (6426) event: created post for event WORKFLOW_EVENTS:6
+D (6426) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba1d4
+D (6427) event: running post WORKFLOW_EVENTS:6 with handler 0x400d4fb4 on loop 0x3ffba1d4
+0x400d4fb4: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:114
 
-I (6423) DISPOD_GATTC: esp_gattc_cb()
-I (6428) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
-I (6435) DISPOD_GATTC: REG_EVT
-I (6446) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
-I (6452) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
-I (6454) DISPOD_GATTC: scan start success
-I (6582) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (6583) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (6583) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (6588) DISPOD_GATTC: searched Device Name Len 0
-I (6594) DISPOD_GATTC:
+I (6429) DISPOD_GATTC: esp_gattc_cb()
+I (6435) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
+I (6440) DISPOD_GATTC: REG_EVT
+I (6453) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
+I (6458) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
+I (6460) DISPOD_GATTC: scan start success
+I (6465) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (6472) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (6526) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (6526) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (6527) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (6532) DISPOD_GATTC: searched Device Name Len 0
+I (6537) DISPOD_GATTC:
 
-I (6633) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (6633) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (6633) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (6639) DISPOD_GATTC: searched Device Name Len 0
-I (6644) DISPOD_GATTC:
+I (6548) DISPOD_TFT: screen textHeight 18
+D (6567) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (6570) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (6573) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (6580) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+I (6921) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (6922) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (6922) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (6928) DISPOD_GATTC: searched Device Name Len 0
+I (6933) DISPOD_GATTC:
 
-I (7304) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (7304) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (7304) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (7310) DISPOD_GATTC: searched Device Name Len 0
-I (7315) DISPOD_GATTC:
+I (8006) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (8007) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (8007) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (8013) DISPOD_GATTC: searched Device Name Len 0
+I (8018) DISPOD_GATTC:
 
-I (7935) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (7936) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (7936) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (7941) DISPOD_GATTC: searched Device Name Len 0
-I (7947) DISPOD_GATTC:
+I (8429) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (8430) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (8430) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (8436) DISPOD_GATTC: searched Device Name Len 0
+I (8441) DISPOD_GATTC:
 
-I (8663) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (8664) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (8664) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (8670) DISPOD_GATTC: searched Device Name Len 0
-I (8675) DISPOD_GATTC:
+I (9247) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (9247) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (9248) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (9253) DISPOD_GATTC: searched Device Name Len 0
+I (9258) DISPOD_GATTC:
 
-I (9210) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (9211) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (9211) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (9216) DISPOD_GATTC: searched Device Name Len 0
-I (9222) DISPOD_GATTC:
+I (9361) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (9362) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (9362) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (9367) DISPOD_GATTC: searched Device Name Len 0
+I (9373) DISPOD_GATTC:
 
-I (9294) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (9295) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (9295) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (9301) DISPOD_GATTC: searched Device Name Len 0
-I (9307) DISPOD_GATTC:
+I (10442) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (10443) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (10443) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (10449) DISPOD_GATTC: searched Device Name Len 0
+I (10455) DISPOD_GATTC:
 
-I (10657) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (10658) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (10658) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (10664) DISPOD_GATTC: searched Device Name Len 0
-I (10670) DISPOD_GATTC:
+I (10604) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (10604) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (10605) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (10610) DISPOD_GATTC: searched Device Name Len 0
+I (10616) DISPOD_GATTC:
 
-I (10673) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (10678) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (10683) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (10690) DISPOD_GATTC: searched Device Name Len 0
-I (10696) DISPOD_GATTC:
+I (12071) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (12072) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (12072) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (12078) DISPOD_GATTC: searched Device Name Len 0
+I (12083) DISPOD_GATTC:
 
-I (10849) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (10850) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (10850) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (10856) DISPOD_GATTC: searched Device Name Len 0
-I (10861) DISPOD_GATTC:
+I (12087) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (12092) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (12097) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (12104) DISPOD_GATTC: searched Device Name Len 0
+I (12110) DISPOD_GATTC:
 
-I (11197) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (11198) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (11198) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (11204) DISPOD_GATTC: searched Device Name Len 0
-I (11209) DISPOD_GATTC:
+I (12228) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (12229) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (12229) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
+I (12235) DISPOD_GATTC: searched Device Name Len 0
+I (12240) DISPOD_GATTC:
 
-I (11933) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (11934) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (11934) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (11940) DISPOD_GATTC: searched Device Name Len 0
-I (11946) DISPOD_GATTC:
+I (13315) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (13316) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (13316) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (13322) DISPOD_GATTC: searched Device Name Len 0
+I (13327) DISPOD_GATTC:
 
-I (13373) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (13374) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (13374) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (13380) DISPOD_GATTC: searched Device Name Len 0
-I (13385) DISPOD_GATTC:
+I (13707) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (13708) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (13708) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (13714) DISPOD_GATTC: searched Device Name Len 0
+I (13719) DISPOD_GATTC:
 
-I (13391) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (13398) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (13399) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (13406) DISPOD_GATTC: searched Device Name Len 0
-I (13411) DISPOD_GATTC:
+I (14521) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (14522) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (14522) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (14528) DISPOD_GATTC: searched Device Name Len 0
+I (14534) DISPOD_GATTC:
 
-I (13561) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (13561) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (13561) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (13567) DISPOD_GATTC: searched Device Name Len 0
-I (13573) DISPOD_GATTC:
+I (16038) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (16039) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (16039) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (16045) DISPOD_GATTC: searched Device Name Len 0
+I (16052) DISPOD_GATTC:
 
-I (14729) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (14730) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (14730) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (14735) DISPOD_GATTC: searched Device Name Len 0
-I (14741) DISPOD_GATTC:
+I (16153) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (16153) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (16154) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (16159) DISPOD_GATTC: searched Device Name Len 0
+I (16165) DISPOD_GATTC:
 
-I (14917) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (14918) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (14918) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (14924) DISPOD_GATTC: searched Device Name Len 0
-I (14929) DISPOD_GATTC:
+I (16969) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (16970) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (16970) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (16976) DISPOD_GATTC: searched Device Name Len 0
+I (16981) DISPOD_GATTC:
 
-I (15541) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (15542) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (15542) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (15548) DISPOD_GATTC: searched Device Name Len 0
-I (15554) DISPOD_GATTC:
+I (17395) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (17396) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (17396) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (17402) DISPOD_GATTC: searched Device Name Len 0
+I (17407) DISPOD_GATTC:
 
-I (15733) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (15734) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (15734) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (15740) DISPOD_GATTC: searched Device Name Len 0
-I (15746) DISPOD_GATTC:
+I (18486) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (18487) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (18487) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (18492) DISPOD_GATTC: searched Device Name Len 0
+I (18498) DISPOD_GATTC:
 
-I (17177) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (17178) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (17178) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (17183) DISPOD_GATTC: searched Device Name Len 0
-I (17189) DISPOD_GATTC:
+I (18599) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (18600) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (18600) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (18606) DISPOD_GATTC: searched Device Name Len 0
+I (18612) DISPOD_GATTC:
 
-I (17365) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (17366) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (17366) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (17372) DISPOD_GATTC: searched Device Name Len 0
-I (17377) DISPOD_GATTC:
+I (19686) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (19687) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (19687) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (19692) DISPOD_GATTC: searched Device Name Len 0
+I (19698) DISPOD_GATTC:
 
-I (18814) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (18815) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (18815) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (18821) DISPOD_GATTC: searched Device Name Len 0
-I (18826) DISPOD_GATTC:
+I (19842) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (19842) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (19842) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (19848) DISPOD_GATTC: searched Device Name Len 0
+I (19854) DISPOD_GATTC:
 
-I (19263) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (19263) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (19264) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (19269) DISPOD_GATTC: searched Device Name Len 0
-I (19275) DISPOD_GATTC:
+I (20656) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (20657) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (20657) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (20663) DISPOD_GATTC: searched Device Name Len 0
+I (20668) DISPOD_GATTC:
 
-I (19806) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (19807) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (19807) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (19813) DISPOD_GATTC: searched Device Name Len 0
-I (19818) DISPOD_GATTC:
+I (21047) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (21048) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (21048) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (21053) DISPOD_GATTC: searched Device Name Len 0
+I (21059) DISPOD_GATTC:
 
-I (19893) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (19894) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (19894) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (19900) DISPOD_GATTC: searched Device Name Len 0
-I (19905) DISPOD_GATTC:
+I (21865) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (21866) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (21866) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (21872) DISPOD_GATTC: searched Device Name Len 0
+I (21877) DISPOD_GATTC:
 
-I (21167) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (21168) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (21168) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (21174) DISPOD_GATTC: searched Device Name Len 0
-I (21180) DISPOD_GATTC:
+I (22559) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (22560) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (22560) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (22566) DISPOD_GATTC: searched Device Name Len 0
+I (22571) DISPOD_GATTC:
 
-I (21250) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (21251) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (21251) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (21256) DISPOD_GATTC: searched Device Name Len 0
-I (21262) DISPOD_GATTC:
+I (23492) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (23493) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (23493) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (23499) DISPOD_GATTC: searched Device Name Len 0
+I (23504) DISPOD_GATTC:
 
-I (22260) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (22261) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (22261) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (22267) DISPOD_GATTC: searched Device Name Len 0
-I (22272) DISPOD_GATTC:
+I (23916) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (23917) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (23917) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (23923) DISPOD_GATTC: searched Device Name Len 0
+I (23928) DISPOD_GATTC:
 
-I (22334) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (22334) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (22334) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (22340) DISPOD_GATTC: searched Device Name Len 0
-I (22346) DISPOD_GATTC:
+I (24733) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (24734) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (24734) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (24740) DISPOD_GATTC: searched Device Name Len 0
+I (24745) DISPOD_GATTC:
 
-I (23957) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (23958) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (23958) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (23963) DISPOD_GATTC: searched Device Name Len 0
-I (23969) DISPOD_GATTC:
+I (24857) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (24858) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (24858) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (24865) DISPOD_GATTC: searched Device Name Len 0
+I (24870) DISPOD_GATTC:
 
-I (24771) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (24772) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (24772) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (24778) DISPOD_GATTC: searched Device Name Len 0
-I (24783) DISPOD_GATTC:
+I (26216) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (26217) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (26218) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (26223) DISPOD_GATTC: searched Device Name Len 0
+I (26229) DISPOD_GATTC:
 
-I (24787) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (24792) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (24797) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (24804) DISPOD_GATTC: searched Device Name Len 0
-I (24810) DISPOD_GATTC:
+I (26232) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (26238) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (26242) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (26250) DISPOD_GATTC: searched Device Name Len 0
+I (26255) DISPOD_GATTC:
 
-I (25245) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (25246) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (25246) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (25252) DISPOD_GATTC: searched Device Name Len 0
-I (25257) DISPOD_GATTC:
+I (26365) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (26365) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (26365) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
+I (26371) DISPOD_GATTC: searched Device Name Len 0
+I (26377) DISPOD_GATTC:
 
-I (26407) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (26408) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (26408) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (26414) DISPOD_GATTC: searched Device Name Len 0
-I (26419) DISPOD_GATTC:
+I (27032) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (27032) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (27033) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (27038) DISPOD_GATTC: searched Device Name Len 0
+I (27044) DISPOD_GATTC:
 
-I (26604) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (26605) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (26605) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (26611) DISPOD_GATTC: searched Device Name Len 0
-I (26616) DISPOD_GATTC:
+I (27183) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (27184) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (27184) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (27190) DISPOD_GATTC: searched Device Name Len 0
+I (27195) DISPOD_GATTC:
 
-I (27229) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (27229) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (27230) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (27235) DISPOD_GATTC: searched Device Name Len 0
-I (27241) DISPOD_GATTC:
+I (28667) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (28668) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (28668) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (28674) DISPOD_GATTC: searched Device Name Len 0
+I (28679) DISPOD_GATTC:
 
-I (27420) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (27421) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (27421) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (27427) DISPOD_GATTC: searched Device Name Len 0
-I (27433) DISPOD_GATTC:
+I (29089) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (29090) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (29090) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (29096) DISPOD_GATTC: searched Device Name Len 0
+I (29101) DISPOD_GATTC:
 
-I (28860) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (28861) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (28861) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (28867) DISPOD_GATTC: searched Device Name Len 0
-I (28872) DISPOD_GATTC:
+I (29635) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (29636) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (29636) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (29641) DISPOD_GATTC: searched Device Name Len 0
+I (29647) DISPOD_GATTC:
 
-I (29050) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (29051) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (29051) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (29057) DISPOD_GATTC: searched Device Name Len 0
-I (29062) DISPOD_GATTC:
+I (29749) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (29750) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (29750) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (29756) DISPOD_GATTC: searched Device Name Len 0
+I (29761) DISPOD_GATTC:
 
-I (29673) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (29674) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (29674) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (29680) DISPOD_GATTC: searched Device Name Len 0
-I (29685) DISPOD_GATTC:
+I (30995) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (30996) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (30996) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (31002) DISPOD_GATTC: searched Device Name Len 0
+I (31008) DISPOD_GATTC:
 
-I (29867) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (29868) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (29868) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (29874) DISPOD_GATTC: searched Device Name Len 0
-I (29879) DISPOD_GATTC:
+I (31105) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (31105) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (31106) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (31111) DISPOD_GATTC: searched Device Name Len 0
+I (31117) DISPOD_GATTC:
 
-I (30953) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (30954) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (30954) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (30960) DISPOD_GATTC: searched Device Name Len 0
-I (30966) DISPOD_GATTC:
+I (32085) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (32086) DISPOD_GATTC: 74 f4 2e 03 5f 07
+I (32086) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (32092) DISPOD_GATTC: searched Device Name Len 0
+I (32097) DISPOD_GATTC:
 
-I (31305) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (31306) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (31306) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (31312) DISPOD_GATTC: searched Device Name Len 0
-I (31318) DISPOD_GATTC:
+I (32189) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (32190) DISPOD_GATTC: 79 eb e2 f8 96 0a
+I (32190) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (32196) DISPOD_GATTC: searched Device Name Len 0
+I (32201) DISPOD_GATTC:
 
-I (32124) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (32125) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (32125) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (32131) DISPOD_GATTC: searched Device Name Len 0
-I (32136) DISPOD_GATTC:
+I (32516) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (32517) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (32517) DISPOD_GATTC: searched Adv Data Len 30, Scan Response Len 26
+I (32523) DISPOD_GATTC: searched Device Name Len 15
+I (32528) DISPOD_GATTC: MilestonePod 12
+I (32533) DISPOD_GATTC:
 
-I (32581) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (32582) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (32582) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (32588) DISPOD_GATTC: searched Device Name Len 0
-I (32593) DISPOD_GATTC:
+I (32536) DISPOD_GATTC: searched device MilestonePod
 
-I (32946) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (32947) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (32947) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (32953) DISPOD_GATTC: searched Device Name Len 0
-I (32958) DISPOD_GATTC:
-
-I (33395) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (33395) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (33395) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (33401) DISPOD_GATTC: searched Device Name Len 0
-I (33407) DISPOD_GATTC:
-
-I (34849) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (34850) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (34850) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (34856) DISPOD_GATTC: searched Device Name Len 0
-I (34862) DISPOD_GATTC:
-
-I (34895) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (34895) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (34895) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (34901) DISPOD_GATTC: searched Device Name Len 0
-I (34907) DISPOD_GATTC:
-
-I (35026) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (35027) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (35027) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (35033) DISPOD_GATTC: searched Device Name Len 0
-I (35038) DISPOD_GATTC:
-
-I (36109) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (36110) DISPOD_GATTC: 79 eb e2 f8 96 0a
-I (36110) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (36116) DISPOD_GATTC: searched Device Name Len 0
-I (36121) DISPOD_GATTC:
-
-I (36204) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (36205) DISPOD_GATTC: 74 f4 2e 03 5f 07
-I (36205) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (36211) DISPOD_GATTC: searched Device Name Len 0
-I (36217) DISPOD_GATTC:
-
-I (36455) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (36455) DISPOD_GATTC: ESP_GAP_SEARCH_INQ_CMPL_EVT
+I (32542) DISPOD_GATTC: connect to the remote device.
+I (32553) DISPOD_GATTC: ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT
+I (32557) DISPOD_GATTC: stop scan successfully
+I (32559) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (32567) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (32642) DISPOD_TFT: screen textHeight 18
+D (32661) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (32664) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (32668) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (32675) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+I (33003) DISPOD_GATTC: esp_gattc_cb()
+I (33003) DISPOD_GATTC: ESP_GATTC_CONNECT_EVT conn_id 0, if 1
+I (33003) DISPOD_GATTC: REMOTE BDA:
+I (33003) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (33008) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (33015) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (33020) DISPOD_GATTC: esp_gattc_cb()
+I (33032) DISPOD_GATTC: ESP_GATTC_OPEN_EVT
+I (33035) DISPOD_GATTC: open success
+I (33095) DISPOD_TFT: screen textHeight 18
+D (33114) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (33117) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (33121) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (33127) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+I (34321) DISPOD_GATTC: esp_gattc_cb()
+I (34322) DISPOD_GATTC: ESP_GATTC_CFG_MTU_EVT, Status 0, MTU 23, conn_id 0
+I (34323) DISPOD_GATTC: esp_gattc_cb()
+I (34327) DISPOD_GATTC: ESP_GATTC_SEARCH_RES_EVT
+I (34333) DISPOD_GATTC: SEARCH RES: conn_id = 0 is primary service 1
+I (34339) DISPOD_GATTC: start handle 16 end handle 29 current handle value 16
+I (34352) DISPOD_GATTC: service found
+I (34352) DISPOD_GATTC: UUID16: 1814
+I (34356) DISPOD_GATTC: esp_gattc_cb()
+I (34360) DISPOD_GATTC: ESP_GATTC_SEARCH_CMPL_EVT
+I (34366) DISPOD_GATTC: Get service information from remote device
+I (34374) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 18
+I (34380) DISPOD_GATTC: REMOTE BDA:
+I (34384) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (34389) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 28
+I (34396) DISPOD_GATTC: REMOTE BDA:
+I (34401) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (34405) DISPOD_GATTC: esp_gattc_cb()
+I (34410) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
+I (34416) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 19, size 2, value 1, type_rsp 2, auth req 0
+I (34427) DISPOD_GATTC: esp_gattc_cb()
+I (34432) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
+I (34438) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 29, size 2, value 1, type_rsp 2, auth req 0
+I (34473) DISPOD_GATTC: esp_gattc_cb()
+I (34474) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
+I (34474) DISPOD_GATTC: write descr success
+I (34500) DISPOD_GATTC: esp_gattc_cb()
+I (34501) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
+I (34501) DISPOD_GATTC: write descr success
+I (38113) DISPOD_GATTC: ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT
+I (38113) DISPOD_GATTC: update connection params status = 0, min_int = 16, max_int = 32,conn_int = 32,latency = 0, timeout = 600
+I (38121) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (38128) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (38204) DISPOD_TFT: screen textHeight 18
+D (38223) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (38225) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (38229) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (38236) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
+W (70592) BT_APPL: bta_gattc_conn_cback() - cif=1 connected=0 conn_id=1 reason=0x0008
+I (70595) DISPOD_GATTC: esp_gattc_cb()
+I (70595) DISPOD_GATTC: ESP_GATTC_DISCONNECT_EVT, reason = 8
+I (70601) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (70601) DISPOD_GATTC: esp_gattc_cb()
+I (70608) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (70689) DISPOD_TFT: screen textHeight 18
+D (70707) DISPOD_TFT: 5) status text litle, show 1 x 34, y 125, text ... none ...
+D (70710) DISPOD_TFT: 6) button label, show A 1 x 14, y 153, text Retry Wifi
+D (70714) DISPOD_TFT: 6) button label, show B 1 x 111, y 153, text Retry Pod
+D (70721) DISPOD_TFT: 6) button label, show C 1 x 212, y 153, text Continue
