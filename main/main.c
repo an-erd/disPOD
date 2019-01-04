@@ -214,14 +214,9 @@ void app_main()
 
 	// adjust logging
 	esp_log_level_set("phy_init",       ESP_LOG_INFO);
-	// esp_log_level_set("memory_layout",  ESP_LOG_INFO);
-	// esp_log_level_set("esp_image",      ESP_LOG_INFO);
-	// esp_log_level_set("heap_init",      ESP_LOG_INFO);
-	// esp_log_level_set("intr_alloc",     ESP_LOG_INFO);
-	// esp_log_level_set("spiram",         ESP_LOG_INFO);
-	// esp_log_level_set("nvs",            ESP_LOG_INFO);
-	// esp_log_level_set("tcpip_adapter",  ESP_LOG_INFO);
-	// esp_log_level_set("BTDM_INIT",      ESP_LOG_INFO);
+	esp_log_level_set("nvs",            ESP_LOG_INFO);
+	esp_log_level_set("tcpip_adapter",  ESP_LOG_INFO);
+	esp_log_level_set("BTDM_INIT",      ESP_LOG_INFO);
 
     // initialize NVS
     initialize_nvs();
