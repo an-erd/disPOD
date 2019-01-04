@@ -170,16 +170,25 @@ int write_out_any_buffers()
 
 void dispod_archiver_set_next_element()
 {
+    int complete = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdFALSE, pdFALSE, 0) & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT;
+    ESP_LOGD(TAG, "dispod_archiver_set_next_element >: current_buffer %u, used in current buffer %u, size %u, complete %u",
+        current_buffer, used_in_buffer[current_buffer], CONFIG_SDCARD_BUFFER_SIZE, complete);
+
     used_in_buffer[current_buffer]++;
     if(used_in_buffer[current_buffer] == CONFIG_SDCARD_BUFFER_SIZE){
         current_buffer = (current_buffer + 1) % CONFIG_SDCARD_NUM_BUFFERS;
         used_in_buffer[current_buffer]= 0;
         xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT);
     }
+
+    complete = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdFALSE, pdFALSE, 0) & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT;
+    ESP_LOGD(TAG, "dispod_archiver_set_next_element <: current_buffer %u, used in current buffer %u, size %u, complete %u",
+        current_buffer, used_in_buffer[current_buffer], CONFIG_SDCARD_BUFFER_SIZE, complete);
 }
 
 void dispod_archiver_set_to_next_buffer()
 {
+    ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer >: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
     if( used_in_buffer[current_buffer] != 0) {
         // set to next (free) buffer and write (all and maybe incomplete) buffer but current
         current_buffer = (current_buffer + 1) % CONFIG_SDCARD_NUM_BUFFERS;
@@ -187,11 +196,13 @@ void dispod_archiver_set_to_next_buffer()
     } else {
         // do nothing because current buffer is empty
     }
+    ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer <: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
 }
 
 void dispod_archiver_add_RSCValues(uint8_t new_cad)
 {
     buffers[current_buffer][used_in_buffer[current_buffer]].cad = new_cad;
+    ESP_LOGD(TAG, "dispod_archiver_add_RSCValues: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
     dispod_archiver_set_next_element();
 }
 
@@ -199,6 +210,7 @@ void dispod_archiver_add_customValues(uint16_t new_GCT, uint8_t new_str)
 {
     buffers[current_buffer][used_in_buffer[current_buffer]].GCT = new_GCT;
     buffers[current_buffer][used_in_buffer[current_buffer]].str = new_str;
+    ESP_LOGD(TAG, "dispod_archiver_add_customValues: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
     dispod_archiver_set_next_element();
 }
 

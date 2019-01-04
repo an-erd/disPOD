@@ -190,7 +190,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 
 	textHeight = TFT_getfontheight();
 	boxSize = textHeight - 4;
-	ESP_LOGI(TAG, "screen textHeight %u", textHeight);
+	// ESP_LOGD(TAG, "screen textHeight %u", textHeight);
 
 	// Title
 	ypos = 10;
@@ -263,7 +263,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 
 	// 5) Status text line
 	ypos += textHeight + YPAD;
-    ESP_LOGD(TAG, "5) status text litle, show %u x %u, y %u, text %s", (params->show_status_text?1:0), xpos, ypos, params->status_text);
+    // ESP_LOGD(TAG, "5) status text litle, show %u x %u, y %u, text %s", (params->show_status_text?1:0), xpos, ypos, params->status_text);
     if(params->show_status_text){
 	    TFT_print(params->status_text, CENTER, ypos);
     } else {
@@ -274,17 +274,17 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 	ypos += textHeight + YPAD;          // ypos = 240 - XPAD;
 
     xpos = X_BUTTON_A - TFT_getStringWidth(params->button_text[BUTTON_A])/2;
-    ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
+    // ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
 	if (params->show_button[BUTTON_A])
 		TFT_print(params->button_text[BUTTON_A], xpos, ypos);
 
     xpos = X_BUTTON_B - TFT_getStringWidth(params->button_text[BUTTON_B])/2;
-    ESP_LOGD(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
+    // ESP_LOGD(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
 	if (params->show_button[BUTTON_B])
 		TFT_print(params->button_text[BUTTON_B], xpos, ypos);
 
     xpos = X_BUTTON_C - TFT_getStringWidth(params->button_text[BUTTON_C])/2;
-    ESP_LOGD(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
+    // ESP_LOGD(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
 	if (params->show_button[BUTTON_C])
 		TFT_print(params->button_text[BUTTON_C], xpos, ypos);
 }

@@ -13,6 +13,7 @@
 
 // disPOD display event group
 #define DISPOD_DISPLAY_UPDATE_BIT           (BIT0)  // display needs an update -> display task
+#define DISPOD_DISPLAY_RUNNING_RSC_BIT      (BIT1)  // new RSC data available
 EventGroupHandle_t dispod_display_evg;
 
 typedef enum {
