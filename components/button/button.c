@@ -221,7 +221,7 @@ button_handle_t iot_button_create(gpio_num_t gpio_num, button_active_t active_le
     btn->tap_psh_cb.pbtn = btn;
     btn->tap_psh_cb.tmr = xTimerCreate("btn_psh_tmr", btn->tap_psh_cb.interval, pdFALSE,
             &btn->tap_psh_cb, button_tap_psh_cb);
-    gpio_install_isr_service(0);
+    // gpio_install_isr_service(0);
     gpio_config_t gpio_conf;
     gpio_conf.intr_type = GPIO_INTR_ANYEDGE;
     gpio_conf.mode = GPIO_MODE_INPUT;

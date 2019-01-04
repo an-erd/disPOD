@@ -7,7 +7,8 @@
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
 #include "sdkconfig.h"
-
+#include "dispod_button.h"
+// #include "iot_button.h"
 #include "dispod_runvalues.h"
 #include "dispod_tft.h"
 
@@ -44,14 +45,15 @@ typedef enum {
     DISPOD_NTP_INIT_DONE_EVT,               /*!< When the NTP update (successfull or failed!) completed, the event comes */
     DISPOD_SD_INIT_DONE_EVT,                /*!< When the SD mount is completed, the event comes */
     DISPOD_BLE_DEVICE_DONE_EVT,             /*!< When the BLE connect (successfull or failed!) completed, the event comes */
-    // DISPOD_LEAVE_SCREEN_EVT,                /*!< When the current screen should be left (& to determine next screen), the event comes */
-    // DISPOD_ENTER_SCREEN_EVT,                /*!< When the new screen should be entered, the event comes */
-    // DISPOD_GO_SHUTDOWN_EVT,                 /*!< When the device should be shutdowned, the event comes */
-    // DISPOD_GO_SLEEP_EVT,                    /*!< When the device should be shutdowned, the event comes */
+    // DISPOD_LEAVE_SCREEN_EVT,             /*!< When the current screen should be left (& to determine next screen), the event comes */
+    // DISPOD_ENTER_SCREEN_EVT,             /*!< When the new screen should be entered, the event comes */
+    // DISPOD_GO_SHUTDOWN_EVT,              /*!< When the device should be shutdowned, the event comes */
+    // DISPOD_GO_SLEEP_EVT,                 /*!< When the device should be shutdowned, the event comes */
+    //
     // activities -> events
+    DISPOD_BUTTON_TAP_EVT,                  /*!< When a button has been TAP event, the event comes */
     DISPOD_BUTTON_2SEC_PRESS_EVT,           /*!< When a button has been pressed for 2s, the event comes */
     DISPOD_BUTTON_5SEC_PRESS_EVT,           /*!< When a button has been pressed for 5s, the event comes */
-    DISPOD_BUTTON_EVT,                      /*!< When a button has been PUSH, RELEASE, TAP event, the event comes */
     //
     // DISPOD_WIFI_ACT_EVT,                    /*!< When WIFI has been activated, the event comes */
     // DISPOD_WIFI_DEACT_EVT,                  /*!< When WIFI has been deactivated, the event comes */
@@ -100,14 +102,6 @@ extern runningValuesStruct_t running_values;
 #define sdPIN_NUM_CLK  18
 #define sdPIN_NUM_CS   4
 
-// Buttons
-#define BUTTON_A 0
-#define BUTTON_B 1
-#define BUTTON_C 2
-#define BUTTON_A_PIN 39
-#define BUTTON_B_PIN 38
-#define BUTTON_C_PIN 37
-#define BUTTON_ACTIVE_LEVEL 0
 
 // Speaker
 #define SPEAKER_PIN 25

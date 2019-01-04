@@ -20,6 +20,7 @@
 #include "dispod_runvalues.h"
 #include "dispod_update.h"
 #include "dispod_archiver.h"
+#include "dispod_button.h"
 
 static const char* TAG = "DISPOD";
 
@@ -116,6 +117,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     case DISPOD_STARTUP_EVT:
         ESP_LOGI(TAG, "DISPOD_STARTUP_EVT");
         dispod_initialize();
+        gpio_install_isr_service(0);
+        dispod_button_initialize();
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
@@ -162,29 +165,42 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         break;
     case DISPOD_NTP_INIT_DONE_EVT:
-            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT");
-            uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
-            ESP_LOGI(TAG, "uxBits: DISPOD_NTP_ACTIVATED_BIT = %u, uxBits = %u", DISPOD_SD_ACTIVATED_BIT, uxBits);
-            if( ( uxBits & DISPOD_SD_ACTIVATED_BIT) == DISPOD_SD_ACTIVATED_BIT){
-                ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: dispod_sd_evg DISPOD_SD_MOUNT_EVT");
-                xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_MOUNT_EVT);
-            } else {
-                ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT");
-                ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
-            }
+        ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT");
+        uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
+        ESP_LOGI(TAG, "uxBits: DISPOD_NTP_ACTIVATED_BIT = %u, uxBits = %u", DISPOD_SD_ACTIVATED_BIT, uxBits);
+        if( ( uxBits & DISPOD_SD_ACTIVATED_BIT) == DISPOD_SD_ACTIVATED_BIT){
+            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: dispod_sd_evg DISPOD_SD_MOUNT_EVT");
+            xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_MOUNT_EVT);
+        } else {
+            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT");
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+        }
         break;
     case DISPOD_SD_INIT_DONE_EVT:
-            ESP_LOGI(TAG, "DISPOD_SD_INIT_DONE_EVT");
-            dispod_ble_initialize();
-            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
+        ESP_LOGI(TAG, "DISPOD_SD_INIT_DONE_EVT");
+        dispod_ble_initialize();
+        // ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_BLE_DEVICE_DONE_EVT:
+        ESP_LOGI(TAG, "DISPOD_BLE_DEVICE_DONE_EVT");
         // at this point we've either
         // - no Wifi configured: no WiFi, no NTP, maybe BLE
         // - WiFi configured: maybe WiFi -> maybe updated NTP, maybe BLE
-        ESP_LOGI(TAG, "DISPOD_BLE_DEVICE_DONE_EVT");
-
-
+        break;
+    case DISPOD_BUTTON_TAP_EVT: {
+        button_unit_t button_unit = *(button_unit_t*) event_data;
+        ESP_LOGI(TAG, "DISPOD_BUTTON_TAP_EVT, button id %d", button_unit.btn_id);
+        }
+        break;
+    case DISPOD_BUTTON_2SEC_PRESS_EVT: {
+        button_unit_t* button_unit = (button_unit_t*) event_data;
+        ESP_LOGI(TAG, "DISPOD_BUTTON_2SEC_PRESS_EVT, button id %d", button_unit->btn_id);
+        }
+        break;
+    case DISPOD_BUTTON_5SEC_PRESS_EVT: {
+        button_unit_t* button_unit = (button_unit_t*) event_data;
+        ESP_LOGI(TAG, "DISPOD_BUTTON_5SEC_PRESS_EVT, button id %d", button_unit->btn_id);
+        }
         break;
     default:
         ESP_LOGI(TAG, "unhandled event base/id %s:%d", base, id);
@@ -228,7 +244,7 @@ void app_main()
     ESP_ERROR_CHECK(esp_event_loop_create(&dispod_loop_args, &dispod_loop_handle));
 
     // Register the handler for task iteration event.
-    ESP_ERROR_CHECK(esp_event_handler_register_with(dispod_loop_handle, ESP_EVENT_ANY_BASE, ESP_EVENT_ANY_ID, run_on_event, NULL));     // TODO check last argument...
+    ESP_ERROR_CHECK(esp_event_handler_register_with(dispod_loop_handle, ESP_EVENT_ANY_BASE, ESP_EVENT_ANY_ID, run_on_event, NULL));
 
     // run the display task with the same priority as the current process
     ESP_LOGI(TAG, "Starting dispod_screen_task()");

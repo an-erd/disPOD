@@ -21,8 +21,8 @@ static const char* GATTC_TAG = "DISPOD_GATTC";
 
 // Beginning of GATTC handling
 #define REMOTE_NOTIFY_CHAR_CUSTOM_UUID  0xff00
-#define NOTIFY_HANDLE_RSC               19
-#define NOTIFY_HANDLE_CUSTOM            29
+#define NOTIFY_HANDLE_RSC               18
+#define NOTIFY_HANDLE_CUSTOM            28
 #define REMOTE_NOTIFY_NUM_UUIDS         2
 #define PROFILE_NUM                     1
 #define PROFILE_A_APP_ID                0
@@ -69,8 +69,8 @@ static esp_ble_scan_params_t ble_scan_params = {
     .scan_type              = BLE_SCAN_TYPE_ACTIVE,
     .own_addr_type          = BLE_ADDR_TYPE_PUBLIC,
     .scan_filter_policy     = BLE_SCAN_FILTER_ALLOW_ALL,
-    .scan_interval          = 0x800, // 0x800, // 0x50,
-    .scan_window            = 0x600, // 0x600,// 0x30,
+    .scan_interval          = 0x50, // 0x800, // 0x50,
+    .scan_window            = 0x30, // 0x600,// 0x30,
     .scan_duplicate         = BLE_SCAN_DUPLICATE_ENABLE
 };
 
@@ -347,7 +347,8 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
         default:
             break;
         }
-    }
+        }
+        break;
     case ESP_GATTC_WRITE_DESCR_EVT:
         ESP_LOGI(GATTC_TAG, "ESP_GATTC_WRITE_DESCR_EVT");
         if (p_data->write.status != ESP_GATT_OK){
@@ -395,7 +396,7 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
     case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
 		ESP_LOGI(GATTC_TAG, "ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT");
         //the unit of the duration is second
-        uint32_t duration = 30;
+        uint32_t duration = 10;
         esp_ble_gap_start_scanning(duration);
         break;
     }
@@ -495,6 +496,8 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
         xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT | DISPOD_BLE_CONNECTING_BIT);
         xEventGroupSetBits(dispod_event_group, DISPOD_BLE_CONNECTED_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+
+        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
 
         break;
     default:
