@@ -58,8 +58,8 @@ static void dispod_initialize()
     // TODO check where to configure
     xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
     xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
+    xEventGroupClearBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
     xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
-    xEventGroupSetBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
 }
 
 static void initialize_spiffs()
@@ -137,10 +137,10 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
             wifi_init_sta();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_WIFI_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
-            // WiFi not activated (and thus no NTP, jump to BLE connect
-            ESP_LOGI(TAG, "no WiFi configured (thus no NTP), connect to BLE next");
-            dispod_ble_initialize();
-            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
+            // WiFi not activated (and thus no NTP), jump to SD mount
+            ESP_LOGI(TAG, "no WiFi configured (thus no NTP), mount SD next");
+            // dispod_ble_initialize();
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;
     case DISPOD_WIFI_INIT_DONE_EVT:
@@ -155,14 +155,26 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
             dispod_sntp_check_time();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
-            // WiFi configured, but not connected, jump to BLE connect
+            // WiFi configured, but not connected, jump to SD mount
             ESP_LOGI(TAG, "no WiFi connection thus no NTP, connect to BLE next");
-            dispod_ble_initialize();
-            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
+            // dispod_ble_initialize();
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;
     case DISPOD_NTP_INIT_DONE_EVT:
             ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT");
+            uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
+            ESP_LOGI(TAG, "uxBits: DISPOD_NTP_ACTIVATED_BIT = %u, uxBits = %u", DISPOD_SD_ACTIVATED_BIT, uxBits);
+            if( ( uxBits & DISPOD_SD_ACTIVATED_BIT) == DISPOD_SD_ACTIVATED_BIT){
+                ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: dispod_sd_evg DISPOD_SD_MOUNT_EVT");
+                xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_MOUNT_EVT);
+            } else {
+                ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT");
+                ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+            }
+        break;
+    case DISPOD_SD_INIT_DONE_EVT:
+            ESP_LOGI(TAG, "DISPOD_SD_INIT_DONE_EVT");
             dispod_ble_initialize();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
@@ -171,20 +183,9 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         // - no Wifi configured: no WiFi, no NTP, maybe BLE
         // - WiFi configured: maybe WiFi -> maybe updated NTP, maybe BLE
         ESP_LOGI(TAG, "DISPOD_BLE_DEVICE_DONE_EVT");
+
+
         break;
-    // ACTIVITY_EVENTS
-    // case DISPOD_WIFI_SCANNING_EVT:
-    //     dispod_screen_status.wifi_status = WIFI_SCANNING;
-    //     xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-    //     break;
-    // case DISPOD_WIFI_CONNECTING_EVT:
-    //     dispod_screen_status.wifi_status = WIFI_CONNECTING;
-    //     xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-    //     break;
-    // case DISPOD_WIFI_CONNECTED_EVT:
-    //     dispod_screen_status.wifi_status = WIFI_CONNECTED;
-    //     xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-    //     break;
     default:
         ESP_LOGI(TAG, "unhandled event base/id %s:%d", base, id);
         break;

@@ -42,11 +42,12 @@ typedef enum {
     DISPOD_WIFI_INIT_DONE_EVT,              /*!< When the WiFi init, not yet completed, the event comes */
     DISPOD_WIFI_GOT_IP_EVT,                 /*!< When the WiFi is connected and got an IP, the event comes */
     DISPOD_NTP_INIT_DONE_EVT,               /*!< When the NTP update (successfull or failed!) completed, the event comes */
+    DISPOD_SD_INIT_DONE_EVT,                /*!< When the SD mount is completed, the event comes */
     DISPOD_BLE_DEVICE_DONE_EVT,             /*!< When the BLE connect (successfull or failed!) completed, the event comes */
-    DISPOD_LEAVE_SCREEN_EVT,                /*!< When the current screen should be left (& to determine next screen), the event comes */
-    DISPOD_ENTER_SCREEN_EVT,                /*!< When the new screen should be entered, the event comes */
-    DISPOD_GO_SHUTDOWN_EVT,                 /*!< When the device should be shutdowned, the event comes */
-    DISPOD_GO_SLEEP_EVT,                    /*!< When the device should be shutdowned, the event comes */
+    // DISPOD_LEAVE_SCREEN_EVT,                /*!< When the current screen should be left (& to determine next screen), the event comes */
+    // DISPOD_ENTER_SCREEN_EVT,                /*!< When the new screen should be entered, the event comes */
+    // DISPOD_GO_SHUTDOWN_EVT,                 /*!< When the device should be shutdowned, the event comes */
+    // DISPOD_GO_SLEEP_EVT,                    /*!< When the device should be shutdowned, the event comes */
     // activities -> events
     DISPOD_BUTTON_2SEC_PRESS_EVT,           /*!< When a button has been pressed for 2s, the event comes */
     DISPOD_BUTTON_5SEC_PRESS_EVT,           /*!< When a button has been pressed for 5s, the event comes */

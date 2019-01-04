@@ -238,7 +238,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 	switch (params->ble_status) {
     case BLE_DEACTIVATED:       tmp_color = TFT_LIGHTGREY;  break;
     case BLE_NOT_CONNECTED:     tmp_color = TFT_RED;        break;
-    case BLE_SEARCHING:         tmp_color = TFT_BLUE;       break;
+    case BLE_SEARCHING:         tmp_color = TFT_CYAN;       break;
     case BLE_CONNECTING:        tmp_color = TFT_YELLOW;     break;
     case BLE_CONNECTED:         tmp_color = TFT_GREEN;      break;
 	default:                    tmp_color = TFT_PURPLE;     break;

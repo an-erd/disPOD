@@ -31,10 +31,9 @@ void dispod_archiver_initialize()
     next_buffer_to_write = 0;
 }
 
-int write_out_any_buffers()
+static int mount_sd_card()
 {
-    ESP_LOGI(TAG, "Initializing SD card");
-    ESP_LOGI(TAG, "Using SDMMC peripheral");
+    ESP_LOGI(TAG, "Initializing and mounting SD card");
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
     sdspi_slot_config_t slot_config = SDSPI_SLOT_CONFIG_DEFAULT();
     slot_config.gpio_miso = CONFIG_SDCARD_PIN_MISO;
@@ -53,7 +52,7 @@ int write_out_any_buffers()
         // .allocation_unit_size = 16 * 1024        // TODO check option
     };
 
-        // Use settings defined above to initialize SD card and mount FAT filesystem.
+    // Use settings defined above to initialize SD card and mount FAT filesystem.
     // Note: esp_vfs_fat_sdmmc_mount is an all-in-one convenience function.
     // Please check its source code and implement error recovery when developing
     // production applications.
@@ -73,6 +72,26 @@ int write_out_any_buffers()
 
     // Card has been initialized, print its properties
     sdmmc_card_print_info(stdout, card);
+
+
+    return 1;       // TODO check return value
+}
+
+static void unmount_sd_card()
+{
+    ESP_LOGI(TAG, "Initializing and mounting SD card");
+
+    // All done, unmount partition and disable SDMMC or SPI peripheral
+    esp_vfs_fat_sdmmc_unmount();
+
+    dispod_screen_status_update_sd(&dispod_screen_status, SD_AVAILABLE);
+    xEventGroupSetBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+    xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+}
+
+
+int write_out_any_buffers()
+{
 
     // file handle and buffer to read
     FILE*   f;
@@ -145,8 +164,6 @@ int write_out_any_buffers()
     ESP_LOGI(TAG, "Closing file");
     fclose(f);
 
-    // All done, unmount partition and disable SDMMC or SPI peripheral
-    esp_vfs_fat_sdmmc_unmount();
 
     return 1;
 }
@@ -192,9 +209,40 @@ void dispod_archiver_task(void *pvParameters)
 
     for (;;)
     {
-        uxBits = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdTRUE, pdFALSE, portMAX_DELAY);
-        if(uxBits & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT){
-            write_out_any_buffers();
+        uxBits = xEventGroupWaitBits(dispod_sd_evg,
+                DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_MOUNT_EVT | DISPOD_SD_UNMOUNT_EVT,
+                pdTRUE, pdFALSE, portMAX_DELAY);
+
+        if((uxBits & DISPOD_SD_MOUNT_EVT) == DISPOD_SD_MOUNT_EVT){
+            ESP_LOGI(TAG, "dispod_archiver_task: mount sd card");
+            if( mount_sd_card() ){
+                dispod_screen_status_update_sd(&dispod_screen_status, SD_AVAILABLE);
+                xEventGroupSetBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+            } else {
+                dispod_screen_status_update_sd(&dispod_screen_status, SD_NOT_AVAILABLE);
+                xEventGroupClearBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+            }
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+        }
+
+        if((uxBits & DISPOD_SD_UNMOUNT_EVT) == DISPOD_SD_UNMOUNT_EVT){
+            ESP_LOGI(TAG, "dispod_archiver_task: unmount sd card");
+            unmount_sd_card();
+
+            dispod_screen_status_update_sd(&dispod_screen_status, SD_NOT_AVAILABLE);
+            xEventGroupClearBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+            xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+        }
+
+        if((uxBits & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT) == DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT){
+            ESP_LOGI(TAG, "dispod_archiver_task: write out completed buffers");
+            if( xEventGroupWaitBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT, pdFALSE, pdFALSE, portMAX_DELAY) & DISPOD_SD_AVAILABLE_BIT){
+                write_out_any_buffers();
+            } else {
+                ESP_LOGE(TAG, "dispod_archiver_task: write out completed buffers but no SD mounted");
+            }
         }
     }
 }

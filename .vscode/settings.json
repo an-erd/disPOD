@@ -68,7 +68,8 @@
         "dispod_runvalues.h": "c",
         "dispod_archiver.h": "c",
         "esp_wifi.h": "c",
-        "esp_wifi_types.h": "c"
+        "esp_wifi_types.h": "c",
+        "sdmmc_cmd.h": "c"
     },
 	"files.exclude": {
 		"**/.git": true,

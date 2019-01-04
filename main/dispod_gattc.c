@@ -447,7 +447,10 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
             xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT);
             xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
+
             break;
+
         default:
             break;
         }
@@ -488,7 +491,7 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
                   param->update_conn_params.latency,
                   param->update_conn_params.timeout);
 
-        dispod_screen_status_update_ble(&dispod_screen_status, BLE_CONNECTED, "MilestonePod");]
+        dispod_screen_status_update_ble(&dispod_screen_status, BLE_CONNECTED, "MilestonePod");
         xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT | DISPOD_BLE_CONNECTING_BIT);
         xEventGroupSetBits(dispod_event_group, DISPOD_BLE_CONNECTED_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
