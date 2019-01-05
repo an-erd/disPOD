@@ -18,7 +18,7 @@ load:0x40080400,len:6360
 entry 0x40080728
 I (28) boot: ESP-IDF v3.3-beta1-dirty 2nd stage bootloader
 I (28) boot: compile time 13:58:23
-I (29) boot: Enabling RNG early entropy source...
+I (28) boot: Enabling RNG early entropy source...
 I (34) boot: SPI Speed      : 40MHz
 I (38) boot: SPI Mode       : DIO
 I (42) boot: SPI Flash Size : 16MB
@@ -32,469 +32,284 @@ I (87) boot:  4 eeprom           Unknown data     01 99 00c90000 00001000
 I (94) boot:  5 spiffs           Unknown data     01 82 00c91000 0036f000
 I (102) boot: End of partition table
 I (106) boot: No factory image, trying OTA 0
-I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x36b68 (224104) map
-I (198) esp_image: segment 1: paddr=0x00046b90 vaddr=0x3ff80000 size=0x00000 (     0) load
-I (198) esp_image: segment 2: paddr=0x00046b98 vaddr=0x3ff80000 size=0x00000 (     0) load
-I (204) esp_image: segment 3: paddr=0x00046ba0 vaddr=0x3ffbdb60 size=0x06450 ( 25680) load
-I (223) esp_image: segment 4: paddr=0x0004cff8 vaddr=0x3ffc3fb0 size=0x00000 (     0) load
-I (223) esp_image: segment 5: paddr=0x0004d000 vaddr=0x40080000 size=0x00400 (  1024) load
+I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x36d98 (224664) map
+I (198) esp_image: segment 1: paddr=0x00046dc0 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (198) esp_image: segment 2: paddr=0x00046dc8 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (204) esp_image: segment 3: paddr=0x00046dd0 vaddr=0x3ffbdb60 size=0x06468 ( 25704) load
+I (223) esp_image: segment 4: paddr=0x0004d240 vaddr=0x3ffc3fc8 size=0x00000 (     0) load
+I (223) esp_image: segment 5: paddr=0x0004d248 vaddr=0x40080000 size=0x00400 (  1024) load
 0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
 
-I (232) esp_image: segment 6: paddr=0x0004d408 vaddr=0x40080400 size=0x02c08 ( 11272) load
-I (245) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xbbce8 (769256) map
+I (232) esp_image: segment 6: paddr=0x0004d650 vaddr=0x40080400 size=0x029c0 ( 10688) load
+I (244) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xbc650 (771664) map
 0x400d0018: _flash_cache_start at ??:?
 
-I (516) esp_image: segment 8: paddr=0x0010bd08 vaddr=0x40083008 size=0x1afc4 (110532) load
-0x40083008: psram_read_id at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:379
- (inlined by) psram_enable at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:620
+I (517) esp_image: segment 8: paddr=0x0010c670 vaddr=0x40082dc0 size=0x1b24c (111180) load
+0x40082dc0: psram_gpio_config at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:518
+ (inlined by) psram_enable at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:615
 
-I (559) esp_image: segment 9: paddr=0x00126cd4 vaddr=0x400c0000 size=0x00000 (     0) load
-I (559) esp_image: segment 10: paddr=0x00126cdc vaddr=0x50000000 size=0x00000 (     0) load
-I (566) esp_image: segment 11: paddr=0x00126ce4 vaddr=0x50000000 size=0x00000 (     0) load
-I (593) boot: Loaded app from partition at offset 0x10000
-I (593) boot: Disabling RNG early entropy source...
-I (594) spiram: Found 32MBit SPI RAM device
-I (598) spiram: SPI RAM mode: flash 40m sram 40m
-I (603) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
-I (611) cpu_start: Pro cpu up.
-I (614) cpu_start: Application information:
-I (619) cpu_start: Project name:     dispod
-I (624) cpu_start: App version:      23eacbf-dirty
-I (630) cpu_start: Compile time:     16:50:34
-I (635) cpu_start: Compile date:     Jan  4 2019
-I (640) cpu_start: ESP-IDF:          v3.3-beta1-dirty
-I (646) cpu_start: Starting app cpu, entry point is 0x4008154c
+I (560) esp_image: segment 9: paddr=0x001278c4 vaddr=0x400c0000 size=0x00000 (     0) load
+I (561) esp_image: segment 10: paddr=0x001278cc vaddr=0x50000000 size=0x00000 (     0) load
+I (567) esp_image: segment 11: paddr=0x001278d4 vaddr=0x50000000 size=0x00000 (     0) load
+I (594) boot: Loaded app from partition at offset 0x10000
+I (594) boot: Disabling RNG early entropy source...
+I (595) spiram: Found 32MBit SPI RAM device
+I (599) spiram: SPI RAM mode: flash 40m sram 40m
+I (605) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
+I (612) cpu_start: Pro cpu up.
+I (615) cpu_start: Application information:
+I (620) cpu_start: Project name:     dispod
+I (625) cpu_start: App version:      bf316a9-dirty
+I (631) cpu_start: Compile time:     13:50:55
+I (636) cpu_start: Compile date:     Jan  5 2019
+I (641) cpu_start: ESP-IDF:          v3.3-beta1-dirty
+I (647) cpu_start: Starting app cpu, entry point is 0x4008154c
 0x4008154c: call_start_cpu1 at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/cpu_start.c:261
 
 I (0) cpu_start: App cpu up.
-I (1531) spiram: SPI SRAM memory test OK
-D (1532) memory_layout: Checking 12 reserved memory ranges:
-D (1533) memory_layout: Reserved memory range 0x3f800000 - 0x3fc00000
-D (1536) memory_layout: Reserved memory range 0x3ffae000 - 0x3ffae6e0
-D (1543) memory_layout: Reserved memory range 0x3ffae6e0 - 0x3ffaff10
-D (1549) memory_layout: Reserved memory range 0x3ffb0000 - 0x3ffb6388
-D (1556) memory_layout: Reserved memory range 0x3ffb8000 - 0x3ffb9a20
-D (1562) memory_layout: Reserved memory range 0x3ffbdb28 - 0x3ffbdb5c
-D (1569) memory_layout: Reserved memory range 0x3ffbdb60 - 0x3ffc6e18
-D (1575) memory_layout: Reserved memory range 0x3ffe0000 - 0x3ffe0440
-D (1582) memory_layout: Reserved memory range 0x3ffe3f20 - 0x3ffe4350
-D (1588) memory_layout: Reserved memory range 0x40070000 - 0x40078000
-D (1595) memory_layout: Reserved memory range 0x40078000 - 0x40080000
+I (1532) spiram: SPI SRAM memory test OK
+D (1534) memory_layout: Checking 12 reserved memory ranges:
+D (1534) memory_layout: Reserved memory range 0x3f800000 - 0x3fc00000
+D (1538) memory_layout: Reserved memory range 0x3ffae000 - 0x3ffae6e0
+D (1544) memory_layout: Reserved memory range 0x3ffae6e0 - 0x3ffaff10
+D (1551) memory_layout: Reserved memory range 0x3ffb0000 - 0x3ffb6388
+D (1557) memory_layout: Reserved memory range 0x3ffb8000 - 0x3ffb9a20
+D (1564) memory_layout: Reserved memory range 0x3ffbdb28 - 0x3ffbdb5c
+D (1570) memory_layout: Reserved memory range 0x3ffbdb60 - 0x3ffc6e28
+D (1577) memory_layout: Reserved memory range 0x3ffe0000 - 0x3ffe0440
+D (1583) memory_layout: Reserved memory range 0x3ffe3f20 - 0x3ffe4350
+D (1590) memory_layout: Reserved memory range 0x40070000 - 0x40078000
+D (1596) memory_layout: Reserved memory range 0x40078000 - 0x40080000
 0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
 
-D (1601) memory_layout: Reserved memory range 0x40080000 - 0x4009dfcc
+D (1603) memory_layout: Reserved memory range 0x40080000 - 0x4009e00c
 0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
 
-D (1608) memory_layout: Building list of available memory regions:
-D (1614) memory_layout: Available memory region 0x3ffaff10 - 0x3ffb0000
-D (1621) memory_layout: Available memory region 0x3ffb6388 - 0x3ffb8000
-D (1627) memory_layout: Available memory region 0x3ffb9a20 - 0x3ffbdb28
-D (1634) memory_layout: Available memory region 0x3ffbdb5c - 0x3ffbdb60
-D (1641) memory_layout: Available memory region 0x3ffc6e18 - 0x3ffc8000
-D (1647) memory_layout: Available memory region 0x3ffc8000 - 0x3ffca000
-D (1654) memory_layout: Available memory region 0x3ffca000 - 0x3ffcc000
-D (1661) memory_layout: Available memory region 0x3ffcc000 - 0x3ffce000
-D (1667) memory_layout: Available memory region 0x3ffce000 - 0x3ffd0000
-D (1674) memory_layout: Available memory region 0x3ffd0000 - 0x3ffd2000
-D (1681) memory_layout: Available memory region 0x3ffd2000 - 0x3ffd4000
-D (1688) memory_layout: Available memory region 0x3ffd4000 - 0x3ffd6000
-D (1694) memory_layout: Available memory region 0x3ffd6000 - 0x3ffd8000
-D (1701) memory_layout: Available memory region 0x3ffd8000 - 0x3ffda000
-D (1708) memory_layout: Available memory region 0x3ffda000 - 0x3ffdc000
-D (1714) memory_layout: Available memory region 0x3ffdc000 - 0x3ffde000
-D (1721) memory_layout: Available memory region 0x3ffde000 - 0x3ffe0000
-D (1728) memory_layout: Available memory region 0x3ffe0440 - 0x3ffe3f20
-D (1734) memory_layout: Available memory region 0x3ffe4350 - 0x3ffe8000
-D (1741) memory_layout: Available memory region 0x3ffe8000 - 0x3fff0000
-D (1748) memory_layout: Available memory region 0x3fff0000 - 0x3fff8000
-D (1754) memory_layout: Available memory region 0x3fff8000 - 0x3fffc000
-D (1761) memory_layout: Available memory region 0x3fffc000 - 0x40000000
-D (1768) memory_layout: Available memory region 0x4009dfcc - 0x4009e000
-D (1774) memory_layout: Available memory region 0x4009e000 - 0x400a0000
-I (1781) heap_init: Initializing. RAM available for dynamic allocation:
-D (1788) heap_init: New heap initialised at 0x3ffaff10
-I (1794) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
-D (1800) heap_init: New heap initialised at 0x3ffb6388
-I (1805) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
-D (1811) heap_init: New heap initialised at 0x3ffb9a20
-I (1816) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
-I (1823) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
-D (1829) heap_init: New heap initialised at 0x3ffc6e18
-I (1834) heap_init: At 3FFC6E18 len 000191E8 (100 KiB): DRAM
-I (1840) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
-I (1847) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
-D (1853) heap_init: New heap initialised at 0x4009dfcc
-I (1858) heap_init: At 4009DFCC len 00002034 (8 KiB): IRAM
-I (1865) cpu_start: Pro cpu start user code
-I (1869) spiram: Adding pool of 4090K of external SPI memory to heap allocator
-D (1885) clk: RTC_SLOW_CLK calibration value: 3252339
-D (105) intr_alloc: Connected src 46 to int 2 (cpu 0)
-D (105) intr_alloc: Connected src 57 to int 3 (cpu 0)
-D (107) intr_alloc: Connected src 24 to int 9 (cpu 0)
-I (111) cpu_start: Starting scheduler on PRO CPU.
+D (1609) memory_layout: Building list of available memory regions:
+D (1615) memory_layout: Available memory region 0x3ffaff10 - 0x3ffb0000
+D (1622) memory_layout: Available memory region 0x3ffb6388 - 0x3ffb8000
+D (1629) memory_layout: Available memory region 0x3ffb9a20 - 0x3ffbdb28
+D (1635) memory_layout: Available memory region 0x3ffbdb5c - 0x3ffbdb60
+D (1642) memory_layout: Available memory region 0x3ffc6e28 - 0x3ffc8000
+D (1649) memory_layout: Available memory region 0x3ffc8000 - 0x3ffca000
+D (1655) memory_layout: Available memory region 0x3ffca000 - 0x3ffcc000
+D (1662) memory_layout: Available memory region 0x3ffcc000 - 0x3ffce000
+D (1669) memory_layout: Available memory region 0x3ffce000 - 0x3ffd0000
+D (1676) memory_layout: Available memory region 0x3ffd0000 - 0x3ffd2000
+D (1682) memory_layout: Available memory region 0x3ffd2000 - 0x3ffd4000
+D (1689) memory_layout: Available memory region 0x3ffd4000 - 0x3ffd6000
+D (1696) memory_layout: Available memory region 0x3ffd6000 - 0x3ffd8000
+D (1702) memory_layout: Available memory region 0x3ffd8000 - 0x3ffda000
+D (1709) memory_layout: Available memory region 0x3ffda000 - 0x3ffdc000
+D (1716) memory_layout: Available memory region 0x3ffdc000 - 0x3ffde000
+D (1722) memory_layout: Available memory region 0x3ffde000 - 0x3ffe0000
+D (1729) memory_layout: Available memory region 0x3ffe0440 - 0x3ffe3f20
+D (1736) memory_layout: Available memory region 0x3ffe4350 - 0x3ffe8000
+D (1742) memory_layout: Available memory region 0x3ffe8000 - 0x3fff0000
+D (1749) memory_layout: Available memory region 0x3fff0000 - 0x3fff8000
+D (1756) memory_layout: Available memory region 0x3fff8000 - 0x3fffc000
+D (1762) memory_layout: Available memory region 0x3fffc000 - 0x40000000
+D (1769) memory_layout: Available memory region 0x4009e00c - 0x400a0000
+I (1776) heap_init: Initializing. RAM available for dynamic allocation:
+D (1783) heap_init: New heap initialised at 0x3ffaff10
+I (1788) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
+D (1794) heap_init: New heap initialised at 0x3ffb6388
+I (1800) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
+D (1806) heap_init: New heap initialised at 0x3ffb9a20
+I (1811) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
+I (1817) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
+D (1823) heap_init: New heap initialised at 0x3ffc6e28
+I (1829) heap_init: At 3FFC6E28 len 000191D8 (100 KiB): DRAM
+I (1835) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (1841) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+D (1848) heap_init: New heap initialised at 0x4009e00c
+I (1853) heap_init: At 4009E00C len 00001FF4 (7 KiB): IRAM
+I (1859) cpu_start: Pro cpu start user code
+I (1864) spiram: Adding pool of 4090K of external SPI memory to heap allocator
+D (1879) clk: RTC_SLOW_CLK calibration value: 3280704
+D (99) intr_alloc: Connected src 46 to int 2 (cpu 0)
+D (100) intr_alloc: Connected src 57 to int 3 (cpu 0)
+D (101) intr_alloc: Connected src 24 to int 9 (cpu 0)
+I (105) cpu_start: Starting scheduler on PRO CPU.
 D (0) intr_alloc: Connected src 25 to int 2 (cpu 1)
 I (4) cpu_start: Starting scheduler on APP CPU.
-D (135) heap_init: New heap initialised at 0x3ffe0440
-D (141) heap_init: New heap initialised at 0x3ffe4350
-I (146) spiram: Reserving pool of 32K of internal memory for DMA/internal allocations
-D (154) spiram: Allocating block of size 32768 bytes
-D (159) intr_alloc: Connected src 16 to int 12 (cpu 0)
-I (165) DISPOD: app_main() entered
-D (178) nvs: nvs_flash_init_custom partition=nvs start=9 count=5
-I (212) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
-I (448) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
-I (448) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
-I (450) DISPOD: initialize dispod
-D (454) event: created task for loop 0x3ffba1d4
-D (454) event: running task for loop 0x3ffba1d4
-D (459) event: created event loop 0x3ffba1d4
-D (467) event: registered handler 0x400d5058 for event any:-1
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+D (130) heap_init: New heap initialised at 0x3ffe0440
+D (136) heap_init: New heap initialised at 0x3ffe4350
+I (141) spiram: Reserving pool of 32K of internal memory for DMA/internal allocations
+D (149) spiram: Allocating block of size 32768 bytes
+D (154) intr_alloc: Connected src 16 to int 12 (cpu 0)
+I (160) DISPOD: app_main() entered
+I (204) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
+I (440) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
+I (440) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
+I (442) DISPOD: initialize dispod
+D (446) event: created task for loop 0x3ffba1d4
+D (446) event: running task for loop 0x3ffba1d4
+D (452) event: created event loop 0x3ffba1d4
+D (460) event: registered handler 0x400d5074 for event any:-1
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (473) DISPOD: Starting dispod_screen_task()
-I (478) DISPOD: Starting dispod_update_task()
-I (478) DISPOD_TFT: dispod_screen_task: started
-I (484) DISPOD: Starting dispod_archiver_task()
-I (484) DISPOD_UPDATER: dispod_update_task: started
-D (495) event: created post for event WORKFLOW_EVENTS:0
-I (495) DISPOD_ARCHIVER: dispod_archiver_task: started
-D (505) event: running post WORKFLOW_EVENTS:0 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (465) DISPOD: Starting dispod_screen_task()
+I (471) DISPOD: Starting dispod_update_task()
+I (471) DISPOD_TFT: dispod_screen_task: started
+I (477) DISPOD: Starting dispod_archiver_task()
+I (477) DISPOD_UPDATER: dispod_update_task: started
+D (487) event: created post for event WORKFLOW_EVENTS:0
+I (487) DISPOD_ARCHIVER: dispod_archiver_task: started
+D (498) event: running post WORKFLOW_EVENTS:0 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-D (506) event: posted WORKFLOW_EVENTS:0 to loop 0x3ffba1d4
-I (518) DISPOD: DISPOD_STARTUP_EVT
-D (528) intr_alloc: Connected src 22 to int 13 (cpu 0)
-I (533) DISPOD_BUTTON: dispod_button_initialize()
-I (539) DISPOD_BUTTON: before btn init, heap: 4348368
-I (545) gpio: GPIO[39]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
-I (554) gpio: GPIO[38]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
-I (563) gpio: GPIO[37]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
-I (572) DISPOD_BUTTON: after btn init, heap: 4347276
+D (499) event: posted WORKFLOW_EVENTS:0 to loop 0x3ffba1d4
+I (511) DISPOD: DISPOD_STARTUP_EVT
+D (520) intr_alloc: Connected src 22 to int 13 (cpu 0)
+I (526) DISPOD_BUTTON: dispod_button_initialize()
+I (531) DISPOD_BUTTON: before btn init, heap: 4348284
+I (537) gpio: GPIO[39]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
+I (546) gpio: GPIO[38]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
+I (555) gpio: GPIO[37]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
+I (565) DISPOD_BUTTON: after btn init, heap: 4347192
 
-D (578) event: created post for event WORKFLOW_EVENTS:1
-D (583) event: posted WORKFLOW_EVENTS:1 to loop 0x3ffba1d4
-D (589) event: running post WORKFLOW_EVENTS:1 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+D (570) event: created post for event WORKFLOW_EVENTS:1
+D (576) event: posted WORKFLOW_EVENTS:1 to loop 0x3ffba1d4
+D (581) event: running post WORKFLOW_EVENTS:1 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (597) DISPOD: DISPOD_BASIC_INIT_DONE_EVT
-I (602) DISPOD_TFT: dispod_display_initialize()
-I (1107) DISPOD_TFT: Display config, Pins used: miso=19, mosi=23, sck=18, cs=14
-I (1107) DISPOD_TFT: SPI: display device added to spi bus (1)
-I (1110) DISPOD_TFT: SPI: attached display device, speed=8000000
-I (1117) DISPOD_TFT: SPI: bus uses native pins: false
-I (1122) DISPOD_TFT: SPI: display init...
-I (1928) DISPOD_TFT: OK
-I (1934) DISPOD_TFT: SPI: Max rd speed = 1000000
-I (1934) DISPOD_TFT: SPI: Changed speed to 26666666
-I (2005) DISPOD_TFT: dispod_screen_status_initialize()
-I (2005) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (2005) event: created post for event WORKFLOW_EVENTS:2
-I (2007) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (2012) event: posted WORKFLOW_EVENTS:2 to loop 0x3ffba1d4
-D (2024) event: running post WORKFLOW_EVENTS:2 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (589) DISPOD: DISPOD_BASIC_INIT_DONE_EVT
+I (594) DISPOD_TFT: dispod_display_initialize()
+I (1100) DISPOD_TFT: Display config, Pins used: miso=19, mosi=23, sck=18, cs=14
+I (1100) DISPOD_TFT: SPI: display device added to spi bus (1)
+I (1103) DISPOD_TFT: SPI: attached display device, speed=8000000
+I (1110) DISPOD_TFT: SPI: bus uses native pins: false
+I (1115) DISPOD_TFT: SPI: display init...
+I (1921) DISPOD_TFT: OK
+I (1927) DISPOD_TFT: SPI: Max rd speed = 1000000
+I (1927) DISPOD_TFT: SPI: Changed speed to 26666666
+I (1998) DISPOD_TFT: dispod_screen_status_initialize()
+I (1998) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (1998) event: created post for event WORKFLOW_EVENTS:2
+I (2000) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (2005) event: posted WORKFLOW_EVENTS:2 to loop 0x3ffba1d4
+D (2017) event: running post WORKFLOW_EVENTS:2 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (2032) DISPOD: DISPOD_DISPLAY_INIT_DONE_EVT
-I (2037) DISPOD: connect to WiFi
-D (2042) nvs: nvs_open_from_partition misc 1
-D (2045) nvs: nvs_get_str_or_blob log
-D (2049) nvs: nvs_erase_key log
+I (2025) DISPOD: DISPOD_DISPLAY_INIT_DONE_EVT
+I (2030) DISPOD: connect to WiFi
+I (2043) wifi: wifi driver task: 3ffd6a8c, prio:23, stack:3584, core=0
+I (2043) wifi: wifi firmware version: 328353e
+I (2044) wifi: config NVS flash: enabled
+I (2048) wifi: config nano formating: disabled
+I (2052) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (2062) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (2088) wifi: Init dynamic tx buffer num: 32
+I (2089) wifi: Init data frame dynamic rx buffer num: 32
+I (2089) wifi: Init management frame dynamic rx buffer num: 32
+I (2092) wifi: Init static tx buffer num: 16
+I (2097) wifi: Init static rx buffer size: 1600
+I (2101) wifi: Init static rx buffer num: 10
+I (2104) wifi: Init dynamic rx buffer num: 32
+D (2110) RTC_MODULE: Wi-Fi takes adc2 lock.
+I (2191) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
+I (2193) wifi: mode : sta (84:0d:8e:25:92:34)
+D (2194) event: SYSTEM_EVENT_STA_START
+D (2196) DISPOD_WIFI: SYSTEM_EVENT_STA_START
+I (2200) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (2207) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (4614) event: SYSTEM_EVENT_SCAN_DONE, status:0, number:5
+D (4615) DISPOD_WIFI: SYSTEM_EVENT_SCAN_DONE
+D (4615) DISPOD_WIFI: -65 W12
+D (4616) DISPOD_WIFI: -65 W12N
+D (4619) DISPOD_WIFI: -71 WLAN-736916
+D (4623) DISPOD_WIFI: -76
+D (4626) DISPOD_WIFI: -94 WLAN-7Q8TJA
+I (4630) DISPOD_WIFI: Setting WiFi configuration SSID W12...
+I (4636) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (4644) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (4652) DISPOD_WIFI: Waiting for IP address...
+I (4773) wifi: new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+I (5469) wifi: state: init -> auth (b0)
+I (5474) wifi: state: auth -> assoc (0)
+I (5479) wifi: state: assoc -> run (10)
+I (5497) wifi: connected with W12, channel 1, bssid = ec:08:6b:8a:ae:3a
+I (5553) wifi: pm start, type: 1
 
-D (2120) nvs: nvs_get_str_or_blob log
-D (2121) nvs: nvs_set_blob log 24
-I (2123) wifi: wifi driver task: 3ffd6a30, prio:23, stack:3584, core=0
-I (2123) wifi: wifi firmware version: 328353e
-I (2127) wifi: config NVS flash: enabled
-I (2130) wifi: config nano formating: disabled
-I (2134) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-I (2144) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-D (2154) nvs: nvs_open_from_partition nvs.net80211 1
-D (2159) nvs: nvs_get opmode 1
-D (2162) nvs: nvs_get_str_or_blob sta.ssid
-D (2167) nvs: nvs_get_str_or_blob sta.mac
-D (2171) nvs: nvs_get sta.authmode 1
-D (2174) nvs: nvs_get_str_or_blob sta.pswd
-D (2178) nvs: nvs_get_str_or_blob sta.pmk
-D (2182) nvs: nvs_get sta.chan 1
-D (2185) nvs: nvs_get auto.conn 1
-D (2189) nvs: nvs_get bssid.set 1
-D (2192) nvs: nvs_get_str_or_blob sta.bssid
-D (2197) nvs: nvs_get sta.lis_intval 2
-D (2200) nvs: nvs_get sta.phym 1
-D (2204) nvs: nvs_get sta.phybw 1
-D (2207) nvs: nvs_get_str_or_blob sta.apsw
-D (2211) nvs: nvs_get_str_or_blob sta.apinfo
-D (2217) nvs: nvs_get sta.scan_method 1
-D (2219) nvs: nvs_get sta.sort_method 1
-D (2223) nvs: nvs_get sta.minrssi 1
-D (2227) nvs: nvs_get sta.minauth 1
-D (2230) nvs: nvs_get_str_or_blob ap.ssid
-D (2235) nvs: nvs_get_str_or_blob ap.mac
-D (2239) nvs: nvs_get_str_or_blob ap.passwd
-D (2243) nvs: nvs_get_str_or_blob ap.pmk
-D (2247) nvs: nvs_get ap.chan 1
-D (2250) nvs: nvs_get ap.authmode 1
-D (2253) nvs: nvs_get ap.hidden 1
-D (2257) nvs: nvs_get ap.max.conn 1
-D (2260) nvs: nvs_get bcn.interval 2
-D (2264) nvs: nvs_get ap.phym 1
-D (2267) nvs: nvs_get ap.phybw 1
-D (2271) nvs: nvs_get ap.sndchan 1
-D (2274) nvs: nvs_get lorate 1
-D (2278) nvs: nvs_set_blob sta.mac 6
-D (2282) nvs: nvs_set_blob ap.mac 6
-I (2286) wifi: Init dynamic tx buffer num: 32
-I (2288) wifi: Init data frame dynamic rx buffer num: 32
-I (2293) wifi: Init management frame dynamic rx buffer num: 32
-I (2299) wifi: Init static tx buffer num: 16
-I (2304) wifi: Init static rx buffer size: 1600
-I (2307) wifi: Init static rx buffer num: 10
-I (2311) wifi: Init dynamic rx buffer num: 32
-D (2316) nvs: nvs_set_blob sta.ssid 36
-D (2321) nvs: nvs_set_blob sta.pswd 65
-D (2325) nvs: nvs_set bssid.set 1 0
-D (2327) nvs: nvs_set sta.lis_intval 2 3
-D (2331) nvs: nvs_set sta.scan_method 1 0
-D (2335) nvs: nvs_set sta.sort_method 1 0
-D (2339) nvs: nvs_set sta.minrssi 1 -127
-D (2343) nvs: nvs_set sta.minauth 1 0
-D (2347) nvs: nvs_set_blob sta.apsw 2
-D (2394) nvs: nvs_set_blob sta.apinfo 700
-D (2398) RTC_MODULE: Wi-Fi takes adc2 lock.
-D (2398) nvs: nvs_open_from_partition phy 0
-D (2399) nvs: nvs_get cal_version 4
-D (2399) nvs: nvs_get_str_or_blob cal_mac
-D (2403) nvs: nvs_get_str_or_blob cal_data
-D (2412) nvs: nvs_close 3
-I (2484) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
-I (2486) wifi: mode : sta (84:0d:8e:25:92:34)
-I (2487) DISPOD_WIFI: wifi_init_sta finished.
-D (2487) event: SYSTEM_EVENT_STA_START
-D (2489) event: created post for event WORKFLOW_EVENTS:3
-I (2496) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (2498) event: posted WORKFLOW_EVENTS:3 to loop 0x3ffba1d4
-I (2507) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (2511) event: running post WORKFLOW_EVENTS:3 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+D (5555) event: SYSTEM_EVENT_STA_CONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, channel:1, authmode:3
+D (5558) DISPOD_WIFI: SYSTEM_EVENT_STA_CONNECTED
+D (6566) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.2.155, mask:255.255.255.0, gw:192.168.2.1
+I (6567) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
+D (6572) DISPOD_WIFI: SYSTEM_EVENT_STA_GOT_IP
+I (6577) DISPOD_WIFI: got ip:192.168.2.155
+I (6582) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (6582) event: created post for event WORKFLOW_EVENTS:4
+D (6582) event: created post for event WORKFLOW_EVENTS:3
+D (6594) event: posted WORKFLOW_EVENTS:4 to loop 0x3ffba1d4
+D (6600) event: posted WORKFLOW_EVENTS:3 to loop 0x3ffba1d4
+I (6589) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (6611) event: running post WORKFLOW_EVENTS:4 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (2525) DISPOD: DISPOD_WIFI_INIT_DONE_EVT
-I (2616) wifi: new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
-I (3312) wifi: state: init -> auth (b0)
-I (3317) wifi: state: auth -> assoc (0)
-I (3322) wifi: state: assoc -> run (10)
-I (3346) wifi: connected with W12, channel 1, bssid = ec:08:6b:8a:ae:3a
-D (3347) nvs: nvs_set sta.chan 1 1
-D (3348) nvs: nvs_set_blob sta.apinfo 700
-I (3354) wifi: pm start, type: 1
+I (6625) DISPOD: DISPOD_WIFI_GOT_IP_EVT
+I (6630) DISPOD: WiFi connected, update NTP
+I (6635) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
+I (6641) DISPOD_SNTP: Initializing SNTP
+I (6649) DISPOD_SNTP: Waiting for system time to be set... (1/10)
+I (6716) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (6717) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (8654) DISPOD_SNTP: The current local date/time is: Sat Jan  5 16:10:27 2019
+I (8654) DISPOD_SNTP: Time set yet.
+I (8655) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (8655) event: created post for event WORKFLOW_EVENTS:5
+I (8663) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (8668) event: posted WORKFLOW_EVENTS:5 to loop 0x3ffba1d4
+D (8680) event: running post WORKFLOW_EVENTS:3 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-D (3354) event: SYSTEM_EVENT_STA_CONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, channel:1, authmode:3
-D (3364) tcpip_adapter: dhcp client init ip/mask/gw to all-0
-D (3369) tcpip_adapter: if0 start ip lost tmr: enter
-D (3374) tcpip_adapter: if0 start ip lost tmr: no need start because netif=0x3ffdfe54 interval=120 ip=0
-D (3384) tcpip_adapter: dhcp client start successfully
-D (4046) tcpip_adapter: if0 dhcpc cb
-D (4046) tcpip_adapter: if0 ip changed=1
-D (4047) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.2.155, mask:255.255.255.0, gw:192.168.2.1
-I (4051) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
-I (4059) DISPOD_WIFI: got ip:192.168.2.155
-I (4064) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (4064) event: created post for event WORKFLOW_EVENTS:4
-I (4071) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (4076) event: posted WORKFLOW_EVENTS:4 to loop 0x3ffba1d4
-D (4076) event: running post WORKFLOW_EVENTS:4 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (8688) DISPOD: DISPOD_WIFI_INIT_DONE_EVT
+D (8693) event: running post WORKFLOW_EVENTS:5 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (4096) DISPOD: DISPOD_WIFI_GOT_IP_EVT
-I (4101) DISPOD: WiFi connected, update NTP
-I (4106) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
-I (4112) DISPOD_SNTP: Initializing SNTP
-I (4119) DISPOD_SNTP: Waiting for system time to be set... (1/10)
-I (4181) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (4181) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (6125) DISPOD_SNTP: The current local date/time is: Fri Jan  4 17:31:56 2019
-I (6126) DISPOD_SNTP: Time set yet.
-I (6127) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (6127) event: created post for event WORKFLOW_EVENTS:5
-I (6134) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (6140) event: posted WORKFLOW_EVENTS:5 to loop 0x3ffba1d4
-D (6151) event: running post WORKFLOW_EVENTS:5 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (8701) DISPOD: DISPOD_NTP_INIT_DONE_EVT
+I (8706) DISPOD: uxBits: DISPOD_NTP_ACTIVATED_BIT = 8192, uxBits = 425
+I (8713) DISPOD: DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT
+D (8720) event: created post for event WORKFLOW_EVENTS:6
+D (8725) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba1d4
+D (8731) event: running post WORKFLOW_EVENTS:6 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (6159) DISPOD: DISPOD_NTP_INIT_DONE_EVT
-I (6164) DISPOD: uxBits: DISPOD_NTP_ACTIVATED_BIT = 2048, uxBits = 217
-I (6171) DISPOD: DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT
-D (6178) event: created post for event WORKFLOW_EVENTS:6
-D (6183) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba1d4
-D (6189) event: running post WORKFLOW_EVENTS:6 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (8739) DISPOD: DISPOD_SD_INIT_DONE_EVT
+I (8744) BTDM_INIT: BT controller compile version [97a362b]
+I (8751) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (9007) DISPOD_GATTC: esp_gattc_cb()
+I (9008) DISPOD_GATTC: REG_EVT
+I (9011) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
+I (9015) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
+I (9018) DISPOD_GATTC: scan start success
+I (9023) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (9030) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (9234) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (9234) DISPOD_GATTC: 43 18 bd 46 27 e9
+I (9235) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (9240) DISPOD_GATTC: searched Device Name Len 0
+I (9246) DISPOD_GATTC:
 
-I (6197) DISPOD: DISPOD_SD_INIT_DONE_EVT
-D (6202) BTDM_INIT: Release DRAM [0x3ffb2730] - [0x3ffb6388]
-I (6208) BTDM_INIT: BT controller compile version [97a362b]
-D (6214) BTDM_INIT: .data initialise [0x3ffae6e0] <== [0x4000d890]
-D (6220) BTDM_INIT: .bss initialise [0x3ffb0000] - [0x3ffb09a8]
-D (6226) BTDM_INIT: .bss initialise [0x3ffb09a8] - [0x3ffb1ddc]
-D (6232) BTDM_INIT: .bss initialise [0x3ffb1ddc] - [0x3ffb2730]
-D (6238) BTDM_INIT: .bss initialise [0x3ffb8000] - [0x3ffb9a20]
-D (6244) BTDM_INIT: .bss initialise [0x3ffbdb28] - [0x3ffbdb5c]
-I (6251) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-D (6262) nvs: nvs_open_from_partition phy 0
-D (6264) nvs: nvs_get cal_version 4
-D (6268) nvs: nvs_get_str_or_blob cal_mac
-D (6272) nvs: nvs_get_str_or_blob cal_data
-D (6278) nvs: nvs_close 4
-I (6502) DISPOD_GATTC: esp_gattc_cb()
-I (6504) DISPOD_GATTC: REG_EVT
-I (6506) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
-I (6510) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
-I (6513) DISPOD_GATTC: scan start success
-I (6518) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (6525) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (6886) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (6887) DISPOD_GATTC: 50 33 8b 1c f0 12
-I (6887) DISPOD_GATTC: searched Adv Data Len 30, Scan Response Len 26
-I (6892) DISPOD_GATTC: searched Device Name Len 15
-I (6898) DISPOD_GATTC: MilestonePod 12
-I (6902) DISPOD_GATTC:
+I (19017) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (19017) DISPOD_GATTC: ESP_GAP_SEARCH_INQ_CMPL_EVT
+I (19017) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (19017) event: created post for event WORKFLOW_EVENTS:7
+I (19025) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (19030) event: posted WORKFLOW_EVENTS:7 to loop 0x3ffba1d4
+D (19030) event: running post WORKFLOW_EVENTS:7 with handler 0x400d5074 on loop 0x3ffba1d4
+0x400d5074: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (6906) DISPOD_GATTC: searched device MilestonePod
+I (19050) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
+I (75205) wifi: bcn_timout,ap_probe_send_start
+I (76868) wifi: state: run -> init (7c0)
+I (76869) wifi: pm stop, total sleep time: 58371092 us / 71315948 us
 
-I (6911) DISPOD_GATTC: connect to the remote device.
-I (6923) DISPOD_GATTC: ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT
-I (6926) DISPOD_GATTC: stop scan successfully
-I (6928) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (6936) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (7381) DISPOD_GATTC: esp_gattc_cb()
-I (7381) DISPOD_GATTC: ESP_GATTC_CONNECT_EVT conn_id 0, if 1
-I (7381) DISPOD_GATTC: REMOTE BDA:
-I (7381) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (7385) DISPOD_GATTC: 50 33 8b 1c f0 12
-I (7392) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (7397) DISPOD_GATTC: esp_gattc_cb()
-I (7410) DISPOD_GATTC: ESP_GATTC_OPEN_EVT
-I (7412) DISPOD_GATTC: open success
-I (8642) DISPOD_GATTC: esp_gattc_cb()
-I (8643) DISPOD_GATTC: ESP_GATTC_CFG_MTU_EVT, Status 0, MTU 23, conn_id 0
-I (8644) DISPOD_GATTC: esp_gattc_cb()
-I (8648) DISPOD_GATTC: ESP_GATTC_SEARCH_RES_EVT
-I (8653) DISPOD_GATTC: SEARCH RES: conn_id = 0 is primary service 1
-I (8660) DISPOD_GATTC: start handle 16 end handle 29 current handle value 16
-I (8671) DISPOD_GATTC: service found
-I (8672) DISPOD_GATTC: UUID16: 1814
-I (8676) DISPOD_GATTC: esp_gattc_cb()
-I (8681) DISPOD_GATTC: ESP_GATTC_SEARCH_CMPL_EVT
-I (8686) DISPOD_GATTC: Get service information from remote device
-I (8694) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 18
-I (8700) DISPOD_GATTC: REMOTE BDA:
-I (8704) DISPOD_GATTC: 50 33 8b 1c f0 12
-I (8709) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 28
-I (8716) DISPOD_GATTC: REMOTE BDA:
-I (8720) DISPOD_GATTC: 50 33 8b 1c f0 12
-I (8725) DISPOD_GATTC: esp_gattc_cb()
-I (8729) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
-I (8735) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 19, size 2, value 1, type_rsp 2, auth req 0
-I (8747) DISPOD_GATTC: esp_gattc_cb()
-I (8751) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
-I (8757) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 29, size 2, value 1, type_rsp 2, auth req 0
-I (8806) DISPOD_GATTC: esp_gattc_cb()
-I (8806) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
-I (8806) DISPOD_GATTC: write descr success
-I (8836) DISPOD_GATTC: esp_gattc_cb()
-I (8836) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
-I (8836) DISPOD_GATTC: write descr success
-I (12477) DISPOD_GATTC: ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT
-I (12478) DISPOD_GATTC: update connection params status = 0, min_int = 16, max_int = 32,conn_int = 32,latency = 0, timeout = 600
-I (12485) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (12485) event: created post for event WORKFLOW_EVENTS:7
-I (12492) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (12498) event: posted WORKFLOW_EVENTS:7 to loop 0x3ffba1d4
-D (12498) event: running post WORKFLOW_EVENTS:7 with handler 0x400d5058 on loop 0x3ffba1d4
-0x400d5058: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-I (12518) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
-I (23770) DISPOD_GATTC: esp_gattc_cb()
-I (23771) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-I (23771) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-I (23776) DISPOD_GATTC: handle: 18
-I (23781) DISPOD_GATTC: 03 6e 02 5d 9c 00 0f 00 00 00
-I (23786) DISPOD_GATTC: 0x2a53: F  3 S 8.7 C  93 Str 156 Dis     1
-I (23794) DISPOD_UPDATER: received from queue: 0x2a53: C  93
-I (23794) DISPOD_GATTC: esp_gattc_cb()
-D (23799) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 0
-I (23804) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-D (23813) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 0, size 256, complete 0
-I (23818) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-D (23829) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 1, size 256, complete 0
-I (23837) DISPOD_GATTC: handle: 28
-I (23852) DISPOD_GATTC: 0f fb 00 08
-I (23856) DISPOD_GATTC: 0xFF00: F 15 Str 0 Swi 2 Imp 0 Sta 251
-I (23863) DISPOD_UPDATER: received from queue: 0xFF00: Str 0 Sta  251
-I (23863) DISPOD_GATTC: esp_gattc_cb()
-D (23870) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 1
-I (23874) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-D (23884) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 1, size 256, complete 0
-I (23889) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-D (23900) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 2, size 256, complete 0
-I (23907) DISPOD_GATTC: handle: 18
-I (23923) DISPOD_GATTC: 03 6e 02 5d b4 00 31 00 00 00
-I (23929) DISPOD_GATTC: 0x2a53: F  3 S 8.7 C  93 Str 180 Dis     4
-I (23936) DISPOD_UPDATER: received from queue: 0x2a53: C  93
-I (23936) DISPOD_GATTC: esp_gattc_cb()
-D (23942) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 2
-I (23947) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-D (23956) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 2, size 256, complete 0
-I (23961) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-D (23972) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 3, size 256, complete 0
-I (23979) DISPOD_GATTC: handle: 28
-I (23995) DISPOD_GATTC: 0f 53 02 04
-I (23999) DISPOD_GATTC: 0xFF00: F 15 Str 0 Swi 1 Imp 0 Sta 595
-I (24005) DISPOD_UPDATER: received from queue: 0xFF00: Str 0 Sta  595
-I (24006) DISPOD_GATTC: esp_gattc_cb()
-D (24013) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 3
-I (24017) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-D (24027) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 3, size 256, complete 0
-I (24031) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-I (24050) DISPOD_GATTC: handle: 18
-D (24043) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 4, size 256, complete 0
-I (24054) DISPOD_GATTC: 03 ae 02 59 c2 00 59 00 00 00
-I (24071) DISPOD_GATTC: 0x2a53: F  3 S 9.6 C  89 Str 194 Dis     8
-I (24078) DISPOD_UPDATER: received from queue: 0x2a53: C  89
-I (24078) DISPOD_GATTC: esp_gattc_cb()
-D (24085) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 4
-I (24089) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-D (24098) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 4, size 256, complete 0
-I (24103) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-D (24115) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 5, size 256, complete 0
-I (24122) DISPOD_GATTC: handle: 28
-I (24138) DISPOD_GATTC: 0f ec 00 04
-I (24142) DISPOD_GATTC: 0xFF00: F 15 Str 0 Swi 1 Imp 0 Sta 236
-I (24148) DISPOD_UPDATER: received from queue: 0xFF00: Str 0 Sta  236
-D (24155) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 5
-D (24165) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 5, size 256, complete 0
-D (24176) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 6, size 256, complete 0
-I (26402) DISPOD_GATTC: esp_gattc_cb()
-I (26406) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-I (26407) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-I (26412) DISPOD_GATTC: handle: 18
-I (26416) DISPOD_GATTC: 03 00 00 00 00 00 68 00 00 00
-I (26421) DISPOD_GATTC: 0x2a53: F  3 S 0.0 C   0 Str   0 Dis    10
-I (26428) DISPOD_UPDATER: received from queue: 0x2a53: C   0
-I (26428) DISPOD_GATTC: esp_gattc_cb()
-D (26435) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 6
-I (26439) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
-D (26448) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 6, size 256, complete 0
-I (26453) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
-D (26465) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 7, size 256, complete 0
-I (26472) DISPOD_GATTC: handle: 28
-I (26488) DISPOD_GATTC: 0f 00 00 01
-I (26492) DISPOD_GATTC: 0xFF00: F 15 Str 1 Swi 0 Imp 0 Sta   0
-I (26498) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta    0
-D (26505) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 7
-D (26515) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 7, size 256, complete 0
-D (26526) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 8, size 256, complete 0
-W (47956) BT_APPL: bta_gattc_conn_cback() - cif=1 connected=0 conn_id=1 reason=0x0008
-I (47959) DISPOD_GATTC: esp_gattc_cb()
-I (47960) DISPOD_GATTC: ESP_GATTC_DISCONNECT_EVT, reason = 8
-I (47965) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (47965) DISPOD_GATTC: esp_gattc_cb()
-I (47973) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (76869) wifi: new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+D (76874) event: SYSTEM_EVENT_STA_DISCONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, reason:7,wifi reason: not assoced
+D (76886) DISPOD_WIFI: SYSTEM_EVENT_STA_DISCONNECTED
+I (76890) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (76898) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (196886) event: SYSTEM_EVENT_STA_LOST_IP
+I (196886) event: station ip lost
+W (196886) DISPOD_WIFI: Unhandled event (8)

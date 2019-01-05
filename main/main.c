@@ -136,8 +136,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         if(uxBits & DISPOD_WIFI_ACTIVATED_BIT){
             // WiFi activated -> connect to WiFi
             ESP_LOGI(TAG, "connect to WiFi");
-            // dispod_wifi_network_up();
-            wifi_init_sta();
+            dispod_wifi_network_up();
+            // wifi_init_sta();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_WIFI_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
             // WiFi not activated (and thus no NTP), jump to SD mount
@@ -186,6 +186,16 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         // at this point we've either
         // - no Wifi configured: no WiFi, no NTP, maybe BLE
         // - WiFi configured: maybe WiFi -> maybe updated NTP, maybe BLE
+        //
+        // no WiFi but retry set -> jump to WiFi again (DISPOD_DISPLAY_INIT_DONE_EVT)
+        // if(!)
+
+        // uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, 0);
+        // if(uxBits & DISPOD_WIFI_CONNECTED_BIT){
+        //     ESP_LOGI(TAG, "WiFi connected, update NTP");
+        //     dispod_sntp_check_time();
+        //     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+
         break;
     case DISPOD_BUTTON_TAP_EVT: {
         button_unit_t button_unit = *(button_unit_t*) event_data;

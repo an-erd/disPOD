@@ -17,15 +17,17 @@
 #define DISPOD_WIFI_SCANNING_BIT                    (BIT1)      // WiFi scanning for APs
 #define DISPOD_WIFI_CONNECTING_BIT	                (BIT2)      // WiFi connecting to appropriate AP
 #define DISPOD_WIFI_CONNECTED_BIT		            (BIT3)      // WiFi got IP
-#define DISPOD_NTP_ACTIVATED_BIT                    (BIT4)      // NTP is activated
-#define DISPOD_NTP_UPDATING_BIT    	                (BIT5)      // NTP update process running
-#define DISPOD_NTP_UPDATED_BIT			            (BIT6)      // NTP time set
-#define DISPOD_BLE_ACTIVATED_BIT                    (BIT7)      // BLE is activated
-#define DISPOD_BLE_SCANNING_BIT     	            (BIT8)      // BLE scanning for devices
-#define DISPOD_BLE_CONNECTING_BIT    	            (BIT9)      // BLE connecting to appropriate device
-#define DISPOD_BLE_CONNECTED_BIT                    (BIT10)     // BLE connected to device
-#define DISPOD_SD_ACTIVATED_BIT                     (BIT11)     // SD card is activated
-#define DISPOD_SD_AVAILABLE_BIT                     (BIT12)     // SD function available
+#define DISPOD_WIFI_RETRY_BIT                       (BIT4)      // Try WiFi (and NTP if necessary) again
+#define DISPOD_NTP_ACTIVATED_BIT                    (BIT5)      // NTP is activated
+#define DISPOD_NTP_UPDATING_BIT    	                (BIT6)      // NTP update process running
+#define DISPOD_NTP_UPDATED_BIT			            (BIT7)      // NTP time set
+#define DISPOD_BLE_ACTIVATED_BIT                    (BIT8)      // BLE is activated
+#define DISPOD_BLE_SCANNING_BIT     	            (BIT9)      // BLE scanning for devices
+#define DISPOD_BLE_CONNECTING_BIT    	            (BIT10)     // BLE connecting to appropriate device
+#define DISPOD_BLE_CONNECTED_BIT                    (BIT11)     // BLE connected to device
+#define DISPOD_BLE_RETRY_BIT                        (BIT12)     // Try BLE again
+#define DISPOD_SD_ACTIVATED_BIT                     (BIT13)     // SD card is activated
+#define DISPOD_SD_AVAILABLE_BIT                     (BIT14)     // SD function available
 EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
