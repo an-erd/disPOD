@@ -129,10 +129,10 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     dispod_screen_status_update_ntp(params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
 	dispod_screen_status_update_ble(params, BLE_NOT_CONNECTED, NULL);      // TODO where to deactivate?
     dispod_screen_status_update_sd(params, SD_DEACTIVATED);                // TODO where to deactivate?
-    dispod_screen_status_update_button(params, BUTTON_A, true, "Retry Wifi");
-    dispod_screen_status_update_button(params, BUTTON_B, true, "Retry Pod");
-    dispod_screen_status_update_button(params, BUTTON_C, true, "Continue");
-    dispod_screen_status_update_statustext(params, true, "... none ...");
+    dispod_screen_status_update_button(params, BUTTON_A, false, "");
+    dispod_screen_status_update_button(params, BUTTON_B, false, "");
+    dispod_screen_status_update_button(params, BUTTON_C, false, "");
+    dispod_screen_status_update_statustext(params, false, "");
 }
 
 // functions to update status screen data
@@ -271,7 +271,8 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
     }
 
 	// 6) Button label
-	ypos += textHeight + YPAD;          // ypos = 240 - XPAD;
+	// ypos += textHeight + YPAD;          // ypos = 240 - YPAD;
+    ypos = 240 - textHeight - YPAD;
 
     xpos = X_BUTTON_A - TFT_getStringWidth(params->button_text[BUTTON_A])/2;
     // ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);

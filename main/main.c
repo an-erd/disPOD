@@ -121,6 +121,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         dispod_button_initialize();
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
+        dispod_wifi_network_init();
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_BASIC_INIT_DONE_EVT:
@@ -137,12 +138,10 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
             // WiFi activated -> connect to WiFi
             ESP_LOGI(TAG, "connect to WiFi");
             dispod_wifi_network_up();
-            // wifi_init_sta();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_WIFI_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
             // WiFi not activated (and thus no NTP), jump to SD mount
             ESP_LOGI(TAG, "no WiFi configured (thus no NTP), mount SD next");
-            // dispod_ble_initialize();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;
@@ -160,7 +159,6 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         } else {
             // WiFi configured, but not connected, jump to SD mount
             ESP_LOGI(TAG, "no WiFi connection thus no NTP, connect to BLE next");
-            // dispod_ble_initialize();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;
@@ -178,28 +176,108 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         break;
     case DISPOD_SD_INIT_DONE_EVT:
         ESP_LOGI(TAG, "DISPOD_SD_INIT_DONE_EVT");
-        dispod_ble_initialize();
-        // ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DEVICE_DONE_EVT, NULL, 0, portMAX_DELAY));
+        uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_BLE_RETRY_BIT, pdTRUE, pdFALSE, 0);
+        ESP_LOGI(TAG, "uxBits: DISPOD_BLE_RETRY_BIT = %u, uxBits = %u", DISPOD_BLE_RETRY_BIT, uxBits);
+        if(!(uxBits & DISPOD_BLE_RETRY_BIT)){
+            dispod_ble_initialize();
+            dispod_ble_app_register();
+        } else {
+            dispod_ble_start_scanning();    // TODO check whether it works with additional call to start_scanning.
+        }
         break;
     case DISPOD_BLE_DEVICE_DONE_EVT:
         ESP_LOGI(TAG, "DISPOD_BLE_DEVICE_DONE_EVT");
+        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+        break;
+    case DISPOD_STARTUP_COMPLETE_EVT:{
+        bool retryWifi = false;
+        bool retryBLE = false;
+        bool cont = false;
+        ESP_LOGI(TAG, "DISPOD_STARTUP_COMPLETE_EVT");
         // at this point we've either
         // - no Wifi configured: no WiFi, no NTP, maybe BLE
         // - WiFi configured: maybe WiFi -> maybe updated NTP, maybe BLE
-        //
+
         // no WiFi but retry set -> jump to WiFi again (DISPOD_DISPLAY_INIT_DONE_EVT)
-        // if(!)
+        if(!(xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, 0) & DISPOD_WIFI_CONNECTED_BIT)){
+            // option: no WiFi, retry WiFi -> Button A
+            dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, true, "WiFi");
+            xEventGroupSetBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT);
+            retryWifi = true;
+        }
+        if(!(xEventGroupWaitBits(dispod_event_group, DISPOD_BLE_CONNECTED_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BLE_CONNECTED_BIT)){
+            // option: no BLE, retry BLE -> Button B
+            dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "BLE");
+            xEventGroupSetBits(dispod_event_group, DISPOD_BTN_B_RETRY_BLE_BIT);
+            retryBLE = true;
+        }
+        if((xEventGroupWaitBits(dispod_event_group, DISPOD_BLE_CONNECTED_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BLE_CONNECTED_BIT)){
+            // option: BLE avail, go to running screen -> Button C
+            dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "Cont.");
+            xEventGroupSetBits(dispod_event_group, DISPOD_BTN_C_CNT_BIT);
+            cont = true;
+        }
 
-        // uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, 0);
-        // if(uxBits & DISPOD_WIFI_CONNECTED_BIT){
-        //     ESP_LOGI(TAG, "WiFi connected, update NTP");
-        //     dispod_sntp_check_time();
-        //     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
-
+        if(retryWifi && retryBLE && (!cont)){
+            dispod_screen_status_update_statustext(&dispod_screen_status, true, "Retry WiFi or BLE?");
+        } else if(retryWifi && (!retryBLE) && cont){
+            dispod_screen_status_update_statustext(&dispod_screen_status, true, "Retry WiFi or continue?");
+        } else if(retryBLE && (!retryWifi) && (!cont)){
+            dispod_screen_status_update_statustext(&dispod_screen_status, true, "Retry BLE?");
+        } else if((!retryWifi) && (!retryBLE) && cont){
+            dispod_screen_status_update_statustext(&dispod_screen_status, true, "Continue?");
+        }
+        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+        }
         break;
+    case DISPOD_RETRY_WIFI_EVT:
+        ESP_LOGI(TAG, "DISPOD_RETRY_WIFI_EVT");
+        break;
+    case DISPOD_RETRY_BLE_EVT:
+        ESP_LOGI(TAG, "DISPOD_RETRY_BLE_EVT");
+        break;
+    case DISPOD_GO_TO_RUNNING_SCREEN_EVT:
+        ESP_LOGI(TAG, "DISPOD_GO_TO_RUNNING_SCREEN_EVT");
+        break;
+    //
     case DISPOD_BUTTON_TAP_EVT: {
         button_unit_t button_unit = *(button_unit_t*) event_data;
         ESP_LOGI(TAG, "DISPOD_BUTTON_TAP_EVT, button id %d", button_unit.btn_id);
+
+
+        // come here from DISPOD_STARTUP_COMPLETE_EVT
+        if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT, pdFALSE, pdFALSE, 0)
+                & (DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT))){
+            switch(button_unit.btn_id){
+            case BUTTON_A:
+                if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BTN_A_RETRY_WIFI_BIT)){
+                    xEventGroupClearBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT);
+                    xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_RETRY_BIT);
+                    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
+                    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_DISPLAY_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+                }
+                break;
+            case BUTTON_B:
+                if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BTN_B_RETRY_BLE_BIT)){
+                    xEventGroupClearBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT);
+                    xEventGroupSetBits(dispod_event_group, DISPOD_BLE_RETRY_BIT);
+                    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
+                    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+                }
+                break;
+            case BUTTON_C:
+                break;
+            default:
+                ESP_LOGI(TAG, "unhandled button");
+                break;
+            }
+        }
         }
         break;
     case DISPOD_BUTTON_2SEC_PRESS_EVT: {

@@ -580,6 +580,11 @@ void dispod_ble_initialize()
         ESP_LOGE(GATTC_TAG, "%s gattc register failed, error code = %x\n", __func__, ret);
         return;
     }
+}
+
+void dispod_ble_app_register()
+{
+    esp_err_t ret;
 
     ret = esp_ble_gattc_app_register(PROFILE_A_APP_ID);
     if (ret){
@@ -589,5 +594,10 @@ void dispod_ble_initialize()
     if (local_mtu_ret){
         ESP_LOGE(GATTC_TAG, "set local  MTU failed, error code = %x", local_mtu_ret);
     }
+}
 
+void dispod_ble_start_scanning()
+{
+    uint32_t duration = 10;
+    ESP_ERROR_CHECK(esp_ble_gap_start_scanning(duration));
 }

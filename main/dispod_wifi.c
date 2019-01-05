@@ -17,11 +17,12 @@
 static const char* TAG = "DISPOD_WIFI";
 
 static int s_retry_num = 0;
+static EventGroupHandle_t evg;
 
-const int STRT_BIT = BIT0;  // after esp_wifi_start() by SYSTEM_EVENT_STA_START this event comes
-const int SCAN_BIT = BIT1;
-const int DISC_BIT = BIT2;
-const int DHCP_BIT = BIT3;
+#define STRT_BIT    (BIT0)
+#define SCAN_BIT    (BIT1)
+#define DISC_BIT    (BIT2)
+#define DHCP_BIT    (BIT3)
 
 struct known_ap {
     char *ssid;
@@ -50,7 +51,6 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     EventGroupHandle_t evg = (EventGroupHandle_t) ctx;
     wifi_config_t wifi_config;
-
 
     // see https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/wifi.html#esp32-wi-fi-event-description
     switch(event->event_id) {
@@ -97,11 +97,31 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
             xEventGroupSetBits(evg, DHCP_BIT);
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_WIFI_GOT_IP_EVT, NULL, 0, portMAX_DELAY));
             break;
+        case SYSTEM_EVENT_STA_LOST_IP:
+            ESP_LOGD(TAG, "SYSTEM_EVENT_STA_LOST_IP");
+            break;
         default:
             ESP_LOGW(TAG, "Unhandled event (%d)", event->event_id);
             break;
     }
     return ESP_OK;
+}
+
+
+void dispod_wifi_network_init()
+{
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+
+    tcpip_adapter_init();
+
+    evg = xEventGroupCreate();
+    ESP_ERROR_CHECK(esp_event_loop_init(event_handler, evg));
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+
+    xEventGroupClearBits(evg, STRT_BIT);
+    ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 esp_err_t dispod_wifi_network_up()
@@ -119,20 +139,6 @@ esp_err_t dispod_wifi_network_up()
         .channel = 0,
         .show_hidden = true
     };
-
-    tcpip_adapter_init();
-
-    EventGroupHandle_t evg = xEventGroupCreate();
-    ESP_ERROR_CHECK(esp_event_loop_init(event_handler, evg));
-
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-
-    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-
-    xEventGroupClearBits(evg, STRT_BIT);
-    ESP_ERROR_CHECK(esp_wifi_start());
 
     int state = 0;
     int done = 0;
