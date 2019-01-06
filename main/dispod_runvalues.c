@@ -47,7 +47,7 @@ void dispod_runvalues_calculate_display_values(runningValuesStruct_t *values)
 	if (values->update_avail_RSC) {
 		values->update_avail_RSC = false;
 		if (values->tmp_values.cad) {
-			ESP_LOGI(TAG, "dispod_runvalues_calculate_display_values(): idxItem = %u",
+			// ESP_LOGI(TAG, "dispod_runvalues_calculate_display_values(): idxItem = %u",
                 values->val_cad.idx_item);
 			values->val_cad.sum_items += values->tmp_values.cad
                 - values->val_cad.values[values->val_cad.idx_item];

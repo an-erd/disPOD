@@ -94,3 +94,19 @@ disPOD consists of several modules:
 * xPad = 10
 * 10 (xPad) + 60 (XXX) + 10 (xPad) + 60 (123) + 20 (2*xPad) + 150 Indikator/Fields/... + 10 (xPad)
 * Indikator x
+
+# Testing
+## Queues and Calculation and Display
+### grep log file
+AKAEM@PC MINGW32 ~/esp/disPOD
+$ grep -e "DISPOD_UPDATER.*0x2a53" -e "DISPOD_UPDATER.*0xFF00" -e "val2dis" -e "DISPOD_RUNVALUES.*,"  Logs/logs.txt
+
+Pattern to look for
+
+I (25905) DISPOD_UPDATER: received from queue: 0x2a53: C  97
+I (25936) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cadence 97
+I (25999) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta  262
+I (26027) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 262, strike 1
+I (26036) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 97   0   0   0   0], num   1, sum   97, val2dis 194
+I (26048) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [262   0   0   0   0], num   1, sum  262, val2dis 262
+I (26061) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   0   0   0   0], num   1, sum    1, val2dis  10
