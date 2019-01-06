@@ -1,4 +1,5 @@
 #include <string.h>
+#include <math.h>
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -24,19 +25,19 @@ static const char* TAG = "DISPOD_TFT";
 #define X_BUTTON_C	    255
 
 // layout measures for running screen
-#define FIELD_MIN_X				        200
+#define FIELD_MIN_X				        160
 #define FIELD_MAX_X				        310
-#define FIELD_BASE_Y			        8
-#define FIELD_HALFHEIGHT		        5
+#define FIELD_BASE_Y			        10
+#define FIELD_HALFHEIGHT		        8
 #define FIELD_WIDTH				        (FIELD_MAX_X - FIELD_MIN_X)
-#define INDICATOR_MIN_X					200
+
+// layout dimensions for indicator bar
+#define INDICATOR_MIN_X					160
 #define INDICATOR_MAX_X					310
 #define INDICATOR_ADJ_MIN_X				(INDICATOR_MIN_X + INDICATOR_TARGET_CIRCLE_RADIUS)
 #define INDICATOR_ADJ_MAX_X				(INDICATOR_MAX_X - INDICATOR_TARGET_CIRCLE_RADIUS)
-#define INDICATOR_BASE_Y				7
-#define INDICATOR_TARGET_CIRCLE_RADIUS	6
-//#define INDICATOR_INDEX_HALFHEIGHT		7
-//#define INDICATOR_INDEX_HALFWIDTH		4
+#define INDICATOR_BASE_Y				10
+#define INDICATOR_TARGET_CIRCLE_RADIUS	8
 
 // Take from menuconfig
 #define MIN_INTERVAL_CADENCE		CONFIG_RUNNING_MIN_INTERVAL_CADENCE
@@ -124,6 +125,7 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     ESP_LOGI(TAG, "dispod_screen_status_initialize()");
 
     // initialize dispod_screen_status_t struct
+    params->current_screen = SCREEN_STATUS;
     params->screen_to_show = SCREEN_STATUS;
     dispod_screen_status_update_wifi(params, WIFI_NOT_CONNECTED, "n/a");
     dispod_screen_status_update_ntp(params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
@@ -133,6 +135,12 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     dispod_screen_status_update_button(params, BUTTON_B, false, "");
     dispod_screen_status_update_button(params, BUTTON_C, false, "");
     dispod_screen_status_update_statustext(params, false, "");
+}
+
+// function to change screen
+void dispod_screen_change(dispod_screen_status_t *params, display_screen_t new_screen)
+{
+    params->screen_to_show = new_screen;
 }
 
 // functions to update status screen data
@@ -290,22 +298,21 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 		TFT_print(params->button_text[BUTTON_C], xpos, ypos);
 }
 
-static void dispod_screen_draw_fields(uint8_t line, uint8_t numLines, char* name, uint8_t numFields, uint8_t current)
+static void dispod_screen_draw_fields(uint8_t line, char* name, uint8_t numFields, float f_current)
 {
     uint16_t    textHeight;
-    uint16_t    xPad = 10, yPad = 5, yLine;
-
-	// Preparation
-	TFT_resetclipwin();
-    TFT_setFont(DEJAVU18_FONT, NULL);
-    _fg = TFT_WHITE;
-	_bg = TFT_BLACK;
+    uint16_t    xPad = 10, yPad = 10, yLine, xVal;
+    char        buffer[32];
+    uint8_t     current;
 
 	textHeight = TFT_getfontheight();
-    yLine = (textHeight  + yPad) * line;
+    yLine = yPad + (textHeight  + yPad) * line;
 
     // field title
     TFT_print(name, xPad, yLine);
+    sprintf(buffer, "%1.1f", f_current);
+    xVal = 10 + 60 + 10 + 60 - TFT_getStringWidth(buffer);
+    TFT_print(buffer, xVal, yLine);
 
 	uint8_t y0 = yLine + FIELD_BASE_Y;
 	// frame
@@ -316,16 +323,31 @@ static void dispod_screen_draw_fields(uint8_t line, uint8_t numLines, char* name
 	for (int i = 0; i < numFields; i++)
 		TFT_drawLine(FIELD_MIN_X + i * deltaX, y0 - FIELD_HALFHEIGHT, FIELD_MIN_X + i * deltaX, y0 + FIELD_HALFHEIGHT - 1, TFT_WHITE);
 
+    current = (uint8_t) round(f_current);
+	bool inInterval = (current >= 1) && (current <= 2);
+
+	// show name
+    _fg = TFT_WHITE;
+    TFT_print(name, xPad, yLine);
+
+	if (inInterval)
+		_fg = TFT_GREEN;
+	else
+		_fg = TFT_RED;
+
 	// mark current
-	TFT_fillRect(FIELD_MIN_X + current * deltaX, y0 - FIELD_HALFHEIGHT, deltaX, 2 * FIELD_HALFHEIGHT, TFT_WHITE);
+	TFT_fillRect(FIELD_MIN_X + current * deltaX + 2, y0 - FIELD_HALFHEIGHT + 2, deltaX - 4, 2 * FIELD_HALFHEIGHT - 4, _fg);
+    _fg = TFT_WHITE;
+
 }
 
-static void dispod_screen_draw_indicator(uint8_t line, uint8_t numLines, char* name,
+static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_value,
 	int16_t valMin, int16_t valMax, int16_t curVal,
 	int16_t lowInterval, int16_t highInterval)
 {
     uint16_t    textHeight;
-    uint16_t    xPad = 10, yPad = 5, yLine;
+    uint16_t    xPad = 10, yPad = 10, yLine, xVal;
+    char        buffer[32];
 
 #ifdef DEBUG_DISPOD
 	// make some checks:
@@ -337,14 +359,8 @@ static void dispod_screen_draw_indicator(uint8_t line, uint8_t numLines, char* n
 		DEBUGLOG("ERROR: displayDrawIndicator: low/high interval values inconsistent");
 #endif // DEBUG_DISPOD
 
-	// Preparation
-	TFT_resetclipwin();
-    TFT_setFont(DEJAVU18_FONT, NULL);
-    _fg = TFT_WHITE;
-	_bg = TFT_BLACK;
-
 	textHeight = TFT_getfontheight();
-    yLine = (textHeight  + yPad) * line;
+    yLine = yPad + (textHeight  + yPad) * line;
 
 	// current values out of range -> move into range
 	uint8_t adjCurVal = curVal;
@@ -354,48 +370,63 @@ static void dispod_screen_draw_indicator(uint8_t line, uint8_t numLines, char* n
 		adjCurVal = valMax;
 
 	// calculate x base coordinates
-	uint16_t xLowInterval = map(lowInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
-	uint16_t xHighInterval = map(highInterval, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
-	uint16_t xTarget = map(adjCurVal, valMin, valMax, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X);
+	uint16_t xLowInterval   = map(lowInterval,  valMin, valMax, INDICATOR_ADJ_MIN_X,     INDICATOR_ADJ_MAX_X);
+	uint16_t xHighInterval  = map(highInterval, valMin, valMax, INDICATOR_ADJ_MIN_X,     INDICATOR_ADJ_MAX_X);
+	uint16_t xTarget        = map(adjCurVal,    valMin, valMax, INDICATOR_ADJ_MIN_X + 2, INDICATOR_ADJ_MAX_X - 2);
 	// calculate y base coordinates
 	uint16_t yBaseline = yLine + INDICATOR_BASE_Y;		// center/base line to display indicator
 
-	//DEBUGLOG("displayDrawIndicator: indMinX %u, indMaxX %u, indAdjMinX %u, indAdjMaxX %u, xLowInt %u, xHighInt %u, xTarget %u, yPad %u, yLine %u, yBaseLine %u\n",
+	//DEBUGLOG("displayDrawIndicator: indMinX %u, indMaxX %u, indAdjMinX %u, indAdjMaxX %u, xLowInt %u, xHighInt %u, xTarget %u, yPad %u, yLine %u, yBaseLine %u",
 	//	INDICATOR_MIN_X, INDICATOR_MAX_X, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X, xLowInterval, xHighInterval, xTarget, yPad, yLine, yBaseline);
 
 	// check if the current value is in target interval
 	bool inInterval = (curVal >= lowInterval) && (curVal <= highInterval);
 
-	// show name, inverse if in target interval
+	// show name
+    TFT_print(name, xPad, yLine);
+
 	if (inInterval)
 		_fg = TFT_GREEN;
 	else
-		_fg = TFT_GREEN;
-    TFT_print(name, xPad, yLine);
+		_fg = TFT_RED;
+
+    // show value
+    if(print_value){
+        sprintf(buffer, "%u", curVal);
+        xVal = 10 + 60 + 10 + 60 - TFT_getStringWidth(buffer);
+        TFT_print(buffer, xVal, yLine);
+    }
     _fg = TFT_WHITE;
 
+    ESP_LOGI(TAG, "drawindicator textwidth %u for '%s', textheight %u", TFT_getStringWidth(name), name, textHeight);
+
 	// baseline, from INDICATOR_MIN_X to INDICATOR_MAX_X
-	TFT_drawLine(INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, TFT_WHITE);
-	//DEBUGLOG("displayDrawIndicator: drawLine %u, %u, %u, %u, %u\n", INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, color);
+	TFT_drawLine(INDICATOR_MIN_X+2, yBaseline, INDICATOR_MAX_X-2, yBaseline, TFT_WHITE);
+	//DEBUGLOG("displayDrawIndicator: drawLine %u, %u, %u, %u, %u", INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, color);
 
 	// show rounded rectangle (first fill w/background, then draw w/foreground color)
 	TFT_fillRoundRect(
-		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS,		// x0, y0 (top left corner)
-		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 1 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,							// w, h
-		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK);														// radius, color
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		        // x0, y0 (top left corner)
+		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,	// w, h
+		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK);														            // radius, color
 	TFT_drawRoundRect(
-		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS,		// x0, y0 (top left corner)
-		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 1 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,							// w, h
-		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);														// radius, color
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
+		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
+		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);														            // radius, color
+    ESP_LOGI(TAG, "TFT_drawRoundRect x0 %u y0 %u w %u h %u r %u",
+        xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
+		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
+		INDICATOR_TARGET_CIRCLE_RADIUS);
 
 	// middle circle, filled = in target range
 	TFT_fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK); // delete (background) first
 	if (inInterval) {
-		TFT_fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);
+		TFT_fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_GREEN);
 	}
 	else {
-		TFT_drawCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);
+		TFT_fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_RED);
 	}
+    ESP_LOGI(TAG, "TFT_fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
 }
 
 
@@ -441,14 +472,15 @@ void dispod_screen_running_update_display() {
 	// Preparation
     TFT_fillScreen(TFT_BLACK);
 	TFT_resetclipwin();
-    TFT_setFont(DEJAVU18_FONT, NULL);       // DEJAVU18_FONT
+    TFT_setFont(DEJAVU24_FONT, NULL);
     _fg = TFT_WHITE;
-	_bg = TFT_BLACK;                        // (color_t){ 64, 64, 64 };
+	_bg = TFT_BLACK;
 
-	dispod_screen_draw_indicator(0, 3, "Cad", MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
-	dispod_screen_draw_indicator(1, 3, "GCT", 200, 240, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
-	dispod_screen_draw_fields(2, 3, "Str", 3, values->values_to_display.str);
-	ESP_LOGI(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u\n", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
+	dispod_screen_draw_indicator(0, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+	dispod_screen_draw_indicator(1, "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
+    dispod_screen_draw_fields   (2, "Str", 3, values->values_to_display.str / 10.);
+
+	ESP_LOGI(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
 }
 
 void dispod_screen_task(void *pvParameters)
@@ -465,6 +497,9 @@ void dispod_screen_task(void *pvParameters)
                 pdTRUE, pdFALSE, portMAX_DELAY) & DISPOD_DISPLAY_UPDATE_BIT));
 
         ESP_LOGI(TAG, "dispod_screen_task: update display, screen_to_show %u", (uint8_t) params->screen_to_show);
+        if(params->current_screen != params->screen_to_show){
+                ESP_LOGI(TAG, "dispod_screen_task: switching from '%u' to '%u'", params->current_screen, params->screen_to_show);
+        }
 
         switch(params->screen_to_show){
         case SCREEN_SPLASH:
@@ -472,11 +507,15 @@ void dispod_screen_task(void *pvParameters)
             break;
         case SCREEN_STATUS:
             ESP_LOGI(TAG, "dispod_screen_task: SCREEN_STATUS");
+            if(params->current_screen != params->screen_to_show)
+                params->current_screen = params->screen_to_show;
             dispod_screen_status_update_display(params, complete);
             break;
         case SCREEN_RUNNING:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_RUNNING - not available yet");
-            // dispod_screen_running_update_display(dispod_screen_status_t *params, bool complete);
+            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_RUNNING");
+            if(params->current_screen != params->screen_to_show)
+                params->current_screen = params->screen_to_show;
+            dispod_screen_running_update_display();
             break;
         case SCREEN_CONFIG:
             ESP_LOGI(TAG, "dispod_screen_task: SCREEN_CONFIG - not available yet");

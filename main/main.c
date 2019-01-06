@@ -213,7 +213,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         if((xEventGroupWaitBits(dispod_event_group, DISPOD_BLE_CONNECTED_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BLE_CONNECTED_BIT)){
             // option: BLE avail, go to running screen -> Button C
-            dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "Cont.");
+            dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Cont.");
             xEventGroupSetBits(dispod_event_group, DISPOD_BTN_C_CNT_BIT);
             cont = true;
         }
@@ -238,6 +238,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         break;
     case DISPOD_GO_TO_RUNNING_SCREEN_EVT:
         ESP_LOGI(TAG, "DISPOD_GO_TO_RUNNING_SCREEN_EVT");
+        dispod_screen_change(&dispod_screen_status, SCREEN_RUNNING);
+        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         break;
     //
     case DISPOD_BUTTON_TAP_EVT: {
@@ -261,7 +263,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 }
                 break;
             case BUTTON_B:
-                if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BTN_B_RETRY_BLE_BIT)){
+                if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_B_RETRY_BLE_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BTN_B_RETRY_BLE_BIT)){
                     xEventGroupClearBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT);
                     xEventGroupSetBits(dispod_event_group, DISPOD_BLE_RETRY_BIT);
                     dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
@@ -272,6 +274,14 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 }
                 break;
             case BUTTON_C:
+                if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_C_CNT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_BTN_C_CNT_BIT)){
+                    xEventGroupClearBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT);
+                    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
+                    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_GO_TO_RUNNING_SCREEN_EVT, NULL, 0, portMAX_DELAY));
+                }
                 break;
             default:
                 ESP_LOGI(TAG, "unhandled button");

@@ -86,3 +86,11 @@ disPOD consists of several modules:
 * if a buffer is completed, write to disk
 * if `DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT` in the event group `EventGroupHandle_t dispod_sd_evg` is set, write all completed buffers to SD card
 * if `DISPOD_SD_WRITE_CURRENT_BUFFER_EVT` in the event group `EventGroupHandle_t dispod_sd_evg` is set, write the current (partial)  buffer to SD card
+
+# Layout
+## Running Values Screen
+### Overall
+* Font: DEJAVU24_FONT
+* xPad = 10
+* 10 (xPad) + 60 (XXX) + 10 (xPad) + 60 (123) + 20 (2*xPad) + 150 Indikator/Fields/... + 10 (xPad)
+* Indikator x

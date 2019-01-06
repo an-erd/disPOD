@@ -60,8 +60,8 @@ typedef struct {
 void dispod_runvalues_initialize(runningValuesStruct_t *values);
 void dispod_runvalues_calculate_display_values(runningValuesStruct_t *values);
 bool dispod_runvalues_get_update_display_available(runningValuesStruct_t *values);
-void dispod_runvalues_update_display_values(runningValuesStruct_t *values,
-    runValuesRSC_t *new_values);
+// void dispod_runvalues_update_display_values(runningValuesStruct_t *values,
+//     runValuesRSC_t *new_values);
 void dispod_runvalues_update_RSCValues(runningValuesStruct_t *values,
     uint8_t new_cad);
 void dispod_runvalues_update_customValues(runningValuesStruct_t *values,

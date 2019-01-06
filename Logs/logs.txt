@@ -1,10 +1,3 @@
-Toolchain path: /opt/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
-Toolchain version: crosstool-ng-1.22.0-80-g6c4433a5
-Compiler version: 5.2.0
-Python requirements from C:/msys32/home/AKAEM/esp/esp-idf/requirements.txt are satisfied.
-MONITOR
---- idf_monitor on COM6 115200 ---
---- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
 ets Jun  8 2016 00:22:57
 
 rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)
@@ -32,463 +25,654 @@ I (87) boot:  4 eeprom           Unknown data     01 99 00c90000 00001000
 I (94) boot:  5 spiffs           Unknown data     01 82 00c91000 0036f000
 I (102) boot: End of partition table
 I (106) boot: No factory image, trying OTA 0
-I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x36fd8 (225240) map
-I (198) esp_image: segment 1: paddr=0x00047000 vaddr=0x3ff80000 size=0x00000 (     0) load
-I (198) esp_image: segment 2: paddr=0x00047008 vaddr=0x3ff80000 size=0x00000 (     0) load
-I (205) esp_image: segment 3: paddr=0x00047010 vaddr=0x3ffbdb60 size=0x06468 ( 25704) load
-I (223) esp_image: segment 4: paddr=0x0004d480 vaddr=0x3ffc3fc8 size=0x00000 (     0) load
-I (223) esp_image: segment 5: paddr=0x0004d488 vaddr=0x40080000 size=0x00400 (  1024) load
+I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x37408 (226312) map
+I (198) esp_image: segment 1: paddr=0x00047430 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (198) esp_image: segment 2: paddr=0x00047438 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (205) esp_image: segment 3: paddr=0x00047440 vaddr=0x3ffbdb60 size=0x06468 ( 25704) load
+I (223) esp_image: segment 4: paddr=0x0004d8b0 vaddr=0x3ffc3fc8 size=0x00000 (     0) load
+I (224) esp_image: segment 5: paddr=0x0004d8b8 vaddr=0x40080000 size=0x00400 (  1024) load
 0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
 
-I (232) esp_image: segment 6: paddr=0x0004d890 vaddr=0x40080400 size=0x02780 ( 10112) load
-I (244) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xbc9b0 (772528) map
+I (232) esp_image: segment 6: paddr=0x0004dcc0 vaddr=0x40080400 size=0x02350 (  9040) load
+I (244) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xbd8f8 (776440) map
 0x400d0018: _flash_cache_start at ??:?
 
-I (517) esp_image: segment 8: paddr=0x0010c9d0 vaddr=0x40082b80 size=0x1b48c (111756) load
-0x40082b80: psram_enable at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:597
+I (519) esp_image: segment 8: paddr=0x0010d918 vaddr=0x40082750 size=0x1b8bc (112828) load
+0x40082750: psram_spi_init at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:434 (discriminator 18)
 
-I (561) esp_image: segment 9: paddr=0x00127e64 vaddr=0x400c0000 size=0x00000 (     0) load
-I (561) esp_image: segment 10: paddr=0x00127e6c vaddr=0x50000000 size=0x00000 (     0) load
-I (568) esp_image: segment 11: paddr=0x00127e74 vaddr=0x50000000 size=0x00000 (     0) load
-I (595) boot: Loaded app from partition at offset 0x10000
-I (595) boot: Disabling RNG early entropy source...
-I (595) spiram: Found 32MBit SPI RAM device
-I (600) spiram: SPI RAM mode: flash 40m sram 40m
-I (605) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
-I (612) cpu_start: Pro cpu up.
-I (616) cpu_start: Application information:
-I (621) cpu_start: Project name:     dispod
-I (626) cpu_start: App version:      1a3355a-dirty
-I (631) cpu_start: Compile time:     17:29:38
-I (636) cpu_start: Compile date:     Jan  5 2019
-I (642) cpu_start: ESP-IDF:          v3.3-beta1-dirty
-I (647) cpu_start: Starting app cpu, entry point is 0x4008154c
+I (563) esp_image: segment 9: paddr=0x001291dc vaddr=0x400c0000 size=0x00000 (     0) load
+I (563) esp_image: segment 10: paddr=0x001291e4 vaddr=0x50000000 size=0x00000 (     0) load
+I (570) esp_image: segment 11: paddr=0x001291ec vaddr=0x50000000 size=0x00000 (     0) load
+I (597) boot: Loaded app from partition at offset 0x10000
+I (597) boot: Disabling RNG early entropy source...
+I (598) spiram: Found 32MBit SPI RAM device
+I (602) spiram: SPI RAM mode: flash 40m sram 40m
+I (607) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
+I (615) cpu_start: Pro cpu up.
+I (618) cpu_start: Application information:
+I (623) cpu_start: Project name:     dispod
+I (628) cpu_start: App version:      50eb80d-dirty
+I (633) cpu_start: Compile time:     09:36:51
+I (638) cpu_start: Compile date:     Jan  6 2019
+I (644) cpu_start: ESP-IDF:          v3.3-beta1-dirty
+I (649) cpu_start: Starting app cpu, entry point is 0x4008154c
 0x4008154c: call_start_cpu1 at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/cpu_start.c:261
 
 I (0) cpu_start: App cpu up.
-I (1533) spiram: SPI SRAM memory test OK
-D (1534) memory_layout: Checking 12 reserved memory ranges:
-D (1535) memory_layout: Reserved memory range 0x3f800000 - 0x3fc00000
-D (1538) memory_layout: Reserved memory range 0x3ffae000 - 0x3ffae6e0
-D (1545) memory_layout: Reserved memory range 0x3ffae6e0 - 0x3ffaff10
-D (1551) memory_layout: Reserved memory range 0x3ffb0000 - 0x3ffb6388
-D (1558) memory_layout: Reserved memory range 0x3ffb8000 - 0x3ffb9a20
-D (1564) memory_layout: Reserved memory range 0x3ffbdb28 - 0x3ffbdb5c
-D (1571) memory_layout: Reserved memory range 0x3ffbdb60 - 0x3ffc6e28
-D (1577) memory_layout: Reserved memory range 0x3ffe0000 - 0x3ffe0440
-D (1584) memory_layout: Reserved memory range 0x3ffe3f20 - 0x3ffe4350
-D (1590) memory_layout: Reserved memory range 0x40070000 - 0x40078000
-D (1597) memory_layout: Reserved memory range 0x40078000 - 0x40080000
+I (1535) spiram: SPI SRAM memory test OK
+D (1537) memory_layout: Checking 12 reserved memory ranges:
+D (1537) memory_layout: Reserved memory range 0x3f800000 - 0x3fc00000
+D (1540) memory_layout: Reserved memory range 0x3ffae000 - 0x3ffae6e0
+D (1547) memory_layout: Reserved memory range 0x3ffae6e0 - 0x3ffaff10
+D (1553) memory_layout: Reserved memory range 0x3ffb0000 - 0x3ffb6388
+D (1560) memory_layout: Reserved memory range 0x3ffb8000 - 0x3ffb9a20
+D (1566) memory_layout: Reserved memory range 0x3ffbdb28 - 0x3ffbdb5c
+D (1573) memory_layout: Reserved memory range 0x3ffbdb60 - 0x3ffc6e30
+D (1579) memory_layout: Reserved memory range 0x3ffe0000 - 0x3ffe0440
+D (1586) memory_layout: Reserved memory range 0x3ffe3f20 - 0x3ffe4350
+D (1592) memory_layout: Reserved memory range 0x40070000 - 0x40078000
+D (1599) memory_layout: Reserved memory range 0x40078000 - 0x40080000
 0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
 
-D (1603) memory_layout: Reserved memory range 0x40080000 - 0x4009e00c
+D (1605) memory_layout: Reserved memory range 0x40080000 - 0x4009e00c
 0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
 
-D (1610) memory_layout: Building list of available memory regions:
-D (1616) memory_layout: Available memory region 0x3ffaff10 - 0x3ffb0000
-D (1623) memory_layout: Available memory region 0x3ffb6388 - 0x3ffb8000
-D (1629) memory_layout: Available memory region 0x3ffb9a20 - 0x3ffbdb28
-D (1636) memory_layout: Available memory region 0x3ffbdb5c - 0x3ffbdb60
-D (1643) memory_layout: Available memory region 0x3ffc6e28 - 0x3ffc8000
-D (1649) memory_layout: Available memory region 0x3ffc8000 - 0x3ffca000
-D (1656) memory_layout: Available memory region 0x3ffca000 - 0x3ffcc000
-D (1663) memory_layout: Available memory region 0x3ffcc000 - 0x3ffce000
-D (1669) memory_layout: Available memory region 0x3ffce000 - 0x3ffd0000
-D (1676) memory_layout: Available memory region 0x3ffd0000 - 0x3ffd2000
-D (1683) memory_layout: Available memory region 0x3ffd2000 - 0x3ffd4000
-D (1689) memory_layout: Available memory region 0x3ffd4000 - 0x3ffd6000
-D (1696) memory_layout: Available memory region 0x3ffd6000 - 0x3ffd8000
-D (1703) memory_layout: Available memory region 0x3ffd8000 - 0x3ffda000
-D (1710) memory_layout: Available memory region 0x3ffda000 - 0x3ffdc000
-D (1716) memory_layout: Available memory region 0x3ffdc000 - 0x3ffde000
-D (1723) memory_layout: Available memory region 0x3ffde000 - 0x3ffe0000
-D (1730) memory_layout: Available memory region 0x3ffe0440 - 0x3ffe3f20
-D (1736) memory_layout: Available memory region 0x3ffe4350 - 0x3ffe8000
-D (1743) memory_layout: Available memory region 0x3ffe8000 - 0x3fff0000
-D (1750) memory_layout: Available memory region 0x3fff0000 - 0x3fff8000
-D (1756) memory_layout: Available memory region 0x3fff8000 - 0x3fffc000
-D (1763) memory_layout: Available memory region 0x3fffc000 - 0x40000000
-D (1770) memory_layout: Available memory region 0x4009e00c - 0x400a0000
-I (1776) heap_init: Initializing. RAM available for dynamic allocation:
-D (1784) heap_init: New heap initialised at 0x3ffaff10
-I (1789) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
-D (1795) heap_init: New heap initialised at 0x3ffb6388
-I (1800) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
-D (1806) heap_init: New heap initialised at 0x3ffb9a20
-I (1812) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
-I (1818) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
-D (1824) heap_init: New heap initialised at 0x3ffc6e28
-I (1829) heap_init: At 3FFC6E28 len 000191D8 (100 KiB): DRAM
-I (1836) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
-I (1842) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
-D (1849) heap_init: New heap initialised at 0x4009e00c
-I (1854) heap_init: At 4009E00C len 00001FF4 (7 KiB): IRAM
-I (1860) cpu_start: Pro cpu start user code
-I (1865) spiram: Adding pool of 4090K of external SPI memory to heap allocator
-D (1880) clk: RTC_SLOW_CLK calibration value: 3305792
-D (100) intr_alloc: Connected src 46 to int 2 (cpu 0)
-D (101) intr_alloc: Connected src 57 to int 3 (cpu 0)
-D (102) intr_alloc: Connected src 24 to int 9 (cpu 0)
-I (106) cpu_start: Starting scheduler on PRO CPU.
+D (1612) memory_layout: Building list of available memory regions:
+D (1618) memory_layout: Available memory region 0x3ffaff10 - 0x3ffb0000
+D (1625) memory_layout: Available memory region 0x3ffb6388 - 0x3ffb8000
+D (1632) memory_layout: Available memory region 0x3ffb9a20 - 0x3ffbdb28
+D (1638) memory_layout: Available memory region 0x3ffbdb5c - 0x3ffbdb60
+D (1645) memory_layout: Available memory region 0x3ffc6e30 - 0x3ffc8000
+D (1652) memory_layout: Available memory region 0x3ffc8000 - 0x3ffca000
+D (1658) memory_layout: Available memory region 0x3ffca000 - 0x3ffcc000
+D (1665) memory_layout: Available memory region 0x3ffcc000 - 0x3ffce000
+D (1672) memory_layout: Available memory region 0x3ffce000 - 0x3ffd0000
+D (1678) memory_layout: Available memory region 0x3ffd0000 - 0x3ffd2000
+D (1685) memory_layout: Available memory region 0x3ffd2000 - 0x3ffd4000
+D (1692) memory_layout: Available memory region 0x3ffd4000 - 0x3ffd6000
+D (1698) memory_layout: Available memory region 0x3ffd6000 - 0x3ffd8000
+D (1705) memory_layout: Available memory region 0x3ffd8000 - 0x3ffda000
+D (1712) memory_layout: Available memory region 0x3ffda000 - 0x3ffdc000
+D (1718) memory_layout: Available memory region 0x3ffdc000 - 0x3ffde000
+D (1725) memory_layout: Available memory region 0x3ffde000 - 0x3ffe0000
+D (1732) memory_layout: Available memory region 0x3ffe0440 - 0x3ffe3f20
+D (1738) memory_layout: Available memory region 0x3ffe4350 - 0x3ffe8000
+D (1745) memory_layout: Available memory region 0x3ffe8000 - 0x3fff0000
+D (1752) memory_layout: Available memory region 0x3fff0000 - 0x3fff8000
+D (1759) memory_layout: Available memory region 0x3fff8000 - 0x3fffc000
+D (1765) memory_layout: Available memory region 0x3fffc000 - 0x40000000
+D (1772) memory_layout: Available memory region 0x4009e00c - 0x400a0000
+I (1779) heap_init: Initializing. RAM available for dynamic allocation:
+D (1786) heap_init: New heap initialised at 0x3ffaff10
+I (1791) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
+D (1797) heap_init: New heap initialised at 0x3ffb6388
+I (1802) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
+D (1809) heap_init: New heap initialised at 0x3ffb9a20
+I (1814) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
+I (1820) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
+D (1826) heap_init: New heap initialised at 0x3ffc6e30
+I (1831) heap_init: At 3FFC6E30 len 000191D0 (100 KiB): DRAM
+I (1838) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (1844) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+D (1851) heap_init: New heap initialised at 0x4009e00c
+I (1856) heap_init: At 4009E00C len 00001FF4 (7 KiB): IRAM
+I (1862) cpu_start: Pro cpu start user code
+I (1867) spiram: Adding pool of 4090K of external SPI memory to heap allocator
+D (1882) clk: RTC_SLOW_CLK calibration value: 3300250
+D (102) intr_alloc: Connected src 46 to int 2 (cpu 0)
+D (103) intr_alloc: Connected src 57 to int 3 (cpu 0)
+D (104) intr_alloc: Connected src 24 to int 9 (cpu 0)
+I (108) cpu_start: Starting scheduler on PRO CPU.
 D (0) intr_alloc: Connected src 25 to int 2 (cpu 1)
 I (4) cpu_start: Starting scheduler on APP CPU.
-D (130) heap_init: New heap initialised at 0x3ffe0440
-D (136) heap_init: New heap initialised at 0x3ffe4350
-I (141) spiram: Reserving pool of 32K of internal memory for DMA/internal allocations
-D (149) spiram: Allocating block of size 32768 bytes
-D (154) intr_alloc: Connected src 16 to int 12 (cpu 0)
-I (160) DISPOD: app_main() entered
-I (205) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
-I (441) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
-I (441) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
-I (443) DISPOD: initialize dispod
-D (447) event: created task for loop 0x3ffba3f0
-D (447) event: running task for loop 0x3ffba3f0
-D (453) event: created event loop 0x3ffba3f0
-D (461) event: registered handler 0x400d5084 for event any:-1
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+D (133) heap_init: New heap initialised at 0x3ffe0440
+D (139) heap_init: New heap initialised at 0x3ffe4350
+I (144) spiram: Reserving pool of 32K of internal memory for DMA/internal allocations
+D (152) spiram: Allocating block of size 32768 bytes
+D (157) intr_alloc: Connected src 16 to int 12 (cpu 0)
+I (163) DISPOD: app_main() entered
+I (207) DISPOD: SPIFFS: calling esp_vfs_spiffs_register()
+I (443) DISPOD: SPIFFS: esp_vfs_spiffs_register() returned
+I (443) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
+I (445) DISPOD: initialize dispod
+D (449) event: created task for loop 0x3ffba1d4
+D (449) event: running task for loop 0x3ffba1d4
+D (455) event: created event loop 0x3ffba1d4
+D (463) event: registered handler 0x400d5080 for event any:-1
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (466) DISPOD: Starting dispod_screen_task()
-I (471) DISPOD: Starting dispod_update_task()
-I (471) DISPOD_TFT: dispod_screen_task: started
-I (476) DISPOD: Starting dispod_archiver_task()
-I (477) DISPOD_UPDATER: dispod_update_task: started
-D (488) event: created post for event WORKFLOW_EVENTS:0
-I (488) DISPOD_ARCHIVER: dispod_archiver_task: started
-D (499) event: running post WORKFLOW_EVENTS:0 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (469) DISPOD: Starting dispod_screen_task()
+I (474) DISPOD: Starting dispod_update_task()
+I (474) DISPOD_TFT: dispod_screen_task: started
+I (480) DISPOD: Starting dispod_archiver_task()
+I (480) DISPOD_UPDATER: dispod_update_task: started
+D (490) event: created post for event WORKFLOW_EVENTS:0
+I (490) DISPOD_ARCHIVER: dispod_archiver_task: started
+D (501) event: running post WORKFLOW_EVENTS:0 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-D (500) event: posted WORKFLOW_EVENTS:0 to loop 0x3ffba3f0
-I (512) DISPOD: DISPOD_STARTUP_EVT
-D (521) intr_alloc: Connected src 22 to int 13 (cpu 0)
-I (526) DISPOD_BUTTON: dispod_button_initialize()
-I (532) DISPOD_BUTTON: before btn init, heap: 4348416
-I (538) gpio: GPIO[39]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
-I (547) gpio: GPIO[38]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
-I (556) gpio: GPIO[37]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
-I (566) DISPOD_BUTTON: after btn init, heap: 4347324
+D (502) event: posted WORKFLOW_EVENTS:0 to loop 0x3ffba1d4
+I (514) DISPOD: DISPOD_STARTUP_EVT
+D (524) intr_alloc: Connected src 22 to int 13 (cpu 0)
+I (529) DISPOD_BUTTON: dispod_button_initialize()
+I (534) DISPOD_BUTTON: before btn init, heap: 4348408
+I (540) gpio: GPIO[39]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
+I (549) gpio: GPIO[38]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
+I (558) gpio: GPIO[37]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:3
+I (568) DISPOD_BUTTON: after btn init, heap: 4347316
 
-I (579) wifi: wifi driver task: 3ffbba80, prio:23, stack:3584, core=0
-I (580) wifi: wifi firmware version: 328353e
-I (580) wifi: config NVS flash: enabled
-I (584) wifi: config nano formating: disabled
-I (588) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-I (598) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-I (625) wifi: Init dynamic tx buffer num: 32
-I (625) wifi: Init data frame dynamic rx buffer num: 32
-I (625) wifi: Init management frame dynamic rx buffer num: 32
-I (628) wifi: Init static tx buffer num: 16
-I (633) wifi: Init static rx buffer size: 1600
-I (637) wifi: Init static rx buffer num: 10
-I (640) wifi: Init dynamic rx buffer num: 32
-D (646) RTC_MODULE: Wi-Fi takes adc2 lock.
-I (727) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
-I (729) wifi: mode : sta (84:0d:8e:25:92:34)
-D (730) event: created post for event WORKFLOW_EVENTS:1
-D (730) event: SYSTEM_EVENT_STA_START
-D (732) event: posted WORKFLOW_EVENTS:1 to loop 0x3ffba3f0
-D (737) DISPOD_WIFI: SYSTEM_EVENT_STA_START
-D (741) event: running post WORKFLOW_EVENTS:1 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (583) wifi: wifi driver task: 3ffd8c94, prio:23, stack:3584, core=0
+I (583) wifi: wifi firmware version: 328353e
+I (584) wifi: config NVS flash: enabled
+I (587) wifi: config nano formating: disabled
+I (591) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (601) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (627) wifi: Init dynamic tx buffer num: 32
+I (628) wifi: Init data frame dynamic rx buffer num: 32
+I (628) wifi: Init management frame dynamic rx buffer num: 32
+I (631) wifi: Init static tx buffer num: 16
+I (636) wifi: Init static rx buffer size: 1600
+I (639) wifi: Init static rx buffer num: 10
+I (643) wifi: Init dynamic rx buffer num: 32
+D (648) RTC_MODULE: Wi-Fi takes adc2 lock.
+I (729) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
+I (731) wifi: mode : sta (84:0d:8e:25:92:34)
+D (732) event: created post for event WORKFLOW_EVENTS:1
+D (732) event: SYSTEM_EVENT_STA_START
+D (735) event: posted WORKFLOW_EVENTS:1 to loop 0x3ffba1d4
+D (739) DISPOD_WIFI: SYSTEM_EVENT_STA_START
+D (744) event: running post WORKFLOW_EVENTS:1 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (746) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 0
-I (754) DISPOD: DISPOD_BASIC_INIT_DONE_EVT
-I (761) DISPOD_TFT: dispod_screen_task: SCREEN_SPLASH - not available yet
-I (766) DISPOD_TFT: dispod_display_initialize()
-I (1279) DISPOD_TFT: Display config, Pins used: miso=19, mosi=23, sck=18, cs=14
-I (1279) DISPOD_TFT: SPI: display device added to spi bus (1)
-I (1282) DISPOD_TFT: SPI: attached display device, speed=8000000
-I (1289) DISPOD_TFT: SPI: bus uses native pins: false
-I (1294) DISPOD_TFT: SPI: display init...
-I (2100) DISPOD_TFT: OK
-I (2106) DISPOD_TFT: SPI: Max rd speed = 1000000
-I (2106) DISPOD_TFT: SPI: Changed speed to 26666666
-I (2177) DISPOD_TFT: dispod_screen_status_initialize()
-I (2177) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (2177) event: created post for event WORKFLOW_EVENTS:2
-I (2179) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (2185) event: posted WORKFLOW_EVENTS:2 to loop 0x3ffba3f0
-D (2196) event: running post WORKFLOW_EVENTS:2 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (748) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 0
+I (756) DISPOD: DISPOD_BASIC_INIT_DONE_EVT
+I (764) DISPOD_TFT: dispod_screen_task: SCREEN_SPLASH - not available yet
+I (768) DISPOD_TFT: dispod_display_initialize()
+I (1281) DISPOD_TFT: Display config, Pins used: miso=19, mosi=23, sck=18, cs=14
+I (1281) DISPOD_TFT: SPI: display device added to spi bus (1)
+I (1284) DISPOD_TFT: SPI: attached display device, speed=8000000
+I (1291) DISPOD_TFT: SPI: bus uses native pins: false
+I (1296) DISPOD_TFT: SPI: display init...
+I (2102) DISPOD_TFT: OK
+I (2108) DISPOD_TFT: SPI: Max rd speed = 1000000
+I (2108) DISPOD_TFT: SPI: Changed speed to 26666666
+I (2179) DISPOD_TFT: dispod_screen_status_initialize()
+I (2179) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (2179) event: created post for event WORKFLOW_EVENTS:2
+I (2181) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (2186) event: posted WORKFLOW_EVENTS:2 to loop 0x3ffba1d4
+D (2198) event: running post WORKFLOW_EVENTS:2 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (2204) DISPOD: DISPOD_DISPLAY_INIT_DONE_EVT
-I (2209) DISPOD: connect to WiFi
-D (4627) event: SYSTEM_EVENT_SCAN_DONE, status:0, number:5
-D (4627) DISPOD_WIFI: SYSTEM_EVENT_SCAN_DONE
-D (4628) DISPOD_WIFI: -71 W12
-D (4629) DISPOD_WIFI: -71 W12N
-D (4632) DISPOD_WIFI: -81
-D (4635) DISPOD_WIFI: -83 Telekom_FON
-D (4639) DISPOD_WIFI: -84 WLAN-736916
-I (4642) DISPOD_WIFI: Setting WiFi configuration SSID W12...
-I (4649) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (4656) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (4666) DISPOD_WIFI: Waiting for IP address...
-I (4786) wifi: new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
-I (5482) wifi: state: init -> auth (b0)
-I (5489) wifi: state: auth -> assoc (0)
+I (2206) DISPOD: DISPOD_DISPLAY_INIT_DONE_EVT
+I (2211) DISPOD: connect to WiFi
+D (4629) event: SYSTEM_EVENT_SCAN_DONE, status:0, number:5
+D (4630) DISPOD_WIFI: SYSTEM_EVENT_SCAN_DONE
+D (4630) DISPOD_WIFI: -68 W12N
+D (4631) DISPOD_WIFI: -69 W12
+D (4634) DISPOD_WIFI: -77 WLAN-736916
+D (4638) DISPOD_WIFI: -77 Telekom_FON
+D (4642) DISPOD_WIFI: -86
+I (4645) DISPOD_WIFI: Setting WiFi configuration SSID W12...
+I (4651) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (4659) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (4668) DISPOD_WIFI: Waiting for IP address...
+I (4789) wifi: new:<9,0>, old:<1,0>, ap:<255,255>, sta:<9,0>, prof:1
+I (5485) wifi: state: init -> auth (b0)
+I (5490) wifi: state: auth -> assoc (0)
 I (5506) wifi: state: assoc -> run (10)
-I (5528) wifi: connected with W12, channel 1, bssid = ec:08:6b:8a:ae:3a
-I (5534) wifi: pm start, type: 1
+I (5524) wifi: connected with W12, channel 9, bssid = ec:08:6b:8a:ae:3a
+I (5580) wifi: pm start, type: 1
 
-D (5534) event: SYSTEM_EVENT_STA_CONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, channel:1, authmode:3
-D (5539) DISPOD_WIFI: SYSTEM_EVENT_STA_CONNECTED
-D (6577) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.2.155, mask:255.255.255.0, gw:192.168.2.1
-I (6578) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
-D (6583) DISPOD_WIFI: SYSTEM_EVENT_STA_GOT_IP
-I (6587) DISPOD_WIFI: got ip:192.168.2.155
-D (6592) event: created post for event WORKFLOW_EVENTS:4
-I (6592) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (6597) event: posted WORKFLOW_EVENTS:4 to loop 0x3ffba3f0
-D (6592) event: created post for event WORKFLOW_EVENTS:3
+D (5582) event: SYSTEM_EVENT_STA_CONNECTED, ssid:W12, ssid_len:3, bssid:ec:08:6b:8a:ae:3a, channel:9, authmode:3
+D (5585) DISPOD_WIFI: SYSTEM_EVENT_STA_CONNECTED
+D (6582) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.2.155, mask:255.255.255.0, gw:192.168.2.1
+I (6584) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
+D (6588) DISPOD_WIFI: SYSTEM_EVENT_STA_GOT_IP
+I (6593) DISPOD_WIFI: got ip:192.168.2.155
+I (6598) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (6598) event: created post for event WORKFLOW_EVENTS:4
+D (6598) event: created post for event WORKFLOW_EVENTS:3
+D (6611) event: posted WORKFLOW_EVENTS:4 to loop 0x3ffba1d4
+D (6616) event: posted WORKFLOW_EVENTS:3 to loop 0x3ffba1d4
 I (6605) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (6616) event: posted WORKFLOW_EVENTS:3 to loop 0x3ffba3f0
-D (6627) event: running post WORKFLOW_EVENTS:4 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+D (6627) event: running post WORKFLOW_EVENTS:4 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (6635) DISPOD: DISPOD_WIFI_GOT_IP_EVT
-I (6640) DISPOD: WiFi connected, update NTP
-I (6645) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
-I (6652) DISPOD_SNTP: Initializing SNTP
-I (6657) DISPOD_SNTP: Waiting for system time to be set... (1/10)
-I (6713) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (6713) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (8664) DISPOD_SNTP: The current local date/time is: Sat Jan  5 20:46:32 2019
-I (8664) DISPOD_SNTP: Time set yet.
-I (8665) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (8665) event: created post for event WORKFLOW_EVENTS:5
-I (8673) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (8678) event: posted WORKFLOW_EVENTS:5 to loop 0x3ffba3f0
-D (8689) event: running post WORKFLOW_EVENTS:3 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (6641) DISPOD: DISPOD_WIFI_GOT_IP_EVT
+I (6646) DISPOD: WiFi connected, update NTP
+I (6651) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
+I (6657) DISPOD_SNTP: Initializing SNTP
+I (6664) DISPOD_SNTP: Waiting for system time to be set... (1/10)
+I (6721) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (6722) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (8670) DISPOD_SNTP: The current local date/time is: Sun Jan  6 19:29:21 2019
+I (8670) DISPOD_SNTP: Time set yet.
+I (8671) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (8671) event: created post for event WORKFLOW_EVENTS:5
+I (8679) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (8684) event: posted WORKFLOW_EVENTS:5 to loop 0x3ffba1d4
+D (8695) event: running post WORKFLOW_EVENTS:3 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (8698) DISPOD: DISPOD_WIFI_INIT_DONE_EVT
-D (8702) event: running post WORKFLOW_EVENTS:5 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (8704) DISPOD: DISPOD_WIFI_INIT_DONE_EVT
+D (8708) event: running post WORKFLOW_EVENTS:5 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (8711) DISPOD: DISPOD_NTP_INIT_DONE_EVT
-I (8715) DISPOD: uxBits: DISPOD_NTP_ACTIVATED_BIT = 8192, uxBits = 425
-I (8722) DISPOD: DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT
-D (8729) event: created post for event WORKFLOW_EVENTS:6
-D (8735) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba3f0
-D (8740) event: running post WORKFLOW_EVENTS:6 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (8717) DISPOD: DISPOD_NTP_INIT_DONE_EVT
+I (8721) DISPOD: uxBits: DISPOD_NTP_ACTIVATED_BIT = 8192, uxBits = 425
+I (8728) DISPOD: DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT
+D (8735) event: created post for event WORKFLOW_EVENTS:6
+D (8741) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba1d4
+D (8746) event: running post WORKFLOW_EVENTS:6 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (8749) DISPOD: DISPOD_SD_INIT_DONE_EVT
-I (8753) DISPOD: uxBits: DISPOD_BLE_RETRY_BIT = 4096, uxBits = 425
-I (8760) BTDM_INIT: BT controller compile version [97a362b]
-I (8767) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
-I (9157) DISPOD_GATTC: esp_gattc_cb()
-I (9160) DISPOD_GATTC: REG_EVT
-I (9164) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
-I (9169) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
-I (9170) DISPOD_GATTC: scan start success
-I (9174) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (9182) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (10946) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (10947) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (10947) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (10953) DISPOD_GATTC: searched Device Name Len 0
-I (10959) DISPOD_GATTC:
+I (8755) DISPOD: DISPOD_SD_INIT_DONE_EVT
+I (8759) DISPOD: uxBits: DISPOD_BLE_RETRY_BIT = 4096, uxBits = 425
+I (8766) BTDM_INIT: BT controller compile version [97a362b]
+I (8773) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (9010) DISPOD_GATTC: esp_gattc_cb()
+I (9017) DISPOD_GATTC: REG_EVT
+I (9020) DISPOD_GATTC: ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT
+I (9023) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
+I (9026) DISPOD_GATTC: scan start success
+I (9031) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (9033) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (9038) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (9044) DISPOD_GATTC: 5d 33 19 07 cd f6
+I (9054) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
+I (9061) DISPOD_GATTC: searched Device Name Len 0
+I (9067) DISPOD_GATTC:
 
-I (19172) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (19172) DISPOD_GATTC: ESP_GAP_SEARCH_INQ_CMPL_EVT
-I (19172) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (19172) event: created post for event WORKFLOW_EVENTS:7
-I (19180) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (19185) event: posted WORKFLOW_EVENTS:7 to loop 0x3ffba3f0
-D (19185) event: running post WORKFLOW_EVENTS:7 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (9070) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
+I (9076) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (9080) DISPOD_GATTC: searched Adv Data Len 9, Scan Response Len 26
+I (9087) DISPOD_GATTC: searched Device Name Len 15
+I (9093) DISPOD_GATTC: MilestonePod 12
+I (9097) DISPOD_GATTC:
 
-I (19205) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
-D (19210) event: created post for event WORKFLOW_EVENTS:8
-D (19215) event: posted WORKFLOW_EVENTS:8 to loop 0x3ffba3f0
-D (19221) event: running post WORKFLOW_EVENTS:8 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (9100) DISPOD_GATTC: searched device MilestonePod
 
-I (19230) DISPOD: DISPOD_STARTUP_COMPLETE_EVT
-I (19283) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (19283) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (24904) DISPOD_BUTTON: push cb (id 0)
-D (24904) event: created post for event ACTIVITY_EVENTS:12
-D (24904) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (9106) DISPOD_GATTC: connect to the remote device.
+I (9123) DISPOD_GATTC: ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT
+I (9123) DISPOD_GATTC: stop scan successfully
+I (9137) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (9137) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (9557) DISPOD_GATTC: esp_gattc_cb()
+I (9561) DISPOD_GATTC: ESP_GATTC_CONNECT_EVT conn_id 0, if 1
+I (9561) DISPOD_GATTC: REMOTE BDA:
+I (9561) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (9564) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (9572) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (9576) DISPOD_GATTC: esp_gattc_cb()
+I (9586) DISPOD_GATTC: ESP_GATTC_OPEN_EVT
+I (9591) DISPOD_GATTC: open success
+I (11748) DISPOD_GATTC: esp_gattc_cb()
+I (11748) DISPOD_GATTC: ESP_GATTC_CFG_MTU_EVT, Status 0, MTU 23, conn_id 0
+I (11750) DISPOD_GATTC: esp_gattc_cb()
+I (11754) DISPOD_GATTC: ESP_GATTC_SEARCH_RES_EVT
+I (11759) DISPOD_GATTC: SEARCH RES: conn_id = 0 is primary service 1
+I (11766) DISPOD_GATTC: start handle 16 end handle 29 current handle value 16
+I (11775) DISPOD_GATTC: service found
+I (11778) DISPOD_GATTC: UUID16: 1814
+I (11782) DISPOD_GATTC: esp_gattc_cb()
+I (11787) DISPOD_GATTC: ESP_GATTC_SEARCH_CMPL_EVT
+I (11792) DISPOD_GATTC: Get service information from remote device
+I (11801) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 18
+I (11806) DISPOD_GATTC: REMOTE BDA:
+I (11811) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (11816) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, handle 28
+I (11823) DISPOD_GATTC: REMOTE BDA:
+I (11827) DISPOD_GATTC: 50 33 8b 1c f0 12
+I (11832) DISPOD_GATTC: esp_gattc_cb()
+I (11836) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
+I (11842) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 19, size 2, value 1, type_rsp 2, auth req 0
+I (11854) DISPOD_GATTC: esp_gattc_cb()
+I (11858) DISPOD_GATTC: ESP_GATTC_REG_FOR_NOTIFY_EVT
+I (11864) DISPOD_GATTC: esp_ble_gattc_write_char_descr() if 1, conn_id 0, handle 29, size 2, value 1, type_rsp 2, auth req 0
+I (11912) DISPOD_GATTC: esp_gattc_cb()
+I (11913) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
+I (11913) DISPOD_GATTC: write descr success
+I (11956) DISPOD_GATTC: esp_gattc_cb()
+I (11956) DISPOD_GATTC: ESP_GATTC_WRITE_DESCR_EVT
+I (11956) DISPOD_GATTC: write descr success
+I (14474) DISPOD_GATTC: ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT
+I (14475) DISPOD_GATTC: update connection params status = 0, min_int = 16, max_int = 32,conn_int = 32,latency = 0, timeout = 600
+I (14482) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+D (14482) event: created post for event WORKFLOW_EVENTS:7
+I (14490) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+D (14495) event: posted WORKFLOW_EVENTS:7 to loop 0x3ffba1d4
+D (14495) event: running post WORKFLOW_EVENTS:7 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-D (24905) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (24911) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 0
-I (26301) DISPOD_BUTTON: push cb (id 2)
-D (26301) event: created post for event ACTIVITY_EVENTS:12
-D (26301) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (14515) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
+D (14520) event: created post for event WORKFLOW_EVENTS:8
+D (14526) event: posted WORKFLOW_EVENTS:8 to loop 0x3ffba1d4
+D (14531) event: running post WORKFLOW_EVENTS:8 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-D (26302) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (26308) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 2
-I (29748) DISPOD_BUTTON: push cb (id 1)
-D (29748) event: created post for event ACTIVITY_EVENTS:12
-D (29748) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+I (14540) DISPOD: DISPOD_STARTUP_COMPLETE_EVT
+I (14592) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
+I (14592) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (17469) DISPOD_BUTTON: push cb (id 2)
+D (17469) event: created post for event ACTIVITY_EVENTS:12
+D (17469) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-D (29749) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (29755) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 1
-D (29767) event: created post for event WORKFLOW_EVENTS:6
-D (29772) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba3f0
-D (29778) event: running post WORKFLOW_EVENTS:6 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
+D (17469) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba1d4
+I (17476) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 2
+D (17488) event: created post for event WORKFLOW_EVENTS:11
+D (17493) event: posted WORKFLOW_EVENTS:11 to loop 0x3ffba1d4
+D (17499) event: running post WORKFLOW_EVENTS:11 with handler 0x400d5080 on loop 0x3ffba1d4
+0x400d5080: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
 
-I (29786) DISPOD: DISPOD_SD_INIT_DONE_EVT
-I (29791) DISPOD: uxBits: DISPOD_BLE_RETRY_BIT = 4096, uxBits = 4521
-I (29804) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
-I (29804) DISPOD_GATTC: scan start success
-I (29809) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (29817) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (30281) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (30282) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (30282) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (30288) DISPOD_GATTC: searched Device Name Len 0
-I (30293) DISPOD_GATTC:
-
-I (30815) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (30816) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (30816) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (30822) DISPOD_GATTC: searched Device Name Len 0
-I (30827) DISPOD_GATTC:
-
-I (36255) DISPOD_BUTTON: push cb (id 2)
-D (36255) event: created post for event ACTIVITY_EVENTS:12
-D (36255) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-D (36256) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (36262) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 2
-I (37551) DISPOD_BUTTON: push cb (id 0)
-D (37551) event: created post for event ACTIVITY_EVENTS:12
-D (37551) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-D (37552) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (37558) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 0
-I (38158) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (38159) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (38159) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (38165) DISPOD_GATTC: searched Device Name Len 0
-I (38170) DISPOD_GATTC:
-
-I (38174) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (38179) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (38184) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (38191) DISPOD_GATTC: searched Device Name Len 0
-I (38196) DISPOD_GATTC:
-
-I (39807) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (39807) DISPOD_GATTC: ESP_GAP_SEARCH_INQ_CMPL_EVT
-I (39807) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (39807) event: created post for event WORKFLOW_EVENTS:7
-I (39815) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (39820) event: posted WORKFLOW_EVENTS:7 to loop 0x3ffba3f0
-D (39820) event: running post WORKFLOW_EVENTS:7 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-I (39840) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
-D (39845) event: created post for event WORKFLOW_EVENTS:8
-D (39851) event: posted WORKFLOW_EVENTS:8 to loop 0x3ffba3f0
-D (39856) event: running post WORKFLOW_EVENTS:8 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-I (39865) DISPOD: DISPOD_STARTUP_COMPLETE_EVT
-I (39916) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (39917) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (42250) DISPOD_BUTTON: push cb (id 1)
-D (42250) event: created post for event ACTIVITY_EVENTS:12
-D (42250) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-D (42251) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (42257) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 1
-D (42269) event: created post for event WORKFLOW_EVENTS:6
-D (42274) event: posted WORKFLOW_EVENTS:6 to loop 0x3ffba3f0
-D (42280) event: running post WORKFLOW_EVENTS:6 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-I (42288) DISPOD: DISPOD_SD_INIT_DONE_EVT
-I (42293) DISPOD: uxBits: DISPOD_BLE_RETRY_BIT = 4096, uxBits = 4521
-I (42305) DISPOD_GATTC: ESP_GAP_BLE_SCAN_START_COMPLETE_EVT
-I (42306) DISPOD_GATTC: scan start success
-I (42311) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (42319) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-I (42510) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (42511) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (42511) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (42516) DISPOD_GATTC: searched Device Name Len 0
-I (42522) DISPOD_GATTC:
-
-I (42525) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (42531) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (42536) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (42543) DISPOD_GATTC: searched Device Name Len 0
-I (42548) DISPOD_GATTC:
-
-I (43367) DISPOD_BUTTON: push cb (id 1)
-D (43367) event: created post for event ACTIVITY_EVENTS:12
-D (43367) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-D (43368) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (43374) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 1
-I (44333) DISPOD_BUTTON: push cb (id 1)
-D (44333) event: created post for event ACTIVITY_EVENTS:12
-D (44333) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-D (44334) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (44340) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 1
-I (45085) DISPOD_BUTTON: push cb (id 1)
-D (45086) event: created post for event ACTIVITY_EVENTS:12
-D (45086) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-I (45093) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 1
-D (45086) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (45733) DISPOD_BUTTON: push cb (id 1)
-D (45733) event: created post for event ACTIVITY_EVENTS:12
-D (45733) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-D (45734) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (45740) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 1
-I (46370) DISPOD_BUTTON: push cb (id 1)
-D (46370) event: created post for event ACTIVITY_EVENTS:12
-D (46370) event: running post ACTIVITY_EVENTS:12 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-D (46371) event: posted ACTIVITY_EVENTS:12 to loop 0x3ffba3f0
-I (46377) DISPOD: DISPOD_BUTTON_TAP_EVT, button id 1
-I (50120) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (50120) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (50120) DISPOD_GATTC: searched Adv Data Len 14, Scan Response Len 0
-I (50126) DISPOD_GATTC: searched Device Name Len 0
-I (50132) DISPOD_GATTC:
-
-I (50135) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (50141) DISPOD_GATTC: 41 17 4d f5 d5 5a
-I (50146) DISPOD_GATTC: searched Adv Data Len 0, Scan Response Len 0
-I (50153) DISPOD_GATTC: searched Device Name Len 0
-I (50158) DISPOD_GATTC:
-
-I (52307) DISPOD_GATTC: ESP_GAP_BLE_SCAN_RESULT_EVT
-I (52307) DISPOD_GATTC: ESP_GAP_SEARCH_INQ_CMPL_EVT
-I (52308) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-D (52308) event: created post for event WORKFLOW_EVENTS:7
-I (52315) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
-D (52320) event: posted WORKFLOW_EVENTS:7 to loop 0x3ffba3f0
-D (52320) event: running post WORKFLOW_EVENTS:7 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-I (52340) DISPOD: DISPOD_BLE_DEVICE_DONE_EVT
-D (52345) event: created post for event WORKFLOW_EVENTS:8
-D (52351) event: posted WORKFLOW_EVENTS:8 to loop 0x3ffba3f0
-D (52357) event: running post WORKFLOW_EVENTS:8 with handler 0x400d5084 on loop 0x3ffba3f0
-0x400d5084: run_on_event at C:/msys32/home/AKAEM/esp/disPOD/main/main.c:115
-
-I (52365) DISPOD: DISPOD_STARTUP_COMPLETE_EVT
-I (52417) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 1
-I (52417) DISPOD_TFT: dispod_screen_task: SCREEN_STATUS
+I (17508) DISPOD: DISPOD_GO_TO_RUNNING_SCREEN_EVT
+I (17513) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (17520) DISPOD_TFT: dispod_screen_task: switching from '1' to '2'
+I (17527) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (17606) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (17608) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (17610) DISPOD_TFT: TFT_fillCircle x0 170 y0 20 r 8
+I (17617) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (17625) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (17630) DISPOD_TFT: TFT_fillCircle x0 170 y0 55 r 8
+I (17640) DISPOD_TFT: updateDisplayWithRunningValues: cad   0 stance   0 strike 0
+I (25882) DISPOD_GATTC: esp_gattc_cb()
+I (25883) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (25883) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (25888) DISPOD_GATTC: handle: 18
+I (25893) DISPOD_GATTC: 03 f1 02 61 b4 00 18 01 00 00
+I (25898) DISPOD_GATTC: 0x2a53: F  3 S 10.6 C  97 Str 180 Dis    28
+I (25905) DISPOD_UPDATER: received from queue: 0x2a53: C  97
+I (25905) DISPOD_GATTC: esp_gattc_cb()
+I (25911) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (25916) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (25923) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(): idxItem = 0
+I (25928) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (25936) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cadence 97
+I (25943) DISPOD_GATTC: handle: 28
+D (25952) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 0
+I (25956) DISPOD_GATTC: 0f 06 01 05
+D (25965) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 0, size 256, complete 0
+I (25969) DISPOD_GATTC: 0xFF00: F 15 Str 1 Swi 1 Imp 0 Sta 262
+D (25981) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 1, size 256, complete 0
+I (25999) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (25999) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta  262
+I (26006) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (26014) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (26027) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 262, strike 1
+I (26036) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 97   0   0   0   0], num   1, sum   97, val2dis 194
+I (26048) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [262   0   0   0   0], num   1, sum  262, val2dis 262
+I (26061) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   0   0   0   0], num   1, sum    1, val2dis  10
+D (26073) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 1
+I (26093) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25ffer 0, used in current buffer 1, size 256, complete 0
+D (26094) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 2, size 256, complete 0
+I (26103) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (26121) DISPOD_TFT: TFT_fillCircle x0 270 y0 20 r 8
+I (26129) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (26136) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (26140) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+I (26151) DISPOD_TFT: updateDisplayWithRunningValues: cad 194 stance 262 strike 10
+I (26154) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (26162) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (26240) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (26242) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (26245) DISPOD_TFT: TFT_fillCircle x0 270 y0 20 r 8
+I (26253) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (26260) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (26264) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+I (26275) DISPOD_TFT: updateDisplayWithRunningValues: cad 194 stance 262 strike 10
+I (26606) DISPOD_GATTC: esp_gattc_cb()
+I (26607) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (26607) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (26612) DISPOD_GATTC: handle: 18
+I (26616) DISPOD_GATTC: 03 f1 02 61 b8 00 3b 01 00 00
+I (26622) DISPOD_GATTC: 0x2a53: F  3 S 10.6 C  97 Str 184 Dis    31
+I (26629) DISPOD_UPDATER: received from queue: 0x2a53: C  97
+I (26629) DISPOD_GATTC: esp_gattc_cb()
+I (26635) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (26639) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (26647) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(): idxItem = 1
+I (26652) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (26660) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cadence 97
+I (26667) DISPOD_GATTC: handle: 28
+D (26675) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 2
+I (26680) DISPOD_GATTC: 0f a1 01 05
+D (26689) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 2, size 256, complete 0
+I (26693) DISPOD_GATTC: 0xFF00: F 15 Str 1 Swi 1 Imp 0 Sta 417
+D (26705) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 3, size 256, complete 0
+I (26711) DISPOD_GATTC: esp_gattc_cb()
+I (26723) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta  417
+I (26727) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (26734) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (26739) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (26746) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 417, strike 1
+I (26753) DISPOD_GATTC: handle: 18
+I (26762) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 97  97   0   0   0], num   2, sum  194, val2dis 194
+I (26767) DISPOD_GATTC: 03 a9 02 5e a0 00 61 01 00 00
+I (26779) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [262 417   0   0   0], num   2, sum  679, val2dis 339
+I (26785) DISPOD_GATTC: 0x2a53: F  3 S 9.6 C  94 Str 160 Dis    35
+I (26797) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   1   0   0   0], num   2, sum    2, val2dis  10
+I (26804) DISPOD_GATTC: esp_gattc_cb()
+D (26816) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 3
+D (26830) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 3, size 256, complete 0
+I (26821) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+D (26842) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 4, size 256, complete 0
+I (26847) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (26858) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (26865) DISPOD_GATTC: handle: 28
+I (26858) DISPOD_UPDATER: received from queue: 0x2a53: C  94
+I (26877) DISPOD_GATTC: 0f 0b 01 24
+I (26873) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (26887) DISPOD_GATTC: 0xFF00: F 15 Str 0 Swi 1 Imp 2 Sta 267
+I (26883) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (26907) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(): idxItem = 2
+I (26916) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cadence 94
+D (26924) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 4
+D (26933) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 4, size 256, complete 0
+D (26945) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 5, size 256, complete 0
+I (26956) DISPOD_UPDATER: received from queue: 0xFF00: Str 0 Sta  267
+I (26963) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (26967) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (26971) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 267, strike 0
+I (26980) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (26987) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 97  97  94   0   0], num   3, sum  288, val2dis 192
+I (26996) DISPOD_TFT: TFT_fillCircle x0 270 y0 20 r 8
+I (27006) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [262 417 267   0   0], num   3, sum  946, val2dis 315
+I (27015) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (27025) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   1   0   0   0], num   3, sum    2, val2dis   6
+I (27036) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+D (27045) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 5
+I (27051) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+D (27061) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 5, size 256, complete 0
+I (27073) DISPOD_TFT: updateDisplayWithRunningValues: cad 192 stance 315 strike 6
+D (27078) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 6, size 256, complete 0
+I (27098) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (27106) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (27184) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (27186) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (27189) DISPOD_TFT: TFT_fillCircle x0 264 y0 20 r 8
+I (27197) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (27204) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (27208) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+I (27219) DISPOD_TFT: updateDisplayWithRunningValues: cad 192 stance 315 strike 6
+I (28002) DISPOD_GATTC: esp_gattc_cb()
+I (28003) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (28003) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (28008) DISPOD_GATTC: handle: 18
+I (28013) DISPOD_GATTC: 03 b6 02 60 b4 00 81 01 00 00
+I (28018) DISPOD_GATTC: 0x2a53: F  3 S 9.8 C  96 Str 180 Dis    38
+I (28025) DISPOD_UPDATER: received from queue: 0x2a53: C  96
+I (28031) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (28025) DISPOD_GATTC: esp_gattc_cb()
+I (28038) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(): idxItem = 3
+I (28043) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (28051) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cadence 96
+I (28056) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+D (28065) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 6
+I (28072) DISPOD_GATTC: handle: 28
+D (28081) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 6, size 256, complete 0
+I (28085) DISPOD_GATTC: 0f d9 01 04
+D (28096) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 7, size 256, complete 0
+I (28101) DISPOD_GATTC: 0xFF00: F 15 Str 0 Swi 1 Imp 0 Sta 473
+I (28119) DISPOD_UPDATER: received from queue: 0xFF00: Str 0 Sta  473
+I (28126) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (28133) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 473, strike 0
+I (28142) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 97  97  94  96   0], num   4, sum  384, val2dis 192
+I (28154) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [262 417 267 473   0], num   4, sum 1419, val2dis 354
+I (28167) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   1   0   0   0], num   4, sum    2, val2dis   5
+D (28179) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 7
+D (28189) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 7, size 256, complete 0
+D (28200) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 8, size 256, complete 0
+I (28212) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (28220) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (28299) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (28301) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (28303) DISPOD_TFT: TFT_fillCircle x0 264 y0 20 r 8
+I (28311) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (28318) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (28322) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+I (28333) DISPOD_TFT: updateDisplayWithRunningValues: cad 192 stance 354 strike 5
+I (31206) DISPOD_GATTC: esp_gattc_cb()
+I (31207) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (31207) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (31212) DISPOD_GATTC: handle: 18
+I (31216) DISPOD_GATTC: 03 9c 02 5c 12 01 9c 01 00 00
+I (31222) DISPOD_GATTC: 0x2a53: F  3 S 9.4 C  92 Str 274 Dis    41
+I (31229) DISPOD_UPDATER: received from queue: 0x2a53: C  92
+I (31229) DISPOD_GATTC: esp_gattc_cb()
+I (31235) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (31239) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (31247) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(): idxItem = 4
+I (31252) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (31260) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cadence 92
+I (31267) DISPOD_GATTC: handle: 28
+D (31275) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 8
+I (31280) DISPOD_GATTC: 0f 1c 01 04
+D (31289) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 8, size 256, complete 0
+I (31293) DISPOD_GATTC: 0xFF00: F 15 Str 0 Swi 1 Imp 0 Sta 284
+D (31305) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 9, size 256, complete 0
+I (31311) DISPOD_GATTC: esp_gattc_cb()
+I (31323) DISPOD_UPDATER: received from queue: 0xFF00: Str 0 Sta  284
+I (31334) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (31327) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (31341) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 284, strike 0
+I (31346) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (31355) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 97  97  94  96  92], num   5, sum  476, val2dis 190
+I (31362) DISPOD_GATTC: handle: 18
+I (31375) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [262 417 267 473 284], num   5, sum 1703, val2dis 340
+I (31391) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   1   0   0   0], num   5, sum    2, val2dis   4
+I (31379) DISPOD_GATTC: 03 8f 02 5b b0 00 bd 01 00 00
+D (31404) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 9
+I (31409) DISPOD_GATTC: 0x2a53: F  3 S 9.2 C  91 Str 176 Dis    44
+D (31419) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 9, size 256, complete 0
+I (31426) DISPOD_GATTC: esp_gattc_cb()
+D (31437) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 10, size 256, complete 0
+I (31442) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (31453) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (31458) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (31453) DISPOD_UPDATER: received from queue: 0x2a53: C  91
+I (31473) DISPOD_GATTC: handle: 28
+I (31466) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (31484) DISPOD_GATTC: 0f 58 01 01
+I (31494) DISPOD_GATTC: 0xFF00: F 15 Str 1 Swi 0 Imp 0 Sta 344
+I (31479) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (31507) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(): idxItem = 0
+I (31516) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cadence 91
+D (31524) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 10
+D (31534) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 10, size 256, complete 0
+D (31545) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 11, size 256, complete 0
+I (31557) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta  344
+I (31564) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (31564) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (31573) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (31579) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 344, strike 1
+I (31588) DISPOD_TFT: TFT_fillCircle x0 258 y0 20 r 8
+I (31594) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 91  97  94  96  92], num   5, sum  470, val2dis 188
+I (31603) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (31613) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [344 417 267 473 284], num   5, sum 1785, val2dis 357
+I (31623) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (31632) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   1   0   0   0], num   5, sum    2, val2dis   4
+I (31639) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+D (31652) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 11
+I (31664) DISPOD_TFT: updateDisplayWithRunningValues: cad 188 stance 357 strike 4
+D (31667) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 11, size 256, complete 0
+D (31687) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 12, size 256, complete 0
+I (31699) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (31706) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (31785) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (31787) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (31790) DISPOD_TFT: TFT_fillCircle x0 252 y0 20 r 8
+I (31797) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (31804) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (31808) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+I (31819) DISPOD_TFT: updateDisplayWithRunningValues: cad 188 stance 357 strike 4
+I (32483) DISPOD_GATTC: esp_gattc_cb()
+I (32483) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (32483) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (32488) DISPOD_GATTC: handle: 18
+I (32493) DISPOD_GATTC: 03 00 00 00 00 00 bd 01 00 00
+I (32498) DISPOD_GATTC: 0x2a53: F  3 S 0.0 C   0 Str   0 Dis    44
+I (32505) DISPOD_UPDATER: received from queue: 0x2a53: C   0
+I (32511) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (32505) DISPOD_GATTC: esp_gattc_cb()
+D (32519) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 12
+I (32523) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+D (32532) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 12, size 256, complete 0
+I (32537) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+D (32549) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 13, size 256, complete 0
+I (32556) DISPOD_GATTC: handle: 28
+I (32572) DISPOD_GATTC: 0f 00 00 01
+I (32576) DISPOD_GATTC: 0xFF00: F 15 Str 1 Swi 0 Imp 0 Sta   0
+I (32582) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta    0
+I (32590) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+D (32597) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 13
+D (32606) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 13, size 256, complete 0
+D (32618) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 14, size 256, complete 0
+I (33277) DISPOD_GATTC: esp_gattc_cb()
+I (33279) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (33279) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (33284) DISPOD_GATTC: handle: 28
+I (33289) DISPOD_GATTC: 0f e2 02 01
+I (33293) DISPOD_GATTC: 0xFF00: F 15 Str 1 Swi 0 Imp 0 Sta 738
+I (33299) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta  738
+I (33306) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (33314) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 738, strike 1
+D (33323) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 14
+D (33332) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 14, size 256, complete 0
+D (33344) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 15, size 256, complete 0
+I (34880) DISPOD_GATTC: esp_gattc_cb()
+I (34883) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+I (34883) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+I (34888) DISPOD_GATTC: handle: 18
+I (34893) DISPOD_GATTC: 03 00 00 00 00 00 d0 01 00 00
+I (34898) DISPOD_GATTC: 0x2a53: F  3 S 0.0 C   0 Str   0 Dis    46
+I (34905) DISPOD_UPDATER: received from queue: 0x2a53: C   0
+I (34911) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+I (34905) DISPOD_GATTC: esp_gattc_cb()
+D (34919) DISPOD_ARCHIVER: dispod_archiver_add_RSCValues: current_buffer 0, used in current buffer 15
+I (34923) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT
+D (34932) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 15, size 256, complete 0
+I (34937) DISPOD_GATTC: ESP_GATTC_NOTIFY_EVT, receive notify value:
+D (34949) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 16, size 256, complete 0
+I (34956) DISPOD_GATTC: handle: 28
+I (34972) DISPOD_GATTC: 0f 00 00 01
+I (34976) DISPOD_GATTC: 0xFF00: F 15 Str 1 Swi 0 Imp 0 Sta   0
+I (34982) DISPOD_UPDATER: received from queue: 0xFF00: Str 1 Sta    0
+I (34989) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values()
+D (34997) DISPOD_ARCHIVER: dispod_archiver_add_customValues: current_buffer 0, used in current buffer 16
+D (35006) DISPOD_ARCHIVER: dispod_archiver_set_next_element >: current_buffer 0, used in current buffer 16, size 256, complete 0
+D (35018) DISPOD_ARCHIVER: dispod_archiver_set_next_element <: current_buffer 0, used in current buffer 17, size 256, complete 0
+W (48314) BT_APPL: bta_gattc_conn_cback() - cif=1 connected=0 conn_id=1 reason=0x0008
+I (48317) DISPOD_GATTC: esp_gattc_cb()
+I (48317) DISPOD_GATTC: ESP_GATTC_DISCONNECT_EVT, reason = 8
+I (48322) DISPOD_TFT: dispod_screen_task: update display, screen_to_show 2
+I (48322) DISPOD_GATTC: esp_gattc_cb()
+I (48330) DISPOD_TFT: dispod_screen_task: SCREEN_RUNNING
+I (48414) DISPOD_TFT: drawindicator textwidth 48 for 'Cad', textheight 25
+I (48416) DISPOD_TFT: TFT_drawRoundRect x0 220 y0 10 w 29 h 20 r 8
+I (48418) DISPOD_TFT: TFT_fillCircle x0 252 y0 20 r 8
+I (48426) DISPOD_TFT: drawindicator textwidth 53 for 'GCT', textheight 25
+I (48433) DISPOD_TFT: TFT_drawRoundRect x0 160 y0 45 w 66 h 20 r 8
+I (48437) DISPOD_TFT: TFT_fillCircle x0 65420 y0 55 r 8
+I (48448) DISPOD_TFT: updateDisplayWithRunningValues: cad 188 stance 357 strike 4
