@@ -31,8 +31,8 @@ typedef struct {
 
 	// update in callback functions, copy to values[] if
 	runValuesRSC_t tmp_values;
-	bool update_avail_RSC;
-	bool update_avail_custom;
+	// bool update_avail_RSC;
+	// bool update_avail_custom;
 } runningValuesStruct_t;
 
 typedef enum {

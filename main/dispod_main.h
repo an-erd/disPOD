@@ -44,7 +44,7 @@ typedef enum {
     // workflow events
     DISPOD_STARTUP_EVT              = 0,    /*!< When the disPOD event loop started, the event comes, last call from app_main() */
     DISPOD_BASIC_INIT_DONE_EVT,             /*!< When the basic init has completed, the event comes */
-    DISPOD_DISPLAY_INIT_DONE_EVT,           /*!< When the display init has completed, the event comes */
+    DISPOD_SPLASH_AND_NETWORK_INIT_DONE_EVT, //DISPOD_DISPLAY_INIT_DONE_EVT,           /*!< When the display splash etc. (not coded yet) has completed, the event comes */
     DISPOD_WIFI_INIT_DONE_EVT,              /*!< When the WiFi init, not yet completed, the event comes */
     DISPOD_WIFI_GOT_IP_EVT,                 /*!< When the WiFi is connected and got an IP, the event comes */
     DISPOD_NTP_INIT_DONE_EVT,               /*!< When the NTP update (successfull or failed!) completed, the event comes */

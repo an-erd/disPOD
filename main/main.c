@@ -117,21 +117,22 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     case DISPOD_STARTUP_EVT:
         ESP_LOGI(TAG, "DISPOD_STARTUP_EVT");
         dispod_initialize();
+        dispod_display_initialize();
+        dispod_screen_status_initialize(&dispod_screen_status);
+        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         gpio_install_isr_service(0);
         dispod_button_initialize();
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
-        dispod_wifi_network_init();
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_BASIC_INIT_DONE_EVT:
         ESP_LOGI(TAG, "DISPOD_BASIC_INIT_DONE_EVT");
-        dispod_display_initialize();
-        dispod_screen_status_initialize(&dispod_screen_status);
-        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_DISPLAY_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+        dispod_wifi_network_init();
+        // show splash and some info here
+        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SPLASH_AND_NETWORK_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
-    case DISPOD_DISPLAY_INIT_DONE_EVT:
+    case DISPOD_SPLASH_AND_NETWORK_INIT_DONE_EVT:
         ESP_LOGI(TAG, "DISPOD_DISPLAY_INIT_DONE_EVT");
         uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
         if(uxBits & DISPOD_WIFI_ACTIVATED_BIT){
@@ -259,7 +260,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
-                    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_DISPLAY_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+                    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SPLASH_AND_NETWORK_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
                 }
                 break;
             case BUTTON_B:

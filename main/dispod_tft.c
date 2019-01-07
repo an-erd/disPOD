@@ -212,7 +212,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 	switch (params->wifi_status) {
 	case WIFI_DEACTIVATED:      tmp_color = TFT_LIGHTGREY;  break;
 	case WIFI_NOT_CONNECTED:    tmp_color = TFT_RED;        break;
-    case WIFI_SCANNING:         tmp_color = TFT_BLUE;       break;
+    case WIFI_SCANNING:         tmp_color = TFT_CYAN;       break;
 	case WIFI_CONNECTING:       tmp_color = TFT_YELLOW;     break;
     case WIFI_CONNECTED:        tmp_color = TFT_GREEN;      break;
 	default:                    tmp_color = TFT_PURPLE;     break;
