@@ -68,11 +68,12 @@ void dispod_display_initialize()
 		.max_transfer_sz = 6*1024,
     };
     spi_lobo_device_interface_config_t devcfg={
+        // .clock_speed_hz=8000000,                // Initial clock out at 8 MHz
         .clock_speed_hz=8000000,                // Initial clock out at 8 MHz
         .mode=0,                                // SPI mode 0
         .spics_io_num=-1,                       // we will use external CS pin
 		.spics_ext_io_num=PIN_NUM_CS,           // external CS pin
-		.flags=LB_SPI_DEVICE_HALFDUPLEX,        // ALWAYS SET  to HALF DUPLEX MODE!! for display spi
+]		.flags=LB_SPI_DEVICE_HALFDUPLEX,        // ALWAYS SET  to HALF DUPLEX MODE!! for display spi
     };
 
     vTaskDelay(500 / portTICK_RATE_MS);

@@ -166,12 +166,12 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     case DISPOD_NTP_INIT_DONE_EVT:
         ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT");
         uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
-        ESP_LOGI(TAG, "uxBits: DISPOD_NTP_ACTIVATED_BIT = %u, uxBits = %u", DISPOD_SD_ACTIVATED_BIT, uxBits);
+        ESP_LOGI(TAG, "uxBits: DISPOD_SD_ACTIVATED_BIT = %u, uxBits = %u", DISPOD_SD_ACTIVATED_BIT, uxBits);
         if( ( uxBits & DISPOD_SD_ACTIVATED_BIT) == DISPOD_SD_ACTIVATED_BIT){
-            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: dispod_sd_evg DISPOD_SD_MOUNT_EVT");
-            xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_MOUNT_EVT);
+            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: dispod_sd_evg DISPOD_SD_PROBE_EVT");
+            xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_PROBE_EVT);
         } else {
-            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_MOUNT_EVT");
+            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_PROBE_EVT");
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;

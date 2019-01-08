@@ -37,6 +37,7 @@ EventGroupHandle_t dispod_event_group;
 #define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write only completed buffers
 #define DISPOD_SD_MOUNT_EVT                         (BIT1)
 #define DISPOD_SD_UNMOUNT_EVT                       (BIT2)
+#define DISPOD_SD_PROBE_EVT                         (BIT3)      // initialize, mount, read/generate ref file, unmount -> set Bits for status
 EventGroupHandle_t dispod_sd_evg;
 
 // disPOD Client callback function events
@@ -48,7 +49,7 @@ typedef enum {
     DISPOD_WIFI_INIT_DONE_EVT,              /*!< When the WiFi init, not yet completed, the event comes */
     DISPOD_WIFI_GOT_IP_EVT,                 /*!< When the WiFi is connected and got an IP, the event comes */
     DISPOD_NTP_INIT_DONE_EVT,               /*!< When the NTP update (successfull or failed!) completed, the event comes */
-    DISPOD_SD_INIT_DONE_EVT,                /*!< When the SD mount is completed, the event comes */
+    DISPOD_SD_INIT_DONE_EVT,                /*!< When the SD mount/probe/unmount is completed, the event comes */
     DISPOD_BLE_DEVICE_DONE_EVT,             /*!< When the BLE connect (successfull or failed!) completed, the event comes */
     DISPOD_STARTUP_COMPLETE_EVT,            /*!< When the startup sequence was run through, the event comes */
     DISPOD_RETRY_WIFI_EVT,                  /*!< When an retry of WiFi is requested, the event comes */

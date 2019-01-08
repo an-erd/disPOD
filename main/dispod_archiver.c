@@ -2,6 +2,8 @@
 #include "esp_vfs_fat.h"
 #include "driver/sdmmc_host.h"
 #include "driver/sdspi_host.h"
+#include "tftspi.h"
+#include "tft.h"
 #include "sdmmc_cmd.h"
 #include "dispod_archiver.h"
 #include "dispod_main.h"
@@ -33,8 +35,10 @@ void dispod_archiver_initialize()
 
 static int mount_sd_card()
 {
-    ESP_LOGI(TAG, "Initializing and mounting SD card");
+    ESP_LOGI(TAG, "mount_sd_card(): Initializing and mounting SD card");
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+    host.slot = HSPI_HOST; // HSPI_HOST
+    host.max_freq_khz = SDMMC_FREQ_DEFAULT;
     sdspi_slot_config_t slot_config = SDSPI_SLOT_CONFIG_DEFAULT();
     slot_config.gpio_miso = CONFIG_SDCARD_PIN_MISO;
     slot_config.gpio_mosi = CONFIG_SDCARD_PIN_MOSI;
@@ -73,13 +77,12 @@ static int mount_sd_card()
     // Card has been initialized, print its properties
     sdmmc_card_print_info(stdout, card);
 
-
     return 1;       // TODO check return value
 }
 
 static void unmount_sd_card()
 {
-    ESP_LOGI(TAG, "Initializing and mounting SD card");
+    ESP_LOGI(TAG, "unmount_sd_card()");
 
     // All done, unmount partition and disable SDMMC or SPI peripheral
     esp_vfs_fat_sdmmc_unmount();
@@ -89,6 +92,51 @@ static void unmount_sd_card()
     xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 }
 
+static int read_sd_card_file_refnr()
+{
+    // file handle and buffer to read
+    FILE*   f;
+    char    line[64];
+    int     file_nr = -1;
+
+    ESP_LOGI(TAG, "read_sd_card_file_refnr()");
+    struct stat st;
+    if (stat("/sdcard/refnr.txt", &st) == 0) {
+        f = fopen("/sdcard/refnr.txt", "r");
+        if (f == NULL) {
+            ESP_LOGE(TAG, "Failed to open file for reading");
+            return -1;
+        }
+    } else {
+        f = fopen("/sdcard/refnr.txt", "w");
+        if (f == NULL) {
+            ESP_LOGE(TAG, "Failed to open file for writing");
+            return -1;
+        }
+        fprintf(f, "0\n");
+        fclose(f);
+        ESP_LOGI(TAG, "File written");
+
+        f = fopen("/sdcard/refnr.txt", "r");
+        if (f == NULL) {
+            ESP_LOGE(TAG, "Failed to open file for reading");
+            return -1;
+        }
+    }
+
+    fgets(line, sizeof(line), f);
+    fclose(f);
+
+    // strip newline
+    char* pos = strchr(line, '\n');
+    if (pos) {
+        *pos = '\0';
+    }
+    ESP_LOGI(TAG, "read_sd_card_file_refnr: Read from file: '%s'", line);
+    sscanf(line, "%d", (int*)&file_nr);
+
+    return file_nr;
+}
 
 int write_out_any_buffers()
 {
@@ -222,39 +270,62 @@ void dispod_archiver_task(void *pvParameters)
     for (;;)
     {
         uxBits = xEventGroupWaitBits(dispod_sd_evg,
-                DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_MOUNT_EVT | DISPOD_SD_UNMOUNT_EVT,
+                DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_MOUNT_EVT | DISPOD_SD_UNMOUNT_EVT | DISPOD_SD_PROBE_EVT,
                 pdTRUE, pdFALSE, portMAX_DELAY);
 
-        if((uxBits & DISPOD_SD_MOUNT_EVT) == DISPOD_SD_MOUNT_EVT){
-            ESP_LOGI(TAG, "dispod_archiver_task: mount sd card");
-            if( mount_sd_card() ){
-                dispod_screen_status_update_sd(&dispod_screen_status, SD_AVAILABLE);
-                xEventGroupSetBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
-                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-            } else {
-                dispod_screen_status_update_sd(&dispod_screen_status, SD_NOT_AVAILABLE);
-                xEventGroupClearBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
-                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-            }
+        if(uxBits & DISPOD_SD_PROBE_EVT){
+            xEventGroupClearBits(dispod_sd_evg, DISPOD_SD_PROBE_EVT);
+
+            ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: disp_deselect()");
+            disp_deselect();
+            ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: mount_sd_card()");
+            mount_sd_card();
+            ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: read_sd_card_file_refnr()");
+            read_sd_card_file_refnr();
+            ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: unmount_sd_card()");
+            unmount_sd_card();
+            ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: disp_select()");
+            disp_select();
+            ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: all done");
+
+            // TODO check real status of mount/read/unmount probe!
+            xEventGroupSetBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+            dispod_screen_status_update_sd(&dispod_screen_status, SD_AVAILABLE);
+            vTaskDelay(50/ portTICK_PERIOD_MS);
+            xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
 
-        if((uxBits & DISPOD_SD_UNMOUNT_EVT) == DISPOD_SD_UNMOUNT_EVT){
-            ESP_LOGI(TAG, "dispod_archiver_task: unmount sd card");
-            unmount_sd_card();
+        // if((uxBits & DISPOD_SD_MOUNT_EVT) == DISPOD_SD_MOUNT_EVT){
+        //     ESP_LOGI(TAG, "dispod_archiver_task: mount sd card");
+        //     if( mount_sd_card() ){
+        //         dispod_screen_status_update_sd(&dispod_screen_status, SD_AVAILABLE);
+        //         xEventGroupSetBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+        //         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+        //     } else {
+        //         dispod_screen_status_update_sd(&dispod_screen_status, SD_NOT_AVAILABLE);
+        //         xEventGroupClearBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+        //         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+        //     }
+        //     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
+        // }
 
-            dispod_screen_status_update_sd(&dispod_screen_status, SD_NOT_AVAILABLE);
-            xEventGroupClearBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
-            xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-        }
+        // if((uxBits & DISPOD_SD_UNMOUNT_EVT) == DISPOD_SD_UNMOUNT_EVT){
+        //     ESP_LOGI(TAG, "dispod_archiver_task: unmount sd card");
+        //     unmount_sd_card();
 
-        if((uxBits & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT) == DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT){
-            ESP_LOGI(TAG, "dispod_archiver_task: write out completed buffers");
-            if( xEventGroupWaitBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT, pdFALSE, pdFALSE, portMAX_DELAY) & DISPOD_SD_AVAILABLE_BIT){
-                write_out_any_buffers();
-            } else {
-                ESP_LOGE(TAG, "dispod_archiver_task: write out completed buffers but no SD mounted");
-            }
-        }
+        //     dispod_screen_status_update_sd(&dispod_screen_status, SD_NOT_AVAILABLE);
+        //     xEventGroupClearBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT);
+        //     xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+        // }
+
+        // if((uxBits & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT) == DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT){
+        //     ESP_LOGI(TAG, "dispod_archiver_task: write out completed buffers");
+        //     if( xEventGroupWaitBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT, pdFALSE, pdFALSE, portMAX_DELAY) & DISPOD_SD_AVAILABLE_BIT){
+        //         write_out_any_buffers();
+        //     } else {
+        //         ESP_LOGE(TAG, "dispod_archiver_task: write out completed buffers but no SD mounted");
+        //     }
+        // }
     }
 }
