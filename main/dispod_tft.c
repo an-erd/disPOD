@@ -73,7 +73,7 @@ void dispod_display_initialize()
         .mode=0,                                // SPI mode 0
         .spics_io_num=-1,                       // we will use external CS pin
 		.spics_ext_io_num=PIN_NUM_CS,           // external CS pin
-]		.flags=LB_SPI_DEVICE_HALFDUPLEX,        // ALWAYS SET  to HALF DUPLEX MODE!! for display spi
+		.flags=LB_SPI_DEVICE_HALFDUPLEX,        // ALWAYS SET  to HALF DUPLEX MODE!! for display spi
     };
 
     vTaskDelay(500 / portTICK_RATE_MS);
