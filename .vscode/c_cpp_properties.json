@@ -43,7 +43,8 @@
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/fatfs/src",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/wear_levelling/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/vfs/include",
-                "C:/msys32/home/AKAEM/esp/esp-idf/components/newlib/platform_include"
+                "C:/msys32/home/AKAEM/esp/esp-idf/components/newlib/platform_include",
+                "${workspaceFolder}/components/m5stack/src"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {

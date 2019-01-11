@@ -70,7 +70,8 @@
         "esp_wifi.h": "c",
         "esp_wifi_types.h": "c",
         "sdmmc_cmd.h": "c",
-        "esp_wifi_os_adapter.h": "c"
+        "esp_wifi_os_adapter.h": "c",
+        "memory": "cpp"
     },
 	"files.exclude": {
 		"**/.git": true,
