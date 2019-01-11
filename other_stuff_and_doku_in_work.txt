@@ -89,3 +89,67 @@ static void esp_gattc_cb(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp
 Device:
 WEMOS LOLIN32, Chip is ESP32D0WDQ6 (revision 1)
 M5Stack-FIRE,  Chip is ESP32D0WDQ6 (revision 1)
+
+
+
+[D][BLERemoteCharacteristic.cpp:442] registerForNotify(): >> registerForNotify(): Characteristic: uuid: 00002a53-0000-1000-8000-00805f9b34fb, handle: 18 0x12, props: broadcast: 0, read: 0, write_nr: 0, write: 0, notify: 1, indicate: 0, auth: 0
+[D][BLERemoteCharacteristic.cpp:327] getDescriptor(): >> getDescriptor: uuid: 00002902-0000-1000-8000-00805f9b34fb
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 38
+[D][BLERemoteCharacteristic.cpp:331] getDescriptor(): << getDescriptor: found
+[D][BLEDevice.cpp:148] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[D][BLERemoteDescriptor.cpp:135] writeValue(): >> writeValue: handle: 19, uuid: 00002902-0000-1000-8000-00805f9b34fb
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 38
+[D][BLERemoteDescriptor.cpp:154] writeValue(): << writeValue
+[V][BLEUtils.cpp:1282] dumpGattClientEvent(): GATT Event: Unknown
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 38
+[D][BLEClient.cpp:162] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[D][BLERemoteCharacteristic.cpp:482] registerForNotify(): << registerForNotify()
+[W][disPOD.ino:602] my_gattc_event_handler(): custom gattc event handler, event: 38
+[D][BLERemoteCharacteristic.cpp:327] getDescriptor(): >> getDescriptor: uuid: 00002902-0000-1000-8000-00805f9b34fb
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLERemoteCharacteristic.cpp:331] getDescriptor(): << getDescriptor: found
+[D][BLEDevice.cpp:148] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[D][BLERemoteDescriptor.cpp:135] writeValue(): >> writeValue: handle: 19, uuid: 00002902-0000-1000-8000-00805f9b34fb
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLERemoteDescriptor.cpp:154] writeValue(): << writeValue
+[V][BLEUtils.cpp:1282] dumpGattClientEvent(): GATT Event: Unknown
+[D][BLERemoteCharacteristic.cpp:442] registerForNotify(): >> registerForNotify(): Characteristic: uuid: 0000ff00-0000-1000-8000-00805f9b34fb, handle: 28 0x1c, props: broadcast: 0, read: 0, write_nr: 0, write: 0, notify: 1, indicate: 0, auth: 0
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLERemoteCharacteristic.cpp:327] getDescriptor(): >> getDescriptor: uuid: 00002902-0000-1000-8000-00805f9b34fb
+[D][BLEClient.cpp:162] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[D][BLERemoteCharacteristic.cpp:331] getDescriptor(): << getDescriptor: found
+[W][disPOD.ino:602] my_gattc_event_handler(): custom gattc event handler, event: 9
+[D][BLERemoteDescriptor.cpp:135] writeValue(): >> writeValue: handle: 29, uuid: 00002902-0000-1000-8000-00805f9b34fb
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 38
+[D][BLERemoteDescriptor.cpp:154] writeValue(): << writeValue
+[D][BLEDevice.cpp:148] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 38
+[V][BLEUtils.cpp:1282] dumpGattClientEvent(): GATT Event: Unknown
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 38
+[D][BLEClient.cpp:162] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[D][BLERemoteCharacteristic.cpp:482] registerForNotify(): << registerForNotify()
+[W][disPOD.ino:602] my_gattc_event_handler(): custom gattc event handler, event: 38
+[D][BLERemoteCharacteristic.cpp:327] getDescriptor(): >> getDescriptor: uuid: 00002902-0000-1000-8000-00805f9b34fb
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLERemoteCharacteristic.cpp:331] getDescriptor(): << getDescriptor: found
+[D][BLEDevice.cpp:148] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[D][BLERemoteDescriptor.cpp:135] writeValue(): >> writeValue: handle: 29, uuid: 00002902-0000-1000-8000-00805f9b34fb
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLERemoteDescriptor.cpp:154] writeValue(): << writeValue
+[V][BLEUtils.cpp:1282] dumpGattClientEvent(): GATT Event: Unknown
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLEClient.cpp:162] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[W][disPOD.ino:602] my_gattc_event_handler(): custom gattc event handler, event: 9
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLEDevice.cpp:148] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[V][BLEUtils.cpp:1282] dumpGattClientEvent(): GATT Event: Unknown
+[V][BLEUtils.cpp:950] gattClientEventTypeToString(): Unknown GATT Client event type: 9
+[D][BLEClient.cpp:162] gattClientEventHandler(): gattClientEventHandler [esp_gatt_if: 4] ... Unknown
+[W][disPOD.ino:602] my_gattc_event_handler(): custom gattc event handler, event: 9
+Preparation done, waiting for NOTIFY
+
+
+Queue and event group       https://github.com/hamsternz/esp32_serial_log_to_sd/blob/master/main/gps_logger.c
+LCD                         https://github.com/espressif/esp-iot-solution/tree/master/components/spi_devices/lcd
+get around flickering w/    https://www.reddit.com/r/esp32/comments/87kp1e/your_experience_with_spi_connected_lcds/

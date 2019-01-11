@@ -11,9 +11,10 @@
 #include "driver/ledc.h"
 #include "sdkconfig.h"
 
-#include "dispod_config.h"
+#include "dispod_main.h"
 #include "dispod_ledc.h"
 
+static const char* TAG = "DISPOD_LEDC";
 
 #define c 261
 #define d 294
@@ -36,12 +37,6 @@
 #define aH 880
 
 #define GPIO_OUTPUT_SPEED LEDC_HIGH_SPEED_MODE
-
-uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max)
-{
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
 
 void sound(int gpio_num, uint32_t freq, uint32_t duration, uint32_t volume)
 {
@@ -66,7 +61,8 @@ void sound(int gpio_num, uint32_t freq, uint32_t duration, uint32_t volume)
 	                                    // 50%=0x01FF, 100%=0x03FF for 10 Bit
 	ledc_channel_config(&ledc_conf);
 
-    // uint32_t new_duty = map(volume, 0, 100, 0, 0x03FF);
+    uint32_t new_duty = map(volume, 0, 100, 0, 0x03FF);
+    ESP_LOGI(TAG, "volume %u, mapped %u (currently unused)", volume, new_duty);
 
 	// start
     ledc_set_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0, volume); // 0x7F -> 12% duty - play here for your speaker or buzzer

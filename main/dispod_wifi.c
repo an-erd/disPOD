@@ -10,16 +10,19 @@
 #include "esp_err.h"
 #include "esp_event_loop.h"
 
-#include "sdkconfig.h"
-
+#include "dispod_main.h"
 #include "dispod_wifi.h"
+#include "dispod_tft.h"
 
 static const char* TAG = "DISPOD_WIFI";
 
-const int SCAN_BIT = BIT0;
-const int STRT_BIT = BIT1;
-const int DISC_BIT = BIT2;
-const int DHCP_BIT = BIT3;
+static int s_retry_num = 0;
+static EventGroupHandle_t evg;
+
+#define STRT_BIT    (BIT0)
+#define SCAN_BIT    (BIT1)
+#define DISC_BIT    (BIT2)
+#define DHCP_BIT    (BIT3)
 
 struct known_ap {
     char *ssid;
@@ -46,30 +49,56 @@ struct known_ap known_aps[CONFIG_WIFI_AP_COUNT] = {
 
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
-    EventGroupHandle_t evg = (EventGroupHandle_t)ctx;
+    EventGroupHandle_t evg = (EventGroupHandle_t) ctx;
+    wifi_config_t wifi_config;
 
+    // see https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/wifi.html#esp32-wi-fi-event-description
     switch(event->event_id) {
-        case SYSTEM_EVENT_STA_START:
-            ESP_LOGD(TAG, "started");
-            xEventGroupSetBits(evg, STRT_BIT);
-            break;
         case SYSTEM_EVENT_SCAN_DONE:
-            ESP_LOGD(TAG, "Scan done");
+            ESP_LOGD(TAG, "SYSTEM_EVENT_SCAN_DONE");
             xEventGroupSetBits(evg, SCAN_BIT);
             break;
-        case SYSTEM_EVENT_STA_CONNECTED:
-            ESP_LOGD(TAG, "connected");
-            break;
-        case SYSTEM_EVENT_STA_GOT_IP:
-            ESP_LOGD(TAG, "dhcp");
-            xEventGroupSetBits(evg, DHCP_BIT);
+        case SYSTEM_EVENT_STA_START:
+            ESP_LOGD(TAG, "SYSTEM_EVENT_STA_START");
+
+            xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_SCANNING_BIT);
+            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_SCANNING, "");
+            xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+
+            xEventGroupSetBits(evg, STRT_BIT);
             break;
         case SYSTEM_EVENT_STA_STOP:
-            ESP_LOGD(TAG, "stopped");
+            ESP_LOGD(TAG, "SYSTEM_EVENT_STA_STOP");
+            break;
+        case SYSTEM_EVENT_STA_CONNECTED:
+            ESP_LOGD(TAG, "SYSTEM_EVENT_STA_CONNECTED");
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
-            ESP_LOGD(TAG, "disconnected");
+            ESP_LOGD(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
+            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_NOT_CONNECTED, "");
+            xEventGroupClearBits(dispod_event_group, DISPOD_WIFI_CONNECTING_BIT);
+            xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+
             xEventGroupSetBits(evg, DISC_BIT);
+            break;
+        case SYSTEM_EVENT_STA_GOT_IP:
+            ESP_LOGD(TAG, "SYSTEM_EVENT_STA_GOT_IP");
+
+            ESP_LOGI(TAG, "got ip:%s", ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
+            s_retry_num = 0;
+
+            ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &wifi_config));
+            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_CONNECTED, (char*) wifi_config.sta.ssid);
+            xEventGroupClearBits(dispod_event_group, DISPOD_WIFI_CONNECTING_BIT);
+            xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_CONNECTED_BIT);
+            xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+
+            // xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+            xEventGroupSetBits(evg, DHCP_BIT);
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_WIFI_GOT_IP_EVT, NULL, 0, portMAX_DELAY));
+            break;
+        case SYSTEM_EVENT_STA_LOST_IP:
+            ESP_LOGD(TAG, "SYSTEM_EVENT_STA_LOST_IP");
             break;
         default:
             ESP_LOGW(TAG, "Unhandled event (%d)", event->event_id);
@@ -78,26 +107,38 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
+
+void dispod_wifi_network_init()
+{
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+
+    tcpip_adapter_init();
+
+    evg = xEventGroupCreate();
+    ESP_ERROR_CHECK(esp_event_loop_init(event_handler, evg));
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+
+    xEventGroupClearBits(evg, STRT_BIT);
+    ESP_ERROR_CHECK(esp_wifi_start());
+}
+
 esp_err_t dispod_wifi_network_up()
 {
-    esp_err_t error;
+    // esp_err_t error;
+    int i = 0, j, f, match;
+    // int retry = 0;
+
     uint16_t apCount;
     wifi_ap_record_t *list = NULL;
-    int i = 0, j, f, match;
-    wifi_config_t wifi_config;
-
-    EventGroupHandle_t evg = xEventGroupCreate();
-    wifi_scan_config_t scanConf =
-        { .ssid = NULL, .bssid = NULL, .channel = 0, .show_hidden = true };
-    tcpip_adapter_init();
-    error = esp_event_loop_init(event_handler, evg);
-    if (error != ESP_OK) return error;
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&cfg);
-    esp_wifi_set_storage(WIFI_STORAGE_RAM);
-    esp_wifi_set_mode(WIFI_MODE_STA);
-    xEventGroupClearBits(evg, STRT_BIT);
-    esp_wifi_start();
+    wifi_config_t wifi_config = {0};
+    wifi_scan_config_t scanConf = {
+        .ssid = NULL,
+        .bssid = NULL,
+        .channel = 0,
+        .show_hidden = true
+    };
 
     int state = 0;
     int done = 0;
@@ -106,11 +147,16 @@ esp_err_t dispod_wifi_network_up()
         case 0:
             while (!(xEventGroupWaitBits(evg, STRT_BIT , pdFALSE, pdFALSE, portMAX_DELAY) & STRT_BIT));
             xEventGroupClearBits(evg, SCAN_BIT);
+
             ESP_ERROR_CHECK(esp_wifi_scan_start(&scanConf, 0));
             while (!(xEventGroupWaitBits(evg, SCAN_BIT , pdFALSE, pdFALSE, portMAX_DELAY) & SCAN_BIT));
+            xEventGroupClearBits(dispod_event_group, DISPOD_WIFI_SCANNING_BIT);
             apCount = 0;
             esp_wifi_scan_get_ap_num(&apCount);
-            if (!apCount) break;
+            if (!apCount) {
+                // retry++;
+                break;
+            }
             free(list);
             list = (wifi_ap_record_t *)malloc(sizeof(wifi_ap_record_t) * apCount);
             ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&apCount, list));
@@ -127,12 +173,22 @@ esp_err_t dispod_wifi_network_up()
             }
             if (!match) break;
             state = 1;
+
             strncpy((char *)wifi_config.sta.ssid, (char *)list[i-1].ssid, 32);
             strncpy((char *)wifi_config.sta.password, known_aps[j-1].passwd, 64);
+
             ESP_LOGI(TAG, "Setting WiFi configuration SSID %s...", (char *)wifi_config.sta.ssid);
-            esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+            wifi_config.sta.scan_method = WIFI_FAST_SCAN;
+
+            xEventGroupClearBits(dispod_event_group, DISPOD_WIFI_SCANNING_BIT);
+            xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_CONNECTING_BIT);
+            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_CONNECTING, (char *)wifi_config.sta.ssid);
+            xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+
+            ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
             xEventGroupClearBits(evg, DISC_BIT | DHCP_BIT);
-            esp_wifi_connect();
+
+            ESP_ERROR_CHECK(esp_wifi_connect());
             ESP_LOGI(TAG, "Waiting for IP address...");
             state = 2;
         case 2:
@@ -142,5 +198,6 @@ esp_err_t dispod_wifi_network_up()
         }
     }
     free(list);
+
     return ESP_OK;
 }
