@@ -7,8 +7,8 @@
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
 #include "sdkconfig.h"
+#include <M5Stack.h>
 #include "dispod_button.h"
-// #include "iot_button.h"
 #include "dispod_runvalues.h"
 #include "dispod_tft.h"
 
@@ -31,14 +31,14 @@
 #define DISPOD_BTN_A_RETRY_WIFI_BIT                 (BIT15)
 #define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT16)
 #define DISPOD_BTN_C_CNT_BIT                        (BIT17)
-EventGroupHandle_t dispod_event_group;
+extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
 #define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write only completed buffers
 #define DISPOD_SD_MOUNT_EVT                         (BIT1)
 #define DISPOD_SD_UNMOUNT_EVT                       (BIT2)
 #define DISPOD_SD_PROBE_EVT                         (BIT3)      // initialize, mount, read/generate ref file, unmount -> set Bits for status
-EventGroupHandle_t dispod_sd_evg;
+extern EventGroupHandle_t dispod_sd_evg;
 
 // disPOD Client callback function events
 typedef enum {
@@ -131,17 +131,17 @@ typedef struct {
 } otaUpdate_t;
 
 // missing functions
-#define min(a,b) \
+#define __min(a,b) \
     ({ __typeof__ (a) _a = (a); \
         __typeof__ (b) _b = (b); \
         _a < _b ? _a : _b; })
 
-#define max(a,b) \
+#define __max(a,b) \
     ({ __typeof__ (a) _a = (a); \
         __typeof__ (b) _b = (b); \
         _a > _b ? _a : _b; })
 
-#define map(x,in_min,in_max,out_min,out_max)\
+#define __map(x,in_min,in_max,out_min,out_max)\
     ({ __typeof__ (x) _x = (x); \
         __typeof__ (in_min) _in_min = (in_min); \
         __typeof__ (in_max) _in_max = (in_max); \

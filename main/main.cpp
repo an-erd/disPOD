@@ -9,7 +9,7 @@
 #include "esp_err.h"
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
-#include "iot_button.h"
+#include <M5Stack.h>
 
 #include "dispod_main.h"
 #include "dispod_wifi.h"
@@ -59,7 +59,7 @@ static void dispod_initialize()
     // TODO check where to configure
     xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
     xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
-    xEventGroupClearBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
+    xEventGroupSetBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
     xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
 }
 
@@ -111,17 +111,27 @@ static void initialize_nvs()
     ESP_ERROR_CHECK( ret );
 }
 
+void dispod_m5stack_task(void *pvParameters){
+    for(;;){
+        M5.update();
+        dispod_m5_buttons_test();
+    }
+}
+
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
     switch(id){
     case DISPOD_STARTUP_EVT:
         ESP_LOGI(TAG, "DISPOD_STARTUP_EVT");
+
+        // Initialize the M5Stack object
+        M5.begin(true, true, true); // LCD, SD, Serial
+
         dispod_initialize();
-        dispod_display_initialize();
         dispod_screen_status_initialize(&dispod_screen_status);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         gpio_install_isr_service(0);
-        dispod_button_initialize();
+        // dispod_button_initialize();
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
@@ -307,7 +317,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     }
 }
 
-void app_main()
+extern "C" void app_main()
 {
     ESP_LOGI(TAG, "app_main() entered");
 
@@ -359,6 +369,10 @@ void app_main()
     // run the archiver task with the same priority as the current process
     ESP_LOGI(TAG, "Starting dispod_archiver_task()");
     xTaskCreate(dispod_archiver_task, "dispod_archiver_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
+
+    // run the M5STack task
+    ESP_LOGI(TAG, "Starting dispod_m5stack_task()");
+    xTaskCreate(dispod_m5stack_task, "dispod_m5stack_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
 
     // push a startup event in the loop
     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_EVT, NULL, 0, portMAX_DELAY));

@@ -127,7 +127,7 @@ void dispod_wifi_network_init()
 esp_err_t dispod_wifi_network_up()
 {
     // esp_err_t error;
-    int i = 0, j, f, match;
+    int i = 0, j = 0, f, match;
     // int retry = 0;
 
     uint16_t apCount;

@@ -44,7 +44,9 @@
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/wear_levelling/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/vfs/include",
                 "C:/msys32/home/AKAEM/esp/esp-idf/components/newlib/platform_include",
-                "${workspaceFolder}/components/m5stack/src"
+                "${workspaceFolder}/components/m5stack/src",
+                "${workspaceFolder}/components/arduino/cores/esp32",
+                "${workspaceFolder}/components/arduino/libraries/FS/src"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {

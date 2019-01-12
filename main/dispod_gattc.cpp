@@ -96,11 +96,12 @@ static struct gattc_profile_inst gl_profile_tab[PROFILE_NUM] = {
 static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t *param)
 {
     esp_ble_gattc_cb_param_t *p_data = (esp_ble_gattc_cb_param_t *)param;
+    esp_err_t scan_ret, mtu_ret;
 
     switch (event) {
     case ESP_GATTC_REG_EVT:
         ESP_LOGI(GATTC_TAG, "REG_EVT");
-        esp_err_t scan_ret = esp_ble_gap_set_scan_params(&ble_scan_params);
+        scan_ret = esp_ble_gap_set_scan_params(&ble_scan_params);
         if (scan_ret){
             ESP_LOGE(GATTC_TAG, "set scan params error, error code = %x", scan_ret);
         }
@@ -117,7 +118,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
         memcpy(gl_profile_tab[PROFILE_A_APP_ID].remote_bda, p_data->connect.remote_bda, sizeof(esp_bd_addr_t));
         ESP_LOGI(GATTC_TAG, "REMOTE BDA:");
         esp_log_buffer_hex(GATTC_TAG, gl_profile_tab[PROFILE_A_APP_ID].remote_bda, sizeof(esp_bd_addr_t));
-        esp_err_t mtu_ret = esp_ble_gattc_send_mtu_req (gattc_if, p_data->connect.conn_id);
+        mtu_ret = esp_ble_gattc_send_mtu_req (gattc_if, p_data->connect.conn_id);
         if (mtu_ret){
             ESP_LOGE(GATTC_TAG, "config MTU error, error code = %x", mtu_ret);
         }
@@ -234,7 +235,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                 ESP_LOGE(GATTC_TAG, "esp_ble_gattc_get_attr_count error");
             }
             if (count > 0){
-                descr_elem_result = malloc(sizeof(esp_gattc_descr_elem_t) * count);
+                descr_elem_result = (esp_gattc_descr_elem_t*) malloc(sizeof(esp_gattc_descr_elem_t) * count);
                 if (!descr_elem_result){
                     ESP_LOGE(GATTC_TAG, "malloc error, gattc no mem");
                 }else{
@@ -257,7 +258,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                                                                      ESP_GATT_WRITE_TYPE_RSP,
                                                                      ESP_GATT_AUTH_REQ_NONE);
 
-						ret_status = esp_ble_gattc_write_char_descr( gattc_if,
+						ret_status = (esp_gatt_status_t) esp_ble_gattc_write_char_descr( gattc_if,
                                                                      gl_profile_tab[PROFILE_A_APP_ID].conn_id,
                                                                      descr_elem_result[0].handle,
                                                                      sizeof(notify_en),
