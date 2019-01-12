@@ -60,7 +60,7 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     dispod_screen_status_update_wifi        (params, WIFI_NOT_CONNECTED, "n/a");
     dispod_screen_status_update_ntp         (params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
 	dispod_screen_status_update_ble         (params, BLE_NOT_CONNECTED, NULL);      // TODO where to deactivate?
-    dispod_screen_status_update_sd          (params, SD_DEACTIVATED);                // TODO where to deactivate?
+    dispod_screen_status_update_sd          (params, SD_NOT_AVAILABLE);                // TODO where to deactivate?
     dispod_screen_status_update_button      (params, BUTTON_A, false, "");
     dispod_screen_status_update_button      (params, BUTTON_B, false, "");
     dispod_screen_status_update_button      (params, BUTTON_C, false, "");
@@ -97,7 +97,7 @@ void dispod_screen_status_update_sd(dispod_screen_status_t *params, display_sd_s
 		params->sd_status = new_status;
 }
 
-void dispod_screen_status_update_button(dispod_screen_status_t *params, uint8_t change_button, bool new_status, char* new_button_text)
+void dispod_screen_status_update_button(dispod_screen_status_t *params, uint8_t change_button, bool new_status, const char* new_button_text)
 {
     params->show_button[change_button] = new_status;
     if(new_button_text)
@@ -113,11 +113,11 @@ void dispod_screen_status_update_statustext(dispod_screen_status_t *params, bool
         memcpy(params->status_text, "", strlen("")+1);
 }
 
-static void dispod_screen_status_update_display(dispod_screen_status_t *params, bool complete)
+static void dispod_screen_status_update_display(dispod_screen_status_t *params)
 {
 	uint16_t textHeight, boxSize, xpos, ypos, xpos2, xcen = 160;
     uint16_t tmp_color;
-    // arg bool complete unused
+    char     buffer[64];
 
 	// Preparation
     //  FF17 &FreeSans9pt7b
@@ -152,9 +152,12 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 	}
 	M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
 	xpos += boxSize + XPAD;
-	M5.Lcd.drawString("Wifi ", xpos, ypos, GFXFF);
-	xpos2 = xpos + 40 + XPAD;   // TODO
-	M5.Lcd.drawString(params->wifi_ssid, xpos2, ypos, GFXFF);
+    if(params->wifi_status == WIFI_CONNECTED){
+        snprintf(buffer, 64, "Wifi (%s)", params->wifi_ssid);
+    } else {
+        snprintf(buffer, 64, "Wifi");
+    }
+	M5.Lcd.drawString(buffer, xpos, ypos, GFXFF);
 
 	// 2) NTP
 	xpos = XPAD;
@@ -170,7 +173,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
 
 	M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
     xpos += boxSize + XPAD;
-	M5.Lcd.drawString("Internet time (NTP)", xpos, ypos, GFXFF);
+	M5.Lcd.drawString("Time set", xpos, ypos, GFXFF);
 
 	// 3) SD Card storage
 	xpos = XPAD;
@@ -443,7 +446,7 @@ void dispod_screen_task(void *pvParameters)
             ESP_LOGI(TAG, "dispod_screen_task: SCREEN_STATUS");
             if(params->current_screen != params->screen_to_show)
                 params->current_screen = params->screen_to_show;
-            dispod_screen_status_update_display(params, complete);
+            dispod_screen_status_update_display(params);
             break;
         case SCREEN_RUNNING:
             ESP_LOGI(TAG, "dispod_screen_task: SCREEN_RUNNING");

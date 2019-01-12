@@ -56,11 +56,14 @@ const char* otaErrorNames[] = {
 
 static void dispod_initialize()
 {
-    // TODO check where to configure
-    xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
-    xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
-    xEventGroupSetBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
-    xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
+    if(CONFIG_USE_WIFI)
+        xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
+    if(CONFIG_DISPOD_USE_SNTP)
+        xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
+    if(CONFIG_DISPOD_USE_SD)
+        xEventGroupSetBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
+    if(CONFIG_USE_BLE)
+        xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
 }
 
 static void initialize_spiffs()
@@ -112,6 +115,8 @@ static void initialize_nvs()
 }
 
 void dispod_m5stack_task(void *pvParameters){
+    ESP_LOGI(TAG, "dispod_m5stack_task: started");
+
     for(;;){
         M5.update();
         dispod_m5_buttons_test();
