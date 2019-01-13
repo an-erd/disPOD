@@ -4,3 +4,6 @@
 [submodule "components/arduino"]
 	path = components/arduino
 	url = https://github.com/espressif/arduino-esp32.git
+[submodule "components/Adafruit_NeoPixel"]
+	path = components/Adafruit_NeoPixel
+	url = https://github.com/adafruit/Adafruit_NeoPixel.git
