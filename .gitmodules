@@ -7,3 +7,6 @@
 [submodule "components/Adafruit_NeoPixel"]
 	path = components/Adafruit_NeoPixel
 	url = https://github.com/adafruit/Adafruit_NeoPixel.git
+[submodule "components/NeoPixelBus"]
+	path = components/NeoPixelBus
+	url = https://github.com/Makuna/NeoPixelBus.git

@@ -71,7 +71,20 @@
         "esp_wifi_types.h": "c",
         "sdmmc_cmd.h": "c",
         "esp_wifi_os_adapter.h": "c",
-        "memory": "cpp"
+        "memory": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "string_view": "cpp",
+        "m5stack.h": "c",
+        "speaker.h": "c",
+        "config.h": "c",
+        "atomic": "cpp",
+        "ios": "cpp",
+        "xiosbase": "cpp",
+        "*.ipp": "cpp"
     },
 	"files.exclude": {
 		"**/.git": true,

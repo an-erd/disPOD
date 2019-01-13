@@ -368,6 +368,39 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
     ESP_LOGI(TAG, "M5.Lcd.fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
 }
 
+static void dispod_screen_draw_footer(uint8_t line, dispod_screen_status_t *params)
+{
+	uint16_t textHeight, boxSize, xpos, ypos, xpos2, xcen = 160;
+    uint16_t tmp_color;
+    char     buffer[64];
+
+    M5.Lcd.setFreeFont(FF17);
+    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+	textHeight = M5.Lcd.fontHeight(GFXFF);
+
+    // copied from above -> needs cleanup and remove duplicate
+	// 6) Button label
+	// ypos += textHeight + YPAD;          // ypos = 240 - YPAD;
+    M5.Lcd.setTextDatum(TC_DATUM);
+    xpos = X_BUTTON_A;
+    ypos = 240 - textHeight - YPAD;
+
+    // ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
+	if (params->show_button[BUTTON_A])
+		M5.Lcd.drawString(params->button_text[BUTTON_A], xpos, ypos, GFXFF);
+
+    xpos = X_BUTTON_B;
+    // ESP_LOGD(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
+	if (params->show_button[BUTTON_B])
+		M5.Lcd.drawString(params->button_text[BUTTON_B], xpos, ypos, GFXFF);
+
+    xpos = X_BUTTON_C;
+    // ESP_LOGD(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
+	if (params->show_button[BUTTON_C])
+		M5.Lcd.drawString(params->button_text[BUTTON_C], xpos, ypos, GFXFF);
+}
+
+
 
 // OTA display update function
 /*#define BAR_PAD		3
@@ -405,7 +438,7 @@ static void dispod_screen_ota_update_display(otaUpdate_t otaUpdate, bool clearSc
 }
 */
 
-void dispod_screen_running_update_display() {
+void dispod_screen_running_update_display(dispod_screen_status_t *params) {
 	runningValuesStruct_t* values = &running_values;
 
 	// Preparation
@@ -416,14 +449,14 @@ void dispod_screen_running_update_display() {
 	dispod_screen_draw_indicator(0, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
 	dispod_screen_draw_indicator(1, "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
     dispod_screen_draw_fields   (2, "Str", 3, values->values_to_display.str / 10.);
-
+    dispod_screen_draw_footer   (3, params);
 	ESP_LOGI(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
 }
 
 void dispod_screen_task(void *pvParameters)
 {
     // EventBits_t uxBits;
-    bool complete;
+    bool complete = false;
     dispod_screen_status_t* params = (dispod_screen_status_t*)pvParameters;
 
     ESP_LOGI(TAG, "dispod_screen_task: started");
@@ -452,7 +485,7 @@ void dispod_screen_task(void *pvParameters)
             ESP_LOGI(TAG, "dispod_screen_task: SCREEN_RUNNING");
             if(params->current_screen != params->screen_to_show)
                 params->current_screen = params->screen_to_show;
-            dispod_screen_running_update_display();
+            dispod_screen_running_update_display(params);
             break;
         case SCREEN_CONFIG:
             ESP_LOGI(TAG, "dispod_screen_task: SCREEN_CONFIG - not available yet");

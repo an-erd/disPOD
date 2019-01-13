@@ -7,10 +7,14 @@
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
 #include "sdkconfig.h"
+#include "driver/ledc.h"
 #include <M5Stack.h>
+#include <Adafruit_NeoPixel.h>
+
 #include "dispod_button.h"
 #include "dispod_runvalues.h"
 #include "dispod_tft.h"
+#include "dispod_timer.h"
 
 // disPOD event group
 #define DISPOD_WIFI_ACTIVATED_BIT                   (BIT0)      // WiFi is activated
@@ -28,9 +32,12 @@
 #define DISPOD_BLE_RETRY_BIT                        (BIT12)     // Try BLE again
 #define DISPOD_SD_ACTIVATED_BIT                     (BIT13)     // SD card is activated
 #define DISPOD_SD_AVAILABLE_BIT                     (BIT14)     // SD function available
-#define DISPOD_BTN_A_RETRY_WIFI_BIT                 (BIT15)
-#define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT16)
-#define DISPOD_BTN_C_CNT_BIT                        (BIT17)
+#define DISPOD_METRO_SOUND_ACT_BIT                  (BIT15)     // Metronome w/sound output activated
+#define DISPOD_METRO_LIGHT_ACT_BIT                  (BIT16)     // Metronome w/light output activated
+#define DISPOD_BTN_A_RETRY_WIFI_BIT                 (BIT17)
+#define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT18)
+#define DISPOD_BTN_C_CNT_BIT                        (BIT19)
+#define DISPOD_RUNNING_SCREEN_BIT                   (BIT20)
 extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
@@ -60,34 +67,6 @@ typedef enum {
     DISPOD_BUTTON_2SEC_PRESS_EVT,           /*!< When a button has been pressed for 2s, the event comes */
     DISPOD_BUTTON_5SEC_PRESS_EVT,           /*!< When a button has been pressed for 5s, the event comes */
     //
-    // DISPOD_LEAVE_SCREEN_EVT,             /*!< When the current screen should be left (& to determine next screen), the event comes */
-    // DISPOD_ENTER_SCREEN_EVT,             /*!< When the new screen should be entered, the event comes */
-    // DISPOD_GO_SHUTDOWN_EVT,              /*!< When the device should be shutdowned, the event comes */
-    // DISPOD_GO_SLEEP_EVT,                 /*!< When the device should be shutdowned, the event comes */
-    // DISPOD_WIFI_ACT_EVT,                 /*!< When WIFI has been activated, the event comes */
-    // DISPOD_WIFI_DEACT_EVT,               /*!< When WIFI has been deactivated, the event comes */
-    // DISPOD_WIFI_SCANNING_EVT,            /*!< When WIFI is starting scanning, the event comes */
-    // DISPOD_WIFI_CONNECTING_EVT,          /*!< When WIFI is starting connecting, the event comes */
-    // DISPOD_WIFI_CONNECTED_EVT,           /*!< When WIFI got connected, the event comes */
-    // DISPOD_WIFI_DISCONNECTED_EVT,        /*!< When WIFI got disconnected, the event comes */
-    // DISPOD_WIFI_INTERNET_EVT,            /*!< When internet gets available, the event comes */
-    // DISPOD_NTP_ACT_EVT,                  /*!< When NTP has been activated, the event comes */
-    // DISPOD_NTP_DEACT_EVT,                /*!< When NTP has been deactivated, the event comes */
-    // DISPOD_NTP_NO_TIME_AVAIL_EVT,        /*!< When NTP has been activated and no time avail, the event comes */
-    // DISPOD_NTP_UPDATING_EVT,             /*!< When NTP updated has started, the event comes */
-    // DISPOD_NTP_TIME_AVAIL_EVT,           /*!< When NTP time has been sucessfully retrieved, the event comes */
-    // DISPOD_BLE_ACT_EVT,                  /*!< When BLE has been activated, the event comes */
-    // DISPOD_BLE_DEACT_EVT,                /*!< When BLE has been deactivated, the event comes */
-    // DISPOD_BLE_NO_CONNECTION_EVT,        /*!< When BLE activated but no connection, the event comes */
-    // DISPOD_BLE_SCAN_STARTED_EVT,         /*!< When BLE scan started, the event comes */
-    // DISPOD_BLE_CONNECTING_DEVICE_EVT,    /*!< When BLE found a device and started to connect, the event comes */
-    // DISPOD_BLE_CONNECTED_EVT,            /*!< When BLE gets connected to target device, the event comes */
-    // DISPOD_BLE_DISCONNECTED_EVT,         /*!< When BLE got's disconnected from target device, the event comes */
-    // DISPOD_BLE_NOTIFICATION_EVT,         /*!< When BLE notification has been received, the event comes */
-    // DISPOD_SD_ACT_EVT,                   /*!< When SD card has been activated, the event comes */
-    // DISPOD_SD_DEACT_EVT,                 /*!< When SD card has been deactivated, the event comes */
-    // DISPOD_SD_NO_CARD_AVAIL_EVT,         /*!< When SD card has been activated but no card avail, the event comes */
-    // DISPOD_SD_CARD_AVAIL_EVT,            /*!< When SD card is ready for use, the event comes */
     DISPOD_EVENT_MAX
 } dispod_cb_event_t;
 
@@ -111,6 +90,8 @@ extern runningValuesStruct_t running_values;
 #define sdPIN_NUM_CLK  18
 #define sdPIN_NUM_CS   4
 
+// M5Stack NeoPixels
+extern Adafruit_NeoPixel pixels;
 
 // Speaker
 #define SPEAKER_PIN 25
