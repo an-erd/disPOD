@@ -11,7 +11,13 @@ void dispod_timer_task(void *pvParameters)
 {
     EventBits_t     uxBits;
     static int      pixelNumber = 0;
+#ifdef ADAFRUIT_NEOPIXEL
     static uint32_t color_on = pixels.Color(255, 255, 255);
+#endif
+#ifdef NEOPIXELBUS
+    RgbColor NEOPIXEL_white(colorSaturation);
+    RgbColor NEOPIXEL_black(0);
+#endif
 
     ESP_LOGI(TAG, "dispod_timer_task: started");
 
@@ -33,12 +39,28 @@ void dispod_timer_task(void *pvParameters)
                 // pixelNumber = (pixelNumber + 1) % 10;
                 // pixels.setPixelColor(pixelNumber, pixels.Color(255, 255, 255));
                 if(pixelNumber%2){
+#ifdef ADAFRUIT_NEOPIXEL
                     pixels.clear();
+#endif
+#ifdef NEOPIXELBUS
+                    pixels.ClearTo(NEOPIXEL_black);
+#endif
                 } else {
+#ifdef ADAFRUIT_NEOPIXEL
                     pixels.fill(color_on, 0, 10);
+#endif
+#ifdef NEOPIXELBUS
+                    pixels.ClearTo(NEOPIXEL_white);
+#endif
                 }
                 pixelNumber++;
+
+#ifdef ADAFRUIT_NEOPIXEL
                 pixels.show();
+#endif
+#ifdef NEOPIXELBUS
+                pixels.Show();
+#endif
             }
         }
     }

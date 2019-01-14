@@ -9,7 +9,18 @@
 #include "sdkconfig.h"
 #include "driver/ledc.h"
 #include <M5Stack.h>
+
+#define NEOPIXELBUS 1
+#undef  ADAFRUIT_NEOPIXEL
+
+#ifdef NEOPIXELBUS
+#include <NeoPixelBus.h>
+#define colorSaturation 128
+#endif
+
+#ifdef ADAFRUIT_NEOPIXEL
 #include <Adafruit_NeoPixel.h>
+#endif
 
 #include "dispod_button.h"
 #include "dispod_runvalues.h"
@@ -91,7 +102,14 @@ extern runningValuesStruct_t running_values;
 #define sdPIN_NUM_CS   4
 
 // M5Stack NeoPixels
+#ifdef ADAFRUIT_NEOPIXEL
 extern Adafruit_NeoPixel pixels;
+#endif
+
+#ifdef NEOPIXELBUS
+// NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
+extern NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels;
+#endif
 
 // Speaker
 #define SPEAKER_PIN 25

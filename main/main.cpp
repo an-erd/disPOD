@@ -17,10 +17,7 @@
 #include "driver/timer.h"
 #include "esp32-hal-ledc.h"
 
-
 #include <M5Stack.h>
-#include <Adafruit_NeoPixel.h>
-
 #include "dispod_main.h"
 #include "dispod_wifi.h"
 #include "dispod_gattc.h"
@@ -78,8 +75,16 @@ typedef struct {
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
 #define M5STACK_FIRE_NEO_DATA_PIN 15
 
+#ifdef ADAFRUIT_NEOPIXEL
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
+#endif
 
+#ifdef NEOPIXELBUS
+// NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
+RgbColor NEOPIXEL_white(colorSaturation);
+RgbColor NEOPIXEL_black(0);
+#endif
 
 // temp to don't have it twice
 const char* otaErrorNames[] = {
@@ -271,9 +276,14 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         // ledcWrite(TONE_PIN_CHANNEL, 3);  // TODO DUTY
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+#ifdef ADAFRUIT_NEOPIXEL
         pixels.begin();
         pixels.show();
-
+#endif
+#ifdef NEOPIXELBUS
+        pixels.Begin();
+        pixels.Show();
+#endif
         dispod_initialize();
         dispod_screen_status_initialize(&dispod_screen_status);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
@@ -387,8 +397,9 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         // Debug NeoPixels "green"
-        for(int i = 0; i < 10; i++)
-            ESP_LOGI(TAG, "NeoPixels(%d) = %ul", i, pixels.getPixelColor(i));
+        // for(int i = 0; i < 10; i++)
+        //     ESP_LOGI(TAG, "NeoPixels(%d) = %ul", i, pixels.getPixelColor(i));
+        //
         }
         break;
     case DISPOD_RETRY_WIFI_EVT:
@@ -468,8 +479,16 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 // Toggle Metronome/Light
                 if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
                     xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+#ifdef ADAFRUIT_NEOPIXEL
                     pixels.clear();
                     pixels.show();
+#endif
+#ifdef NEOPIXELBUS
+                    pixels.ClearTo(NEOPIXEL_black);
+                    pixels.Show();
+#endif
+
+
                 } else {
                     xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
                 }
@@ -478,8 +497,14 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
                 xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
                 xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
-                pixels.clear();
-                pixels.show();
+#ifdef ADAFRUIT_NEOPIXEL
+                    pixels.clear();
+                    pixels.show();
+#endif
+#ifdef NEOPIXELBUS
+                    pixels.ClearTo(NEOPIXEL_black);
+                    pixels.Show();
+#endif
                 dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
                 dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
                 dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
