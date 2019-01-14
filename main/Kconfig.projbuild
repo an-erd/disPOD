@@ -1,230 +1,213 @@
 menu "disPOD Configuration"
 
-config EXAMPLE_DISPLAY_TYPE
-    int
-    default 0 if EXAMPLE_DISPLAY_TYPE0
-    default 1 if EXAMPLE_DISPLAY_TYPE1
-    default 2 if EXAMPLE_DISPLAY_TYPE2
-    default 3 if EXAMPLE_DISPLAY_TYPE3
+    menu "WiFi and NTP configuration"
 
-    choice
-        prompt "Select predefined display configuration"
-        default EXAMPLE_DISPLAY_TYPE0
+        config USE_WIFI
+            bool "Use wifi in disPOD"
+            default y
+            help
+                If WiFi is used ntp server will be used to provide the exact time
+                and file timestamps will be correct.
+
+        menu "WiFi access point configuration"
+
+            config WIFI_AP1
+                bool "Set WiFi access point 1" if USE_WIFI
+            config WIFI_AP1_SSID
+                string "SSID of access point 1" if WIFI_AP1
+            config WIFI_AP1_PASSWORD
+                string "Password of access point 1" if WIFI_AP1
+
+            config WIFI_AP2
+                bool "Set WiFi access point 2" if WIFI_AP1
+            config WIFI_AP2_SSID
+                string "SSID of access point 2" if WIFI_AP2
+            config WIFI_AP2_PASSWORD
+                string "Password of access point 2" if WIFI_AP2
+
+            config WIFI_AP3
+                bool "Set WiFi access point 3" if WIFI_AP2
+            config WIFI_AP3_SSID
+                string "SSID of access point 3" if WIFI_AP3
+            config WIFI_AP3_PASSWORD
+                string "Password of access point 3" if WIFI_AP3
+
+            config WIFI_AP4
+                bool "Set WiFi access point 4" if WIFI_AP3
+            config WIFI_AP4_SSID
+                string "SSID of access point 4" if WIFI_AP4
+            config WIFI_AP4_PASSWORD
+                string "Password of access point 4" if WIFI_AP4
+
+            config WIFI_AP5
+                bool "Set WiFi access point 5" if WIFI_AP4
+            config WIFI_AP5_SSID
+                string "SSID of access point 5" if WIFI_AP5
+            config WIFI_AP5_PASSWORD
+                string "Password of access point 5" if WIFI_AP5
+
+            config WIFI_AP_COUNT
+                int "Number of access points configured"
+                range 0 5
+                default 5 if WIFI_AP5
+                default 4 if WIFI_AP4
+                default 3 if WIFI_AP3
+                default 2 if WIFI_AP2
+                default 1 if WIFI_AP1
+                default 0
+
+            config WIFI_MAXIMUM_RETRY
+                int "Maximum retry"
+               	depends on USE_WIFI
+                default 5
+                help
+            	Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
+
+        endmenu
+
+    config DISPOD_USE_SNTP
+        bool "SNTP"
+        depends on USE_WIFI
+        default y
         help
-            Select predefined display configuration
+            If WiFi and internet are available an ntp server will be used to get  the exact time
+            and file timestamps will be correct.
 
-        config EXAMPLE_DISPLAY_TYPE0
-            bool "None"
-        config EXAMPLE_DISPLAY_TYPE1
-            bool "ESP-WROVER-KIT Display"
-        config EXAMPLE_DISPLAY_TYPE2
-            bool "Adafruit TFT Feather display"
-        config EXAMPLE_DISPLAY_TYPE3
-            bool "M5Stack TFT display"
-    endchoice
+    endmenu
 
+    menu "SD Card configuration"
 
-config USE_WIFI
-    bool "Use wifi in disPOD"
-    default y
-    help
-        If WiFi is used ntp server will be used to provide the exact time
-        and file timestamps will be correct.
+        config DISPOD_USE_SD
+            bool "Use SD card"
+            default y
+            help
+                Enable SD card and allow to store running values on the card.
 
+        config SDCARD_FILE_NAME
+            string "Enter file name format for running value files"
+            default "/sdcard/runvals_%u.txt"
 
-menu "WiFi access point configuration"
+        config SDCARD_NUM_BUFFERS
+            int "Number of buffers for archiver"
+            default 5
 
-config WIFI_AP1
-    bool "Set WiFi access point 1" if USE_WIFI
-config WIFI_AP1_SSID
-    string "SSID of access point 1" if WIFI_AP1
-config WIFI_AP1_PASSWORD
-    string "Password of access point 1" if WIFI_AP1
+        config SDCARD_BUFFER_SIZE
+            int "Size (=num of elements) of the buffers for archiver"
+            default 8192
 
-config WIFI_AP2
-    bool "Set WiFi access point 2" if WIFI_AP1
-config WIFI_AP2_SSID
-    string "SSID of access point 2" if WIFI_AP2
-config WIFI_AP2_PASSWORD
-    string "Password of access point 2" if WIFI_AP2
+        config SDCARD_PIN_MISO
+            int "MISO PIN"
+            default 19
+        config SDCARD_PIN_MOSI
+            int "MOSI PIN"
+            default 23
+        config SDCARD_PIN_CLK
+            int "CLK PIN"
+            default 18
+        config SDCARD_PIN_CS
+            int "CS PIN"
+            default 4
 
-config WIFI_AP3
-    bool "Set WiFi access point 3" if WIFI_AP2
-config WIFI_AP3_SSID
-    string "SSID of access point 3" if WIFI_AP3
-config WIFI_AP3_PASSWORD
-    string "Password of access point 3" if WIFI_AP3
+    endmenu
 
-config WIFI_AP4
-    bool "Set WiFi access point 4" if WIFI_AP3
-config WIFI_AP4_SSID
-    string "SSID of access point 4" if WIFI_AP4
-config WIFI_AP4_PASSWORD
-    string "Password of access point 4" if WIFI_AP4
+    menu "BLE configuration"
 
-config WIFI_AP5
-    bool "Set WiFi access point 5" if WIFI_AP4
-config WIFI_AP5_SSID
-    string "SSID of access point 5" if WIFI_AP5
-config WIFI_AP5_PASSWORD
-    string "Password of access point 5" if WIFI_AP5
+        config USE_BLE
+            bool "Enable BLE"
+            default y
 
-config WIFI_AP_COUNT
-    int "Number of access points configured"
-    range 0 5
-    default 5 if WIFI_AP5
-    default 4 if WIFI_AP4
-    default 3 if WIFI_AP3
-    default 2 if WIFI_AP2
-    default 1 if WIFI_AP1
-    default 0
+        config USE_PREDEFINED_BLE
+            bool "Use predefined BLE devices"
+            default y
+            help
+                Define predefined BLE devices instead of scanning for devices
 
-config WIFI_MAXIMUM_RETRY
-    int "Maximum retry"
-   	depends on USE_WIFI
-    default 5
-    help
-	Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
+        config BLE_SCAN_PREFIX_DEVICE
+            string "Prefix of the device name to search for"
+            default "MilestonePod"
 
-endmenu
+        config BLE_DEVICE_1
+            bool "Set BLE Device 1"
+        config BLE_DEVICE_1_ADDR
+            string "Address of BLE device 1" if BLE_DEVICE_1
+        config BLE_DEVICE_1_NAME
+            string "Name of BLE device 1" if BLE_DEVICE_1
 
-config DISPOD_USE_SNTP
-    bool "SNTP"
-    depends on USE_WIFI
-    default y
-    help
-        If WiFi and internet are available an ntp server will be used to get  the exact time
-        and file timestamps will be correct.
+        config BLE_DEVICE_2
+            bool "Set BLE Device 2" if BLE_DEVICE_1
+        config BLE_DEVICE_2_ADDR
+            string "Address of BLE device 2" if BLE_DEVICE_2
+        config BLE_DEVICE_2_NAME
+            string "Name of BLE device 2" if BLE_DEVICE_2
 
+        config BLE_DEVICE_3
+            bool "Set BLE Device 3" if BLE_DEVICE_2
+        config BLE_DEVICE_3_ADDR
+            string "Address of BLE device 3" if BLE_DEVICE_3
+        config BLE_DEVICE_3_NAME
+            string "Name of BLE device 3" if BLE_DEVICE_3
 
-menu "BLE device configuration"
+        config BLE_DEVICE_4
+            bool "Set BLE Device 4" if BLE_DEVICE_3
+        config BLE_DEVICE_4_ADDR
+            string "Address of BLE device 4" if BLE_DEVICE_4
+        config BLE_DEVICE_4_NAME
+            string "Name of BLE device 4" if BLE_DEVICE_4
 
-config USE_PREDEFINED_BLE
-    bool "Use predefined BLE devices"
-    default y
-    help
-        Define predefined BLE devices instead of scanning for devices
+        config BLE_DEVICE_5
+            bool "Set BLE Device 5" if BLE_DEVICE_4
+        config BLE_DEVICE_5_ADDR
+            string "Address of BLE device 5" if BLE_DEVICE_5
+        config BLE_DEVICE_5_NAME
+            string "Name of BLE device 5" if BLE_DEVICE_5
 
-config BLE_SCAN_PREFIX_DEVICE
-    string "Prefix of the device name to search for"
-    default "MilestonePod"
+        config BLE_DEVICE_COUNT
+            int "Number of BLE devices configured"
+            range 0 5
+            default 5 if BLE_DEVICE_5
+            default 4 if BLE_DEVICE_4
+            default 3 if BLE_DEVICE_3
+            default 2 if BLE_DEVICE_2
+            default 1 if BLE_DEVICE_1
+            default 0
 
-config BLE_DEVICE_1
-    bool "Set BLE Device 1"
-config BLE_DEVICE_1_ADDR
-    string "Address of BLE device 1" if BLE_DEVICE_1
-config BLE_DEVICE_1_NAME
-    string "Name of BLE device 1" if BLE_DEVICE_1
+    endmenu
 
-config BLE_DEVICE_2
-    bool "Set BLE Device 2" if BLE_DEVICE_1
-config BLE_DEVICE_2_ADDR
-    string "Address of BLE device 2" if BLE_DEVICE_2
-config BLE_DEVICE_2_NAME
-    string "Name of BLE device 2" if BLE_DEVICE_2
+    menu "Running values configuration"
 
-config BLE_DEVICE_3
-    bool "Set BLE Device 3" if BLE_DEVICE_2
-config BLE_DEVICE_3_ADDR
-    string "Address of BLE device 3" if BLE_DEVICE_3
-config BLE_DEVICE_3_NAME
-    string "Name of BLE device 3" if BLE_DEVICE_3
+        config RUNNING_MIN_INTERVAL_CADENCE
+            int "Lower target interval for cadence"
+            range 160 200
+            default 180
+        config RUNNING_MAX_INTERVAL_CADENCE
+            int "Upper target interval for cadence"
+            range 150 220
+            default 184
+        config RUNNING_MIN_INTERVAL_GCT
+            int "Lower target interval for GCT (ground contact time)"
+            range 100 250
+            default 180
+        config RUNNING_MAX_INTERVAL_GCT
+            int "Upper target interval for GCT"
+            range 100 250
+            default 210
+        config RUNNING_DISPLAY_STYLE
+            int
+            default 0 if RUNNING_DISPLAY_STYLE0
+            default 1 if RUNNING_DISPLAY_STYLE1
+            default 2 if RUNNING_DISPLAY_STYLE2
 
-config BLE_DEVICE_4
-    bool "Set BLE Device 4" if BLE_DEVICE_3
-config BLE_DEVICE_4_ADDR
-    string "Address of BLE device 4" if BLE_DEVICE_4
-config BLE_DEVICE_4_NAME
-    string "Name of BLE device 4" if BLE_DEVICE_4
+            choice
+                prompt "Select visual or text or visual+text display option"
+                default RUNNING_DISPLAY_STYLE2
+                config RUNNING_DISPLAY_STYLE0
+                    bool "Only visual presentation"
+                config RUNNING_DISPLAY_STYLE1
+                    bool "Only text presentation"
+                config RUNNING_DISPLAY_STYLE2
+                    bool "Visual and text presentation"
+            endchoice
 
-config BLE_DEVICE_5
-    bool "Set BLE Device 5" if BLE_DEVICE_4
-config BLE_DEVICE_5_ADDR
-    string "Address of BLE device 5" if BLE_DEVICE_5
-config BLE_DEVICE_5_NAME
-    string "Name of BLE device 5" if BLE_DEVICE_5
+    endmenu
 
-config BLE_DEVICE_COUNT
-    int "Number of BLE devices configured"
-    range 0 5
-    default 5 if BLE_DEVICE_5
-    default 4 if BLE_DEVICE_4
-    default 3 if BLE_DEVICE_3
-    default 2 if BLE_DEVICE_2
-    default 1 if BLE_DEVICE_1
-    default 0
-
-endmenu
-
-menu "Button"
-    config IO_GLITCH_FILTER_TIME_MS
-        int "IO glitch filter timer ms (10~100)"
-        range 10 100
-        default 50
-endmenu
-
-menu "Running values"
-
-config RUNNING_MIN_INTERVAL_CADENCE
-    int "Lower target interval for cadence"
-    range 150 220
-    default 180
-config RUNNING_MAX_INTERVAL_CADENCE
-    int "Upper target interval for cadence"
-    range 150 220
-    default 184
-config RUNNING_MIN_INTERVAL_GCT
-    int "Lower target interval for GCT (ground contact time)"
-    range 100 250
-    default 180
-config RUNNING_MAX_INTERVAL_GCT
-    int "Upper target interval for GCT"
-    range 100 250
-    default 210
-config RUNNING_DISPLAY_STYLE
-    int
-    default 0 if RUNNING_DISPLAY_STYLE0
-    default 1 if RUNNING_DISPLAY_STYLE1
-    default 2 if RUNNING_DISPLAY_STYLE2
-
-    choice
-        prompt "Select visual or text or visual+text display option"
-        default RUNNING_DISPLAY_STYLE2
-        config RUNNING_DISPLAY_STYLE0
-            bool "Only visual presentation"
-        config RUNNING_DISPLAY_STYLE1
-            bool "Only text presentation"
-        config RUNNING_DISPLAY_STYLE2
-            bool "Visual and text presentation"
-    endchoice
-
-menu "SD Card storage"
-
-config SDCARD_FILE_NAME
-    string "Enter file name format for running value files"
-    default "/sdcard/runvals_%u.txt"
-endmenu
-
-config SDCARD_NUM_BUFFERS
-    int "Number of buffers for archiver"
-    default 5
-
-config SDCARD_BUFFER_SIZE
-    int "Size (=num of elements) of the buffers for archiver"
-    default 8192
-
-config SDCARD_PIN_MISO
-    int "MISO PIN"
-    default 19
-config SDCARD_PIN_MOSI
-    int "MOSI PIN"
-    default 23
-config SDCARD_PIN_CLK
-    int "CLK PIN"
-    default 18
-config SDCARD_PIN_CS
-    int "CS PIN"
-    default 4
-
-endmenu
 endmenu

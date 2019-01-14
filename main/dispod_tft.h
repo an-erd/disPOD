@@ -14,7 +14,7 @@
 // disPOD display event group
 #define DISPOD_DISPLAY_UPDATE_BIT           (BIT0)  // display needs an update -> display task
 #define DISPOD_DISPLAY_RUNNING_RSC_BIT      (BIT1)  // new RSC data available
-EventGroupHandle_t dispod_display_evg;
+extern EventGroupHandle_t dispod_display_evg;
 
 typedef enum {
     SCREEN_SPLASH,
@@ -72,9 +72,6 @@ typedef struct {
 	char                    status_text[32];
 } dispod_screen_status_t;
 
-// initialize HW display
-void dispod_display_initialize();
-
 // initialize all display structs
 void dispod_screen_status_initialize(dispod_screen_status_t *params);
 
@@ -86,7 +83,7 @@ void dispod_screen_status_update_wifi       (dispod_screen_status_t *params, dis
 void dispod_screen_status_update_ntp        (dispod_screen_status_t *params, display_ntp_status_t new_status);
 void dispod_screen_status_update_ble        (dispod_screen_status_t *params, display_ble_status_t new_status, const char* new_name);
 void dispod_screen_status_update_sd         (dispod_screen_status_t *params, display_sd_status_t new_status);
-void dispod_screen_status_update_button     (dispod_screen_status_t *params, uint8_t change_button, bool new_status, char* new_button_text);
+void dispod_screen_status_update_button     (dispod_screen_status_t *params, uint8_t change_button, bool new_status, const char* new_button_text);
 void dispod_screen_status_update_statustext (dispod_screen_status_t *params, bool new_show_text, char* new_status_text);
 
 // running screen

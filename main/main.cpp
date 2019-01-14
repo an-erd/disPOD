@@ -1,5 +1,6 @@
 // disPOD - connect to MilestonePod via BLE and read data and display on M5Stack-Fire
 
+#include "esp_types.h"
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "esp_log.h"
@@ -7,10 +8,15 @@
 #include "esp_event.h"
 #include "esp_event_loop.h"
 #include "esp_err.h"
+#include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
-#include "iot_button.h"
+#include "freertos/portmacro.h"
+#include "soc/timer_group_struct.h"
+#include "driver/periph_ctrl.h"
+#include "esp32-hal-ledc.h"
 
+#include <M5Stack.h>
 #include "dispod_main.h"
 #include "dispod_wifi.h"
 #include "dispod_gattc.h"
@@ -21,6 +27,7 @@
 #include "dispod_update.h"
 #include "dispod_archiver.h"
 #include "dispod_button.h"
+#include "dispod_timer.h"
 
 static const char* TAG = "DISPOD";
 
@@ -45,7 +52,15 @@ const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
 // temp return value from xEventGroupWaitBits, ... functions
 EventBits_t uxBits;
 
-// temp to don't have it twice
+#define M5STACK_FIRE_NEO_NUM_LEDS 10
+#define M5STACK_FIRE_NEO_DATA_PIN 15
+
+// NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
+RgbColor NEOPIXEL_white(colorSaturation);
+RgbColor NEOPIXEL_black(0);
+
+// TODO temp to don't have it twice
 const char* otaErrorNames[] = {
 	"Error: Auth Failed",		// OTA_AUTH_ERROR
 	"Error: Begin Failed",		// OTA_BEGIN_ERROR
@@ -56,11 +71,14 @@ const char* otaErrorNames[] = {
 
 static void dispod_initialize()
 {
-    // TODO check where to configure
-    xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
-    xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
-    xEventGroupClearBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
-    xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
+    if(CONFIG_USE_WIFI)
+        xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT);
+    if(CONFIG_DISPOD_USE_SNTP)
+        xEventGroupSetBits(dispod_event_group, DISPOD_NTP_ACTIVATED_BIT);
+    if(CONFIG_DISPOD_USE_SD)
+        xEventGroupSetBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT);
+    if(CONFIG_USE_BLE)
+        xEventGroupSetBits(dispod_event_group, DISPOD_BLE_ACTIVATED_BIT);
 }
 
 static void initialize_spiffs()
@@ -111,17 +129,34 @@ static void initialize_nvs()
     ESP_ERROR_CHECK( ret );
 }
 
+void dispod_m5stack_task(void *pvParameters){
+    ESP_LOGI(TAG, "dispod_m5stack_task: started");
+
+    for(;;){
+        M5.update();
+        dispod_m5_buttons_test();
+    }
+}
+
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
     switch(id){
     case DISPOD_STARTUP_EVT:
         ESP_LOGI(TAG, "DISPOD_STARTUP_EVT");
+
+        // Initialize the M5Stack object and the M5Stack NeoPixels
+        M5.begin(true, true, true); // LCD, SD, Serial
+        M5.Speaker.setBeep(1000, 40);
+        // ledcWrite(TONE_PIN_CHANNEL, 3);  // TODO DUTY
+        xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+        xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+        pixels.Begin();
+        pixels.Show();
+		
         dispod_initialize();
-        dispod_display_initialize();
         dispod_screen_status_initialize(&dispod_screen_status);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-        gpio_install_isr_service(0);
-        dispod_button_initialize();
+
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
@@ -239,14 +274,18 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         break;
     case DISPOD_GO_TO_RUNNING_SCREEN_EVT:
         ESP_LOGI(TAG, "DISPOD_GO_TO_RUNNING_SCREEN_EVT");
+        xEventGroupSetBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
         dispod_screen_change(&dispod_screen_status, SCREEN_RUNNING);
+        dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, true, "Beep");
+        dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "Flash");
+        dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Back");
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+		dispod_timer_start_metronome();
         break;
     //
     case DISPOD_BUTTON_TAP_EVT: {
         button_unit_t button_unit = *(button_unit_t*) event_data;
         ESP_LOGI(TAG, "DISPOD_BUTTON_TAP_EVT, button id %d", button_unit.btn_id);
-
 
         // come here from DISPOD_STARTUP_COMPLETE_EVT
         if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT, pdFALSE, pdFALSE, 0)
@@ -289,6 +328,48 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 break;
             }
         }
+        // showing running screen
+        if((xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT)){
+            switch(button_unit.btn_id){
+            case BUTTON_A:
+                // Toggle Metronome/Sound
+                if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_SOUND_ACT_BIT)){
+                    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+                } else {
+                    xEventGroupSetBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+                }
+
+                break;
+            case BUTTON_B:
+                // Toggle Metronome/Light
+                if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
+                    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+                    pixels.ClearTo(NEOPIXEL_black);
+                    pixels.Show();
+                } else {
+                    xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+                }
+                break;
+            case BUTTON_C:
+                xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
+                xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+                xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+				dispod_timer_stop_metronome();
+                pixels.ClearTo(NEOPIXEL_black);
+                pixels.Show();
+                dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
+                dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
+                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
+                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
+                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+                ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+                break;
+            default:
+                ESP_LOGI(TAG, "unhandled button");
+                break;
+            }
+        }
         }
         break;
     case DISPOD_BUTTON_2SEC_PRESS_EVT: {
@@ -307,7 +388,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     }
 }
 
-void app_main()
+extern "C" void app_main()
 {
     ESP_LOGI(TAG, "app_main() entered");
 
@@ -330,6 +411,7 @@ void app_main()
     dispod_event_group  = xEventGroupCreate();
     dispod_display_evg  = xEventGroupCreate();
     dispod_sd_evg       = xEventGroupCreate();
+    dispod_timer_evg    = xEventGroupCreate();
 
     // create running values queue to get BLE notification decoded and put into this queue
     running_values_queue = xQueueCreate( 10, sizeof( running_values_queue_element_t ) );
@@ -359,6 +441,15 @@ void app_main()
     // run the archiver task with the same priority as the current process
     ESP_LOGI(TAG, "Starting dispod_archiver_task()");
     xTaskCreate(dispod_archiver_task, "dispod_archiver_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
+
+    // run the M5STack task
+    ESP_LOGI(TAG, "Starting dispod_m5stack_task()");
+    xTaskCreate(dispod_m5stack_task, "dispod_m5stack_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
+
+    // run the timer task and the timer
+    ESP_LOGI(TAG, "Starting dispod_timer_task()");
+    xTaskCreate(dispod_timer_task, "dispod_timer_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
+	dispod_timer_initialize();
 
     // push a startup event in the loop
     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_EVT, NULL, 0, portMAX_DELAY));

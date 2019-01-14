@@ -65,7 +65,7 @@ void dispod_runvalues_update_RSCValues(runningValuesStruct_t *values, uint8_t ne
 		values->val_cad.sum_items += values->tmp_values.cad - values->val_cad.values[values->val_cad.idx_item];
 		values->val_cad.values[values->val_cad.idx_item] = values->tmp_values.cad;
 		values->val_cad.idx_item = (values->val_cad.idx_item + 1) % DISPOD_RUNVALUES_BUFFERLEN;
-		values->val_cad.num_items = min(DISPOD_RUNVALUES_BUFFERLEN, values->val_cad.num_items + 1);
+		values->val_cad.num_items = __min(DISPOD_RUNVALUES_BUFFERLEN, values->val_cad.num_items + 1);
 	    if(values->val_cad.num_items){
 		    values->values_to_display.cad = (values->val_cad.sum_items / values->val_cad.num_items) * 2;
 			update_display_RSC = true;
@@ -89,12 +89,12 @@ void dispod_runvalues_update_customValues(runningValuesStruct_t *values, uint16_
 		values->val_GCT.sum_items += values->tmp_values.GCT - values->val_GCT.values[values->val_GCT.idx_item];
 		values->val_GCT.values[values->val_GCT.idx_item] = values->tmp_values.GCT;
 		values->val_GCT.idx_item = (values->val_GCT.idx_item + 1) % DISPOD_RUNVALUES_BUFFERLEN;
-		values->val_GCT.num_items = min(DISPOD_RUNVALUES_BUFFERLEN, values->val_GCT.num_items + 1);
+		values->val_GCT.num_items = __min(DISPOD_RUNVALUES_BUFFERLEN, values->val_GCT.num_items + 1);
 
 		values->val_str.sum_items += values->tmp_values.str - values->val_str.values[values->val_str.idx_item];
 		values->val_str.values[values->val_str.idx_item] = values->tmp_values.str;
 		values->val_str.idx_item = (values->val_str.idx_item + 1) % DISPOD_RUNVALUES_BUFFERLEN;
-		values->val_str.num_items = min(DISPOD_RUNVALUES_BUFFERLEN, values->val_str.num_items + 1);
+		values->val_str.num_items = __min(DISPOD_RUNVALUES_BUFFERLEN, values->val_str.num_items + 1);
 
         if(values->val_GCT.num_items){   // one check (e.g. values->val_GCT.num_items) is sufficient
         	values->values_to_display.GCT = values->val_GCT.sum_items / values->val_GCT.num_items;
