@@ -14,7 +14,6 @@
 #include "freertos/portmacro.h"
 #include "soc/timer_group_struct.h"
 #include "driver/periph_ctrl.h"
-#include "driver/timer.h"
 #include "esp32-hal-ledc.h"
 
 #include <M5Stack.h>
@@ -53,40 +52,15 @@ const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
 // temp return value from xEventGroupWaitBits, ... functions
 EventBits_t uxBits;
 
-#define TIMER_DIVIDER         16  //  Hardware timer clock divider
-#define TIMER_SCALE           (TIMER_BASE_CLK / TIMER_DIVIDER)  // convert counter value to seconds
-#define TIMER_INTERVAL0_SEC   (0.3333) // cadence 180 = 1 min/180 = 3/sec
-#define TEST_WITHOUT_RELOAD   0        // testing will be done without auto reload
-#define TEST_WITH_RELOAD      1 // testing will be done with auto reload
-
-/*
- * A sample structure to pass events
- * from the timer interrupt handler to the main program.
- */
-typedef struct {
-    int type;  // the type of timer's event
-    int timer_group;
-    int timer_idx;
-    uint64_t timer_counter_value;
-} timer_event_t;
-
-// TODO Adafruit NeoPixels
-
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
 #define M5STACK_FIRE_NEO_DATA_PIN 15
 
-#ifdef ADAFRUIT_NEOPIXEL
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
-#endif
-
-#ifdef NEOPIXELBUS
 // NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
 RgbColor NEOPIXEL_white(colorSaturation);
 RgbColor NEOPIXEL_black(0);
-#endif
 
-// temp to don't have it twice
+// TODO temp to don't have it twice
 const char* otaErrorNames[] = {
 	"Error: Auth Failed",		// OTA_AUTH_ERROR
 	"Error: Begin Failed",		// OTA_BEGIN_ERROR
@@ -164,106 +138,6 @@ void dispod_m5stack_task(void *pvParameters){
     }
 }
 
-/*
- * Timer group0 ISR handler
- *
- * Note:
- * We don't call the timer API here because they are not declared with IRAM_ATTR.
- * If we're okay with the timer irq not being serviced while SPI flash cache is disabled,
- * we can allocate this interrupt without the ESP_INTR_FLAG_IRAM flag and use the normal API.
- */
-void IRAM_ATTR timer_group0_isr(void *para)
-{
-    BaseType_t xHigherPriorityTaskWoken, xResult;
-
-  /* xHigherPriorityTaskWoken must be initialised to pdFALSE. */
-    xHigherPriorityTaskWoken = pdFALSE;
-
-    int timer_idx = (int) para;
-
-    /* Retrieve the interrupt status and the counter value
-       from the timer that reported the interrupt */
-    uint32_t intr_status = TIMERG0.int_st_timers.val;
-    TIMERG0.hw_timer[timer_idx].update = 1;
-    uint64_t timer_counter_value =
-        ((uint64_t) TIMERG0.hw_timer[timer_idx].cnt_high) << 32
-        | TIMERG0.hw_timer[timer_idx].cnt_low;
-
-    /* Prepare basic event data
-       that will be then sent back to the main program task */
-    timer_event_t evt;
-    evt.timer_group = 0;
-    evt.timer_idx = timer_idx;
-    evt.timer_counter_value = timer_counter_value;
-
-    /* Clear the interrupt
-       and update the alarm time for the timer with without reload */
-    if ((intr_status & BIT(timer_idx)) && timer_idx == TIMER_0) {
-        evt.type = TEST_WITHOUT_RELOAD;
-        TIMERG0.int_clr_timers.t0 = 1;
-        timer_counter_value += (uint64_t) (TIMER_INTERVAL0_SEC * TIMER_SCALE);
-        TIMERG0.hw_timer[timer_idx].alarm_high = (uint32_t) (timer_counter_value >> 32);
-        TIMERG0.hw_timer[timer_idx].alarm_low = (uint32_t) timer_counter_value;
-    } else if ((intr_status & BIT(timer_idx)) && timer_idx == TIMER_1) {
-        evt.type = TEST_WITH_RELOAD;
-        TIMERG0.int_clr_timers.t1 = 1;
-    } else {
-        evt.type = -1; // not supported even type
-    }
-
-    /* After the alarm has been triggered
-      we need enable it again, so it is triggered the next time */
-    TIMERG0.hw_timer[timer_idx].config.alarm_en = TIMER_ALARM_EN;
-
-    /* Now just send the event data back to the main program task */
-    // xQueueSendFromISR(timer_queue, &evt, NULL);
-    xResult = xEventGroupSetBitsFromISR(dispod_timer_evg, DISPOD_TIMER_METRONOME_BIT, &xHigherPriorityTaskWoken);
-
-    /* Was the message posted successfully? */
-    if( xResult == pdPASS )
-    {
-        /* If xHigherPriorityTaskWoken is now set to pdTRUE then a context
-        switch should be requested.  The macro used is port specific and will
-        be either portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() - refer to
-        the documentation page for the port being used. */
-        // portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-        portYIELD_FROM_ISR();
-  }
-}
-
-/*
- * Initialize selected timer of the timer group 0
- *
- * timer_idx - the timer number to initialize
- * auto_reload - should the timer auto reload on alarm?
- * timer_interval_sec - the interval of alarm to set
- */
-static void example_tg0_timer_init(int timer_idx, bool auto_reload, double timer_interval_sec)
-{
-    /* Select and initialize basic parameters of the timer */
-    timer_config_t config;
-    config.divider      = TIMER_DIVIDER;
-    config.counter_dir  = TIMER_COUNT_UP;
-    config.counter_en   = TIMER_PAUSE;
-    config.alarm_en     = TIMER_ALARM_EN;
-    config.intr_type    = TIMER_INTR_LEVEL;
-    config.auto_reload  = auto_reload;
-    timer_init(TIMER_GROUP_0, (timer_idx_t) timer_idx, &config);
-
-    /* Timer's counter will initially start from value below.
-       Also, if auto_reload is set, this value will be automatically reload on alarm */
-    timer_set_counter_value(TIMER_GROUP_0, (timer_idx_t) timer_idx, 0x00000000ULL);
-
-    /* Configure the alarm value and the interrupt on alarm. */
-    timer_set_alarm_value(TIMER_GROUP_0,(timer_idx_t)  timer_idx, timer_interval_sec * TIMER_SCALE);
-    timer_enable_intr(TIMER_GROUP_0, (timer_idx_t) timer_idx);
-    timer_isr_register(TIMER_GROUP_0, (timer_idx_t) timer_idx, timer_group0_isr,
-        (void *) timer_idx, ESP_INTR_FLAG_IRAM, NULL);
-
-    timer_start(TIMER_GROUP_0, (timer_idx_t) timer_idx);
-}
-
-
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
     switch(id){
@@ -276,19 +150,13 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         // ledcWrite(TONE_PIN_CHANNEL, 3);  // TODO DUTY
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
-#ifdef ADAFRUIT_NEOPIXEL
-        pixels.begin();
-        pixels.show();
-#endif
-#ifdef NEOPIXELBUS
         pixels.Begin();
         pixels.Show();
-#endif
+		
         dispod_initialize();
         dispod_screen_status_initialize(&dispod_screen_status);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-        gpio_install_isr_service(0);
-        // dispod_button_initialize();
+
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
@@ -396,10 +264,6 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
             dispod_screen_status_update_statustext(&dispod_screen_status, true, "Continue?");
         }
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-        // Debug NeoPixels "green"
-        // for(int i = 0; i < 10; i++)
-        //     ESP_LOGI(TAG, "NeoPixels(%d) = %ul", i, pixels.getPixelColor(i));
-        //
         }
         break;
     case DISPOD_RETRY_WIFI_EVT:
@@ -416,6 +280,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "Flash");
         dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Back");
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+		dispod_timer_start_metronome();
         break;
     //
     case DISPOD_BUTTON_TAP_EVT: {
@@ -479,16 +344,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 // Toggle Metronome/Light
                 if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
                     xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
-#ifdef ADAFRUIT_NEOPIXEL
-                    pixels.clear();
-                    pixels.show();
-#endif
-#ifdef NEOPIXELBUS
                     pixels.ClearTo(NEOPIXEL_black);
                     pixels.Show();
-#endif
-
-
                 } else {
                     xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
                 }
@@ -497,14 +354,9 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
                 xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
                 xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
-#ifdef ADAFRUIT_NEOPIXEL
-                    pixels.clear();
-                    pixels.show();
-#endif
-#ifdef NEOPIXELBUS
-                    pixels.ClearTo(NEOPIXEL_black);
-                    pixels.Show();
-#endif
+				dispod_timer_stop_metronome();
+                pixels.ClearTo(NEOPIXEL_black);
+                pixels.Show();
                 dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
                 dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
                 dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
@@ -594,10 +446,10 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "Starting dispod_m5stack_task()");
     xTaskCreate(dispod_m5stack_task, "dispod_m5stack_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
 
-    // run the timer task and the timer (TODO)
+    // run the timer task and the timer
     ESP_LOGI(TAG, "Starting dispod_timer_task()");
     xTaskCreate(dispod_timer_task, "dispod_timer_task", 4096, NULL, uxTaskPriorityGet(NULL), NULL);
-    example_tg0_timer_init(TIMER_1, TEST_WITH_RELOAD, TIMER_INTERVAL0_SEC);
+	dispod_timer_initialize();
 
     // push a startup event in the loop
     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_EVT, NULL, 0, portMAX_DELAY));
