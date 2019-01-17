@@ -9,19 +9,7 @@
 #include "sdkconfig.h"
 #include "driver/ledc.h"
 #include <M5Stack.h>
-
-#define NEOPIXELBUS 1
-#undef  ADAFRUIT_NEOPIXEL
-
-#ifdef NEOPIXELBUS
 #include <NeoPixelBus.h>
-#define colorSaturation 128
-#endif
-
-#ifdef ADAFRUIT_NEOPIXEL
-#include <Adafruit_NeoPixel.h>
-#endif
-
 #include "dispod_button.h"
 #include "dispod_runvalues.h"
 #include "dispod_tft.h"
@@ -44,11 +32,12 @@
 #define DISPOD_SD_ACTIVATED_BIT                     (BIT13)     // SD card is activated
 #define DISPOD_SD_AVAILABLE_BIT                     (BIT14)     // SD function available
 #define DISPOD_METRO_SOUND_ACT_BIT                  (BIT15)     // Metronome w/sound output activated
-#define DISPOD_METRO_LIGHT_ACT_BIT                  (BIT16)     // Metronome w/light output activated
-#define DISPOD_BTN_A_RETRY_WIFI_BIT                 (BIT17)
-#define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT18)
-#define DISPOD_BTN_C_CNT_BIT                        (BIT19)
-#define DISPOD_RUNNING_SCREEN_BIT                   (BIT20)
+#define DISPOD_METRO_LIGHT_ACT_BIT                  (BIT16)     // Metronome w/light output activated (both sides)
+#define DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT           (BIT17)     // Metronome w/sound output activated (alternate sides)
+#define DISPOD_BTN_A_RETRY_WIFI_BIT                 (BIT18)
+#define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT19)
+#define DISPOD_BTN_C_CNT_BIT                        (BIT20)
+#define DISPOD_RUNNING_SCREEN_BIT                   (BIT21)
 extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
@@ -102,14 +91,9 @@ extern runningValuesStruct_t running_values;
 #define sdPIN_NUM_CS   4
 
 // M5Stack NeoPixels
-#ifdef ADAFRUIT_NEOPIXEL
-extern Adafruit_NeoPixel pixels;
-#endif
-
-#ifdef NEOPIXELBUS
 // NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN);
 extern NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels;
-#endif
+#define colorSaturation 128
 
 // Speaker
 #define SPEAKER_PIN 25

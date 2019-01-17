@@ -106,7 +106,7 @@ static void timer_metronome_callback(void* arg)
 void dispod_timer_task(void *pvParameters)
 {
     EventBits_t     uxBits;
-    static int      pixelNumber = 0;
+    static int      pixelNumber = 0; // 0 left, 1 right
 
     RgbColor NEOPIXEL_white(colorSaturation);
     RgbColor NEOPIXEL_black(0);
@@ -131,6 +131,17 @@ void dispod_timer_task(void *pvParameters)
 				ESP_ERROR_CHECK(esp_timer_start_once(timer_handles[TIMER_METRONOM_OFF_LIGHT], METRONOME_LIGHT_DURATION_US));
 				ESP_LOGI(TAG, "Started timer TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
 			    // ESP_LOGI(TAG, "                                                         %lld us", esp_timer_get_time());
+            } else if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT)){
+                ESP_LOGV(TAG, "dispod_timer_task: DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT");
+                if(pixelNumber){
+                    pixels.ClearTo(NEOPIXEL_white, 0, 4);
+                } else {
+                    pixels.ClearTo(NEOPIXEL_white, 5, 9);
+                }
+                pixels.Show();
+                pixelNumber = 1 - pixelNumber;
+				ESP_ERROR_CHECK(esp_timer_start_once(timer_handles[TIMER_METRONOM_OFF_LIGHT], METRONOME_LIGHT_DURATION_US));
+				ESP_LOGI(TAG, "Started timer TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
             }
 
 			// Sound on, if activated

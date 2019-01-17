@@ -152,7 +152,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
         pixels.Begin();
         pixels.Show();
-		
+
         dispod_initialize();
         dispod_screen_status_initialize(&dispod_screen_status);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
@@ -342,10 +342,12 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 break;
             case BUTTON_B:
                 // Toggle Metronome/Light
-                if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
-                    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+                if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdTRUE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
+                    xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT);
                     pixels.ClearTo(NEOPIXEL_black);
                     pixels.Show();
+                } else if ((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT, pdTRUE, pdFALSE, 0) & DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT)) {
+                    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT | DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT);
                 } else {
                     xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
                 }
