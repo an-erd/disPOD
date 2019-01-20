@@ -146,6 +146,7 @@ esp_err_t dispod_wifi_network_up()
         switch (state) {
         case 0:
             while (!(xEventGroupWaitBits(evg, STRT_BIT , pdFALSE, pdFALSE, portMAX_DELAY) & STRT_BIT));
+            ESP_LOGD(TAG, "case 0: xEventGroupWaitBits(evg, STRT_BIT ...); state = %d", state);
             xEventGroupClearBits(evg, SCAN_BIT);
 
             ESP_ERROR_CHECK(esp_wifi_scan_start(&scanConf, 0));
@@ -171,7 +172,10 @@ esp_err_t dispod_wifi_network_up()
                     match = !strcasecmp((char *)list[i].ssid, known_aps[j].ssid);
                 }
             }
-            if (!match) break;
+            if (!match) {
+                ESP_LOGD(TAG, "case 1: not match, break; state = %d", state);
+                break;
+            }
             state = 1;
 
             strncpy((char *)wifi_config.sta.ssid, (char *)list[i-1].ssid, 32);
@@ -191,10 +195,13 @@ esp_err_t dispod_wifi_network_up()
             ESP_ERROR_CHECK(esp_wifi_connect());
             ESP_LOGI(TAG, "Waiting for IP address...");
             state = 2;
+            ESP_LOGD(TAG, "case 1: esp_wifi_connect() called; state = %d", state);
         case 2:
             f = xEventGroupWaitBits(evg, DHCP_BIT|DISC_BIT , pdFALSE, pdFALSE, portMAX_DELAY);
+            ESP_LOGD(TAG, "case 2: xEventGroupWaitBits(evg, DHCP_BIT|DISC_BIT...); state = %d, DISC_BIT %d, DHCP_BIT %d", state, f|DISC_BIT, f|DHCP_BIT);
             if (f & DISC_BIT) state = 1;
             done = f & DHCP_BIT;
+            ESP_LOGD(TAG, "case 2: xEventGroupWaitBits(evg, DHCP_BIT|DISC_BIT; state = %d, done = %d", state, done);
         }
     }
     free(list);
