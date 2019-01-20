@@ -366,6 +366,9 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
                 xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
                 ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+                ESP_LOGI(TAG, "Test: SD CARD: DISPOD_SD_GENERATE_TESTDATA_EVT >");
+                xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_GENERATE_TESTDATA_EVT);
+                ESP_LOGI(TAG, "Test: SD CARD: DISPOD_SD_GENERATE_TESTDATA_EVT <");
                 break;
             default:
                 ESP_LOGI(TAG, "unhandled button");

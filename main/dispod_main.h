@@ -1,12 +1,13 @@
 #ifndef __DISPOD_MAIN_H__
 #define __DISPOD_MAIN_H__
 
+#include "sdkconfig.h"
+#include "esp_attr.h"
 #include "esp_event.h"
 #include "esp_event_loop.h"
 #include "esp_err.h"
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
-#include "sdkconfig.h"
 #include "driver/ledc.h"
 #include <M5Stack.h>
 #include <NeoPixelBus.h>
@@ -42,9 +43,8 @@ extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
 #define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write only completed buffers
-#define DISPOD_SD_MOUNT_EVT                         (BIT1)
-#define DISPOD_SD_UNMOUNT_EVT                       (BIT2)
-#define DISPOD_SD_PROBE_EVT                         (BIT3)      // initialize, mount, read/generate ref file, unmount -> set Bits for status
+#define DISPOD_SD_PROBE_EVT                         (BIT1)      // check availability of card and function -> set Bits for status
+#define DISPOD_SD_GENERATE_TESTDATA_EVT             (BIT2)      // fill the buffer array with test data
 extern EventGroupHandle_t dispod_sd_evg;
 
 // disPOD Client callback function events
