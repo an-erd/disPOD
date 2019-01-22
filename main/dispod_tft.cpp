@@ -352,10 +352,10 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
 		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
 		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);														            // radius, color
-    ESP_LOGI(TAG, "M5.Lcd.drawRoundRect x0 %u y0 %u w %u h %u r %u",
-        xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
-		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
-		INDICATOR_TARGET_CIRCLE_RADIUS);
+    // ESP_LOGI(TAG, "M5.Lcd.drawRoundRect x0 %u y0 %u w %u h %u r %u",
+    //     xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
+	// 	xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
+	// 	INDICATOR_TARGET_CIRCLE_RADIUS);
 
 	// middle circle, filled = in target range
 	M5.Lcd.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK); // delete (background) first
@@ -365,7 +365,7 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 	else {
 		M5.Lcd.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_RED);
 	}
-    ESP_LOGI(TAG, "M5.Lcd.fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
+    // ESP_LOGD(TAG, "M5.Lcd.fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
 }
 
 static void dispod_screen_draw_footer(uint8_t line, dispod_screen_status_t *params)
@@ -450,7 +450,7 @@ void dispod_screen_running_update_display(dispod_screen_status_t *params) {
 	dispod_screen_draw_indicator(1, "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
     dispod_screen_draw_fields   (2, "Str", 3, values->values_to_display.str / 10.);
     dispod_screen_draw_footer   (3, params);
-	ESP_LOGI(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
+	// ESP_LOGD(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
 }
 
 void dispod_screen_task(void *pvParameters)

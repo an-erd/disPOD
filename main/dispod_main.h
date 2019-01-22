@@ -42,9 +42,10 @@
 extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
-#define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write only completed buffers
-#define DISPOD_SD_PROBE_EVT                         (BIT1)      // check availability of card and function -> set Bits for status
-#define DISPOD_SD_GENERATE_TESTDATA_EVT             (BIT2)      // fill the buffer array with test data
+#define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write completed buffers
+#define DISPOD_SD_WRITE_ALL_BUFFER_EVT				(BIT1)		// write incompleted buffers, too
+#define DISPOD_SD_PROBE_EVT                         (BIT2)      // check availability of card and function -> set Bits for status
+#define DISPOD_SD_GENERATE_TESTDATA_EVT             (BIT3)      // fill the buffer array with test data
 extern EventGroupHandle_t dispod_sd_evg;
 
 // disPOD Client callback function events

@@ -4,6 +4,7 @@
 #include "esp_event.h"
 
 #define DISPOD_RUNVALUES_BUFFERLEN      5
+#define DISPOD_RUNVALUES_TIMELEN		32
 #define RUNNING_VALUES_UPDATE_RCS		BIT0
 #define RUNNING_VALUES_UPDATE_CUSTOM	BIT1
 
@@ -38,6 +39,7 @@ typedef struct {
 typedef enum {
     ID_RSC,             // i.e. Cadence
     ID_CUSTOM,          // i.e. GCT, strike
+	ID_TIME,			// i.e. date/time from heartbeat event
 } running_values_id_t;
 
 // union used to put received BLE packets into a queue for further work
@@ -50,6 +52,10 @@ typedef union {
         uint16_t    GCT;
         uint8_t     str;
     } custom;
+	
+	struct time_element {
+		struct tm	timeinfo;
+	} time;
 } running_values_element_t;
 
 typedef struct {

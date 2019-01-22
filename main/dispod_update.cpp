@@ -18,6 +18,7 @@ void dispod_update_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "dispod_update_task: started");
     running_values_queue_element_t new_queue_element;
+	char strftime_buf[64];
 
     for(;;) {
         if(xQueueReceive(running_values_queue, (void * )&new_queue_element, (portTickType)portMAX_DELAY)) {
@@ -34,7 +35,12 @@ void dispod_update_task(void *pvParameters)
                 dispod_check_and_update_display();
                 dispod_archiver_add_customValues(new_queue_element.data.custom.GCT, new_queue_element.data.custom.str);
                 break;
-            default:
+            case ID_TIME:
+			    strftime(strftime_buf, sizeof(strftime_buf), "%c", &new_queue_element.data.time.timeinfo);
+    	        ESP_LOGI(TAG, "received from queue: TIME: %s", strftime_buf);
+                dispod_archiver_add_time(new_queue_element.data.time.timeinfo);
+                break;
+			default:
                 ESP_LOGI(TAG, "unknown event id");
                 break;
             }

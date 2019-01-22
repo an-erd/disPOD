@@ -8,23 +8,24 @@ static const char* TAG = "DISPOD_TIMER";
 EventGroupHandle_t dispod_timer_evg;
 
 static void timer_metronome_callback(void* arg);
-// static void periodic_timer_metronome_on_callback(void* arg);
-// static void timer_metronome_off_light_callback(void* arg);
-// static void timer_metronome_off_sound_callback(void* arg);
+static void timer_heartbeat_callback(void* arg);
 
-// create 3 timer args and handles
+// create 4 timer args and handles
 // - periodic timer for metronome on/cadence = 180 bpm
 // - timer for metronome off/light, one-shot timer fired by periodic timer
 // - timer for metronome off/sound, one-shot timer fired by periodic timer
+// - timer for heartbeat to have time stamps in the running values log files
 typedef enum {
 	TIMER_METRONOM_PERIODIC = 0,
 	TIMER_METRONOM_OFF_LIGHT,
 	TIMER_METRONOM_OFF_SOUND,
-	MAX_TIMER_METRONOM,
-} timer_metronom_id;
+	TIMER_HEARTBEAT_PERIODIC,
+	MAX_TIMER_NUMBER,
+} timer_dispod_id;
 
-static esp_timer_handle_t timer_handles[MAX_TIMER_METRONOM] = { 0 };
-static uint8_t			  timer_num    [MAX_TIMER_METRONOM] = { TIMER_METRONOM_PERIODIC, TIMER_METRONOM_OFF_LIGHT, TIMER_METRONOM_OFF_SOUND, };
+static esp_timer_handle_t timer_handles[MAX_TIMER_NUMBER] = { 0 };
+static uint8_t			  timer_num    [MAX_TIMER_NUMBER]
+	= { TIMER_METRONOM_PERIODIC, TIMER_METRONOM_OFF_LIGHT, TIMER_METRONOM_OFF_SOUND, TIMER_HEARTBEAT_PERIODIC,};
 
 
 void dispod_timer_initialize()
@@ -40,19 +41,26 @@ void dispod_timer_initialize()
         (void*) &timer_num[TIMER_METRONOM_OFF_LIGHT],
          ESP_TIMER_TASK,
         "metronome_off_light"
-};
-
+	};
     const esp_timer_create_args_t timer_metronome_off_sound_args = {
         &timer_metronome_callback,
         (void*) &timer_num[TIMER_METRONOM_OFF_SOUND],
         ESP_TIMER_TASK,
         "metronome_off_sound"
     };
+    const esp_timer_create_args_t periodic_timer_heartbeat_args = {
+        &timer_heartbeat_callback,
+        (void*) &timer_num[TIMER_HEARTBEAT_PERIODIC],
+        ESP_TIMER_TASK,
+        "heartbeat"
+    };
+
 
 	ESP_LOGI(TAG, "dispod_timer_initialize() started");
 	ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_metronome_on_args, &timer_handles[TIMER_METRONOM_PERIODIC]));
 	ESP_ERROR_CHECK(esp_timer_create(&timer_metronome_off_light_args,   &timer_handles[TIMER_METRONOM_OFF_LIGHT]));
 	ESP_ERROR_CHECK(esp_timer_create(&timer_metronome_off_sound_args,   &timer_handles[TIMER_METRONOM_OFF_SOUND]));
+	ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_heartbeat_args,   	&timer_handles[TIMER_HEARTBEAT_PERIODIC]));
 
 	// should be empty
     ESP_ERROR_CHECK(esp_timer_dump(stdout));
@@ -84,7 +92,7 @@ static void timer_metronome_callback(void* arg)
 	BaseType_t xResult;
 
     int64_t time_since_boot = esp_timer_get_time();
-    ESP_LOGI(TAG, "timer_metronome_callback, time since boot: %lld us", time_since_boot);
+    ESP_LOGD(TAG, "timer_metronome_callback, time since boot: %lld us", time_since_boot);
 
 	switch(timer_nr){
 		case TIMER_METRONOM_PERIODIC:  uxBits = DISPOD_TIMER_METRONOME_ON_BIT;	          break;
@@ -93,7 +101,49 @@ static void timer_metronome_callback(void* arg)
 		default: ESP_LOGI(TAG, "timer_metronome_callback, unhandled timer %u", timer_nr); break;
 	}
 
-	ESP_LOGI(TAG, "timer_metronome_callback, handled %u", timer_nr);
+	ESP_LOGD(TAG, "timer_metronome_callback, handled %u", timer_nr);
+
+	xResult = xEventGroupSetBitsFromISR(dispod_timer_evg, uxBits, &xHigherPriorityTaskWoken);
+
+    // message posted successfully?
+    if( xResult == pdPASS ){
+        portYIELD_FROM_ISR();
+    }
+}
+
+void dispod_timer_start_heartbeat()
+{
+	// Start the heartbeat timer
+    ESP_ERROR_CHECK(esp_timer_start_periodic(timer_handles[TIMER_HEARTBEAT_PERIODIC], CONFIG_RUNNING_LOGFILE_HEARTBEAT_INTERVAL * 1e+6)); // sec -> usec
+
+	ESP_LOGI(TAG, "dispod_timer_start_heartbeat(), time since boot: %lld us", esp_timer_get_time());
+    ESP_ERROR_CHECK(esp_timer_dump(stdout));
+}
+
+void dispod_timer_stop_heartbeat()
+{
+    ESP_ERROR_CHECK(esp_timer_stop(timer_handles[TIMER_HEARTBEAT_PERIODIC]));
+
+	ESP_LOGI(TAG, "dispod_timer_stop_heartbeat(), time since boot: %lld us", esp_timer_get_time());
+    ESP_ERROR_CHECK(esp_timer_dump(stdout));
+}
+
+static void timer_heartbeat_callback(void* arg)
+{
+	uint8_t timer_nr = *((uint8_t *) arg);
+	EventBits_t     uxBits = 0;
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;	// xHigherPriorityTaskWoken must be initialised to pdFALSE.
+	BaseType_t xResult;
+
+    int64_t time_since_boot = esp_timer_get_time();
+    ESP_LOGI(TAG, "timer_heartbeat_callback, time since boot: %lld us", time_since_boot);
+
+	switch(timer_nr){
+		case TIMER_HEARTBEAT_PERIODIC:  uxBits = DISPOD_TIMER_HEARTBEAT_BIT;	          break;
+		default: ESP_LOGI(TAG, "timer_heartbeat_callback, unhandled timer %u", timer_nr); break;
+	}
+
+	ESP_LOGD(TAG, "timer_heartbeat_callback, handled %u", timer_nr);
 
 	xResult = xEventGroupSetBitsFromISR(dispod_timer_evg, uxBits, &xHigherPriorityTaskWoken);
 
@@ -116,8 +166,8 @@ void dispod_timer_task(void *pvParameters)
     for (;;)
     {
         uxBits = xEventGroupWaitBits(dispod_timer_evg,
-					DISPOD_TIMER_METRONOME_ON_BIT | DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT | DISPOD_TIMER_METRONOME_OFF_SOUND_BIT,
-					pdFALSE, pdFALSE, portMAX_DELAY);
+					DISPOD_TIMER_METRONOME_ON_BIT | DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT | DISPOD_TIMER_METRONOME_OFF_SOUND_BIT
+					| DISPOD_TIMER_HEARTBEAT_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 
         if(uxBits & DISPOD_TIMER_METRONOME_ON_BIT){
             ESP_LOGV(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_ON_BIT");
@@ -169,5 +219,27 @@ void dispod_timer_task(void *pvParameters)
             M5.Speaker.mute();
 			ESP_LOGI(TAG, "Switched off TIMER_METRONOME_OFF_SOUND, time since boot: %lld us", esp_timer_get_time());
         }
+
+		// Heartbeat
+		if(uxBits & DISPOD_TIMER_HEARTBEAT_BIT){
+			time_t now;
+			running_values_queue_element_t new_queue_element;
+			BaseType_t  xStatus;
+
+            ESP_LOGV(TAG, "dispod_timer_task: DISPOD_TIMER_HEARTBEAT_BIT");
+
+			xEventGroupClearBits(dispod_timer_evg, DISPOD_TIMER_HEARTBEAT_BIT);
+
+			new_queue_element.id = ID_TIME;
+			time(&now);
+			localtime_r(&now, &new_queue_element.data.time.timeinfo);
+
+            xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
+            if(xStatus != pdTRUE ){
+                ESP_LOGW(TAG, "dispod_timer_task: DISPOD_TIMER_HEARTBEAT_BIT: cannot send to queue");
+            }
+			ESP_LOGI(TAG, "queued heartbeat, time since boot: %lld us", esp_timer_get_time());
+        }
+
 	}
 }

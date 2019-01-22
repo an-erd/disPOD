@@ -281,6 +281,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Back");
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 		dispod_timer_start_metronome();
+        dispod_timer_start_heartbeat();
         break;
     //
     case DISPOD_BUTTON_TAP_EVT: {
@@ -321,6 +322,11 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
                     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_GO_TO_RUNNING_SCREEN_EVT, NULL, 0, portMAX_DELAY));
+                    // open new running value file
+                    dispod_archiver_set_new_file();
+
+					// Test data generation, when entering running screen
+					xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_GENERATE_TESTDATA_EVT);
                 }
                 break;
             default:
@@ -357,6 +363,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
                 xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
 				dispod_timer_stop_metronome();
+                dispod_timer_stop_heartbeat();
                 pixels.ClearTo(NEOPIXEL_black);
                 pixels.Show();
                 dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
@@ -366,9 +373,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
                 xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
                 ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
-                ESP_LOGI(TAG, "Test: SD CARD: DISPOD_SD_GENERATE_TESTDATA_EVT >");
-                xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_GENERATE_TESTDATA_EVT);
-                ESP_LOGI(TAG, "Test: SD CARD: DISPOD_SD_GENERATE_TESTDATA_EVT <");
+				ESP_LOGI(TAG, "Archiver: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
+				xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
                 break;
             default:
                 ESP_LOGI(TAG, "unhandled button");

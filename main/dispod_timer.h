@@ -9,11 +9,14 @@
 #define DISPOD_TIMER_METRONOME_ON_BIT           (BIT0)
 #define DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT	(BIT1)
 #define DISPOD_TIMER_METRONOME_OFF_SOUND_BIT	(BIT2)
+#define DISPOD_TIMER_HEARTBEAT_BIT				(BIT3)
 extern EventGroupHandle_t dispod_timer_evg;
 
 void dispod_timer_initialize();
 void dispod_timer_start_metronome();
 void dispod_timer_stop_metronome();
+void dispod_timer_start_heartbeat();	// put element in queue all RUNNING_LOGFILE_HEARTBEAT_INTERVAL secs
+void dispod_timer_stop_heartbeat();
 
 void dispod_timer_task(void *pvParameters);
 

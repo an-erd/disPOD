@@ -10,12 +10,16 @@
 
 static const char* TAG = "DISPOD_ARCHIVER";
 
-// data buffers (should be configured to CONFIG_SDCARD_NUM_BUFFERS=4 and CONFIG_SDCARD_BUFFER_SIZE=131072)
+// data buffers to keep in RAM
+// should be configured to
+//   120 min * 180 cadence * 2 values/step + 120 min/1/min time stamp = 43.320 -> 2^16 = 65536
+//   => CONFIG_SDCARD_NUM_BUFFERS=4 and CONFIG_SDCARD_BUFFER_SIZE=65536
 static buffer_element_t buffers[CONFIG_SDCARD_NUM_BUFFERS][CONFIG_SDCARD_BUFFER_SIZE] EXT_RAM_ATTR;
 static uint8_t  current_buffer;                             // buffer to write next elements to
 static uint32_t used_in_buffer[CONFIG_SDCARD_NUM_BUFFERS];  // position in resp. buffer
 static uint8_t  next_buffer_to_write;                       // next buffer to write to
 static int s_ref_file_nr = -2;
+static bool new_file = true;
 
 EventGroupHandle_t dispod_sd_evg;
 
@@ -105,47 +109,48 @@ static int read_sd_card_file_refnr()
     FILE*   f;
     char    line[64];
     int     file_nr = -1;
+    struct 	stat st;
 
-    ESP_LOGI(TAG, "read_sd_card_file_refnr() >");
-    struct stat st;
+    ESP_LOGD(TAG, "read_sd_card_file_refnr() >");
+
     if (stat("/sd/refnr.txt", &st) == 0) {
         f = fopen("/sd/refnr.txt", "r");
         if (f == NULL) {
-            ESP_LOGE(TAG, "Failed to open file for reading");
+            ESP_LOGE(TAG, "read_sd_card_file_refnr(): Failed to open file for reading");
             return -1;
         }
-    // else {
-    //     f = fopen("/refnr.txt", "w");
-    //     if (f == NULL) {
-    //         ESP_LOGE(TAG, "Failed to open file for writing");
-    //         return -1;
-    //     }
-    //     fprintf(f, "0\n");
-    //     fclose(f);
-    //     ESP_LOGI(TAG, "File written");
+	} else {
+        f = fopen("/sd/refnr.txt", "w");
+        if (f == NULL) {
+            ESP_LOGE(TAG, "read_sd_card_file_refnr(): Failed to open file for writing");
+            return -1;
+        }
+        fprintf(f, "0\n");	// start new file with (file_nr=) 0
+        fclose(f);
 
-    //     f = fopen("/refnr.txt", "r");
-    //     if (f == NULL) {
-    //         ESP_LOGE(TAG, "Failed to open file for reading");
-    //         return -1;
-    //     }
-    // }
+        ESP_LOGD(TAG, "read_sd_card_file_refnr(): New file refnr.txt written");
+
+        f = fopen("/sd/refnr.txt", "r");
+        if (f == NULL) {
+            ESP_LOGE(TAG, "read_sd_card_file_refnr(): Failed to open file for reading (2)");
+            return -1;
+        }
+    }
 
     fgets(line, sizeof(line), f);
     fclose(f);
-    }
 
     // strip newline
     char* pos = strchr(line, '\n');
     if (pos) {
         *pos = '\0';
     }
-    ESP_LOGI(TAG, "read_sd_card_file_refnr: Read from file: '%s'", line);
+    ESP_LOGD(TAG, "read_sd_card_file_refnr(): Read from file: '%s'", line);
     sscanf(line, "%d", (int*)&file_nr);
 
     s_ref_file_nr = file_nr;
 
-    ESP_LOGI(TAG, "read_sd_card_file_refnr() <, file_nr = %d", file_nr);
+    ESP_LOGD(TAG, "read_sd_card_file_refnr() <, file_nr = %d", file_nr);
 
     return file_nr;
 }
@@ -154,12 +159,12 @@ static int write_sd_card_file_refnr(int new_refnr)
 {
     // file handle and buffer to read
     FILE*   f;
-    char    line[64];
-    struct stat st;
+    // char    line[64];
+    struct  stat st;
 
-    ESP_LOGI(TAG, "write_sd_card_file_refnr() >, new_refnr = %d", new_refnr);
+    ESP_LOGD(TAG, "write_sd_card_file_refnr() >, new_refnr = %d", new_refnr);
     if (stat("/sd/refnr.txt", &st) == 0) {
-        ESP_LOGI(TAG, "write_sd_card_file_refnr(), stat = 0");
+        ESP_LOGD(TAG, "write_sd_card_file_refnr(), stat = 0");
         f = fopen("/sd/refnr.txt", "w");
         if (f == NULL) {
             ESP_LOGE(TAG, "write_sd_card_file_refnr() <, Failed to open file for writing");
@@ -167,130 +172,171 @@ static int write_sd_card_file_refnr(int new_refnr)
         }
         fprintf(f, "%d\n", new_refnr);
         fclose(f);
-        ESP_LOGI(TAG, "write_sd_card_file_refnr() <, File written");
+        ESP_LOGD(TAG, "write_sd_card_file_refnr() <, File written");
     }
 
     return new_refnr;
 }
 
-int write_out_any_buffers()
+int write_out_buffers(bool write_only_completed)
 {
-    ESP_LOGI(TAG, "write_out_any_buffers(): >");
 
     // file handle and buffer to read
     FILE*   f;
     char    line[64];
     int     file_nr;
+    char    strftime_buf[64];
+
+    ESP_LOGI(TAG, "write_out_buffers() >");
 
     // Read the last file number from file. If it does not exist, create a new and start with "0".
     // If it exists, read the value and increase by 1.
     file_nr = read_sd_card_file_refnr();
     if(file_nr < 0)
-        ESP_LOGE(TAG, "write_out_any_buffers(): Ref. file could not be read or created - ABORT");
-    file_nr++;
-    write_sd_card_file_refnr(file_nr);
+        ESP_LOGE(TAG, "write_out_buffers(): Ref. file could not be read or created - ABORT");
+
+    // generate a new reference number if requested and store in file for upcoming use
+    if(new_file){
+        file_nr++;
+        new_file = false;
+        write_sd_card_file_refnr(file_nr);
+    }
 
     // generate new file name
     sprintf(line, CONFIG_SDCARD_FILE_NAME, file_nr);
-    // sprintf(line, "/sd/out_1.txt");
-    ESP_LOGI(TAG, "write_out_any_buffers(): generated file name '%s'", line);
+    ESP_LOGI(TAG, "write_out_buffers(): generated file name '%s'", line);
 
     f = fopen(line, "a");
     if(f == NULL) {
         f = fopen(line, "w");
         if (f == NULL) {
-            ESP_LOGE(TAG, "write_out_any_buffers(): Failed to open file for writing");
+            ESP_LOGE(TAG, "write_out_buffers(): Failed to open file for writing");
             return 0;
         }
-        ESP_LOGI(TAG, "write_out_any_buffers(): Created new file for write");
+        ESP_LOGI(TAG, "write_out_buffers(): Created new file for write");
     } else {
-        ESP_LOGI(TAG, "write_out_any_buffers(): Opening file for append");
+        ESP_LOGI(TAG, "write_out_buffers(): Opening file for append");
     }
 
-    // Attempt to write out any full or completed buffers
-    while( next_buffer_to_write != current_buffer ) {
-        if(fwrite(buffers[next_buffer_to_write], sizeof(buffer_element_t), used_in_buffer[next_buffer_to_write], f) != used_in_buffer[next_buffer_to_write]) {
-        ESP_LOGI(TAG, "Write fwrite(buffers[%u], ...) error", next_buffer_to_write);
-        break;
-        }
-        clean_buffer(next_buffer_to_write);
-        // dispod_archiver_set_to_next_buffer();
-        next_buffer_to_write = (next_buffer_to_write + 1) % CONFIG_SDCARD_NUM_BUFFERS;
-    }
+	if(!write_only_completed){
+		// switch to next buffer to ensure no conflict of new incoming data
+		current_buffer = (current_buffer + 1) % CONFIG_SDCARD_NUM_BUFFERS;
+		used_in_buffer[current_buffer] = 0;		// just to be sure
+	}
+	while( next_buffer_to_write != current_buffer ){
+		// write buffer next_buffer_to_write
+		ESP_LOGI(TAG, "write_out_buffers(): write buffers[%u][0..%u]", next_buffer_to_write, used_in_buffer[next_buffer_to_write]);
 
-    ESP_LOGI(TAG, "Closing file");
+		for(uint32_t i = 0; i < used_in_buffer[next_buffer_to_write]; i++){
+			// check for timestamp:       strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+            if(buffers[next_buffer_to_write][i].GCT == 999) // TODO more sophisticaed way...
+            {
+			    strftime(strftime_buf, sizeof(strftime_buf), "%c", &buffers[next_buffer_to_write][i].timeinfo);
+			    fprintf(f, "%u:%u,%s,,,\r\n", next_buffer_to_write, i, strftime_buf);
+
+            } else {
+                if(buffers[next_buffer_to_write][i].str == 9){
+    			    fprintf(f, "%u:%u,,%u,,%u\r\n", next_buffer_to_write, i,
+	    			    buffers[next_buffer_to_write][i].cad, buffers[next_buffer_to_write][i].GCT);
+                } else {
+    			    fprintf(f, "%u:%u,,,%u,\r\n", next_buffer_to_write, i, buffers[next_buffer_to_write][i].str);
+                }
+            }
+		}
+		clean_buffer(next_buffer_to_write);
+		next_buffer_to_write = (next_buffer_to_write + 1) % CONFIG_SDCARD_NUM_BUFFERS;
+	}
+
+    ESP_LOGI(TAG, "write_out_buffers(): Closing file");
     fclose(f);
 
-    ESP_LOGI(TAG, "write_out_any_buffers: <");
+    ESP_LOGI(TAG, "write_out_buffers() <");
 
     return 1;
 }
 
 void dispod_archiver_set_next_element()
 {
-    int complete = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdFALSE, pdFALSE, 0) & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT;
+    // int complete = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdFALSE, pdFALSE, 0) & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT;
     // ESP_LOGD(TAG, "dispod_archiver_set_next_element >: current_buffer %u, used in current buffer %u, size %u, complete %u",
     //     current_buffer, used_in_buffer[current_buffer], CONFIG_SDCARD_BUFFER_SIZE, complete);
 
     used_in_buffer[current_buffer]++;
     if(used_in_buffer[current_buffer] == CONFIG_SDCARD_BUFFER_SIZE){
-        current_buffer = (current_buffer + 1) % CONFIG_SDCARD_NUM_BUFFERS;
-        used_in_buffer[current_buffer] = 0;
-        xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT);
+		dispod_archiver_set_to_next_buffer();
     }
 
-    complete = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdFALSE, pdFALSE, 0) & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT;
+    // complete = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdFALSE, pdFALSE, 0) & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT;
     // ESP_LOGD(TAG, "dispod_archiver_set_next_element <: current_buffer %u, used in current buffer %u, size %u, complete %u",
     //     current_buffer, used_in_buffer[current_buffer], CONFIG_SDCARD_BUFFER_SIZE, complete);
 }
 
 void dispod_archiver_set_to_next_buffer()
 {
-    // ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer >: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
+    ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer >: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
     if( used_in_buffer[current_buffer] != 0) {
         // set to next (free) buffer and write (all and maybe incomplete) buffer but current
         current_buffer = (current_buffer + 1) % CONFIG_SDCARD_NUM_BUFFERS;
+		used_in_buffer[current_buffer] = 0;
         xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT);
     } else {
         // do nothing because current buffer is empty
+		ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer: current_buffer empty, do nothing");
+
     }
-    // ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer <: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
+    ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer <: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
 }
 
 void dispod_archiver_add_RSCValues(uint8_t new_cad)
 {
     buffers[current_buffer][used_in_buffer[current_buffer]].cad = new_cad;
+	buffers[current_buffer][used_in_buffer[current_buffer]].str = 9;	// empty
+	buffers[current_buffer][used_in_buffer[current_buffer]].GCT = 0;	// empty
     // ESP_LOGD(TAG, "dispod_archiver_add_RSCValues: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
     dispod_archiver_set_next_element();
 }
 
 void dispod_archiver_add_customValues(uint16_t new_GCT, uint8_t new_str)
 {
+    buffers[current_buffer][used_in_buffer[current_buffer]].cad = 0;	// empty
     buffers[current_buffer][used_in_buffer[current_buffer]].GCT = new_GCT;
     buffers[current_buffer][used_in_buffer[current_buffer]].str = new_str;
     // ESP_LOGD(TAG, "dispod_archiver_add_customValues: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
     dispod_archiver_set_next_element();
 }
 
+void dispod_archiver_add_time(tm timeinfo)
+{
+    buffers[current_buffer][used_in_buffer[current_buffer]].GCT      = 999; // TODO code for time element
+	buffers[current_buffer][used_in_buffer[current_buffer]].timeinfo = timeinfo;
+	dispod_archiver_set_next_element();
+}
+
+void dispod_archiver_set_new_file()
+{
+    new_file = true;
+}
+
 void dispod_archiver_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "dispod_archiver_task: started");
     EventBits_t uxBits;
+	bool		write_only_completed = true;
 
     for (;;)
     {
         uxBits = xEventGroupWaitBits(dispod_sd_evg,
-                DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_PROBE_EVT | DISPOD_SD_GENERATE_TESTDATA_EVT,
+                DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT | DISPOD_SD_PROBE_EVT | DISPOD_SD_GENERATE_TESTDATA_EVT,
                 pdTRUE, pdFALSE, portMAX_DELAY);
 
         if(uxBits & DISPOD_SD_PROBE_EVT){
             xEventGroupClearBits(dispod_sd_evg, DISPOD_SD_PROBE_EVT);
 
             ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: DISPOD_SD_PROBE_EVT");
-            ESP_LOGI(TAG, "SD card info %d, card size %llu, total bytes %llu used bytes %llu, used %3.1f perc.",
-                SD.cardType(), SD.cardSize(), SD.totalBytes(), SD.usedBytes(), (SD.usedBytes() / (float) SD.totalBytes()));
+            ESP_LOGI(TAG, "SD card info %d, card size kb %llu, total kb %llu used kb %llu, used %3.1f perc.",
+                SD.cardType(), SD.cardSize()/1024, SD.totalBytes()/1024, SD.usedBytes()/1024, (SD.usedBytes() / (float) SD.totalBytes()));
             // TF card test
-            listDir(SD, "/", 0);
+            // listDir(SD, "/", 0);
             // writeFile(SD, "/hello.txt", "Hello world");
             // readFile(SD, "/hello.txt");
             if(SD.cardType() != CARD_NONE){
@@ -307,9 +353,10 @@ void dispod_archiver_task(void *pvParameters)
         }
 
         if((uxBits & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT) == DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT){
-            ESP_LOGI(TAG, "dispod_archiver_task: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT");
+			write_only_completed = !( (uxBits & DISPOD_SD_WRITE_ALL_BUFFER_EVT) == DISPOD_SD_WRITE_ALL_BUFFER_EVT);
+            ESP_LOGI(TAG, "dispod_archiver_task: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, write_only_completed=%d", write_only_completed);
             if( xEventGroupWaitBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT, pdFALSE, pdFALSE, portMAX_DELAY) & DISPOD_SD_AVAILABLE_BIT){
-                write_out_any_buffers();
+                write_out_buffers(write_only_completed);
             } else {
                 ESP_LOGE(TAG, "dispod_archiver_task: write out completed buffers but no SD mounted");
             }
@@ -317,14 +364,14 @@ void dispod_archiver_task(void *pvParameters)
 
         if((uxBits & DISPOD_SD_GENERATE_TESTDATA_EVT) == DISPOD_SD_GENERATE_TESTDATA_EVT){
             ESP_LOGI(TAG, "dispod_archiver_task: DISPOD_SD_GENERATE_TESTDATA_EVT start");
-            for(int i=0; i < CONFIG_SDCARD_BUFFER_SIZE; i++){
+            for(int i=0; i < CONFIG_SDCARD_NUM_BUFFERS; i++){
                 for(int j=0; j < CONFIG_SDCARD_BUFFER_SIZE; j++){
                     if(j%2){
                         dispod_archiver_add_RSCValues(180);
                     } else {
                         dispod_archiver_add_customValues(352,1);
                     }
-                    if((i==(CONFIG_SDCARD_BUFFER_SIZE-1)) && j == 130000)
+                    if((i==(CONFIG_SDCARD_NUM_BUFFERS-1)) && j == (CONFIG_SDCARD_BUFFER_SIZE-4))
                         break;
                 }
             }
