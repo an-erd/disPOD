@@ -175,6 +175,10 @@ menu "disPOD Configuration"
 
     menu "Running values configuration"
 
+		config RUNNING_LOGFILE_HEARTBEAT_INTERVAL
+			int "Time interval to put a heartbeat in running value queue in sec"
+			range 1 600
+			default 60
         config RUNNING_MIN_INTERVAL_CADENCE
             int "Lower target interval for cadence"
             range 160 200
