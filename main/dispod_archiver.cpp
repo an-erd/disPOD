@@ -23,6 +23,12 @@ static bool new_file = true;
 
 EventGroupHandle_t dispod_sd_evg;
 
+// static  archiver buffer event group
+#define BUFFER_RSC_BIT        				(BIT0)      // RSC values are availalbe
+#define BUFFER_CUSTOM_BIT        			(BIT1)      // Custom values are availalbe
+static EventGroupHandle_t buffer_evg;
+
+// forward declaration
 void dispod_archiver_set_to_next_buffer();
 
 static void clean_buffer(uint8_t num_buffer)
@@ -33,6 +39,7 @@ static void clean_buffer(uint8_t num_buffer)
 
 void dispod_archiver_initialize()
 {
+    buffer_evg = xEventGroupCreate();
     for (int i = 0; i < CONFIG_SDCARD_NUM_BUFFERS; i++){
         clean_buffer(i);
     }
@@ -204,7 +211,7 @@ int write_out_buffers(bool write_only_completed)
 
     // generate new file name
     sprintf(line, CONFIG_SDCARD_FILE_NAME, file_nr);
-    ESP_LOGI(TAG, "write_out_buffers(): generated file name '%s'", line);
+    ESP_LOGD(TAG, "write_out_buffers(): generated file name '%s'", line);
 
     f = fopen(line, "a");
     if(f == NULL) {
@@ -213,9 +220,9 @@ int write_out_buffers(bool write_only_completed)
             ESP_LOGE(TAG, "write_out_buffers(): Failed to open file for writing");
             return 0;
         }
-        ESP_LOGI(TAG, "write_out_buffers(): Created new file for write");
+        ESP_LOGD(TAG, "write_out_buffers(): Created new file for write");
     } else {
-        ESP_LOGI(TAG, "write_out_buffers(): Opening file for append");
+        ESP_LOGD(TAG, "write_out_buffers(): Opening file for append");
     }
 
 	if(!write_only_completed){
@@ -225,32 +232,32 @@ int write_out_buffers(bool write_only_completed)
 	}
 	while( next_buffer_to_write != current_buffer ){
 		// write buffer next_buffer_to_write
-		ESP_LOGI(TAG, "write_out_buffers(): write buffers[%u][0..%u]", next_buffer_to_write, used_in_buffer[next_buffer_to_write]);
+		ESP_LOGD(TAG, "write_out_buffers(): write buffers[%u][0..%u]", next_buffer_to_write, used_in_buffer[next_buffer_to_write]);
 
 		for(uint32_t i = 0; i < used_in_buffer[next_buffer_to_write]; i++){
 			// check for timestamp:       strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-            if(buffers[next_buffer_to_write][i].GCT == 999) // TODO more sophisticaed way...
-            {
+            // TODO
+            if(buffers[next_buffer_to_write][i].timeinfo.tm_year != 0){
 			    strftime(strftime_buf, sizeof(strftime_buf), "%c", &buffers[next_buffer_to_write][i].timeinfo);
-			    fprintf(f, "%u:%u,%s,,,\r\n", next_buffer_to_write, i, strftime_buf);
-
+			    fprintf(f, "%u:%u,%s,%u,%u,%u\r\n", next_buffer_to_write, i, strftime_buf,
+                    buffers[next_buffer_to_write][i].cad, buffers[next_buffer_to_write][i].str, buffers[next_buffer_to_write][i].GCT);
+                ESP_LOGD(TAG, "write_out_buffers(): Write: %u:%u,%s,%u,%u,%u\n", next_buffer_to_write, i, strftime_buf,
+                    buffers[next_buffer_to_write][i].cad, buffers[next_buffer_to_write][i].str, buffers[next_buffer_to_write][i].GCT);
             } else {
-                if(buffers[next_buffer_to_write][i].str == 9){
-    			    fprintf(f, "%u:%u,,%u,,%u\r\n", next_buffer_to_write, i,
-	    			    buffers[next_buffer_to_write][i].cad, buffers[next_buffer_to_write][i].GCT);
-                } else {
-    			    fprintf(f, "%u:%u,,,%u,\r\n", next_buffer_to_write, i, buffers[next_buffer_to_write][i].str);
-                }
+                fprintf(f, "%u:%u,,%u,%u,%u\r\n", next_buffer_to_write, i,
+                    buffers[next_buffer_to_write][i].cad, buffers[next_buffer_to_write][i].str, buffers[next_buffer_to_write][i].GCT);
+                ESP_LOGD(TAG, "write_out_buffers(): Write: %u:%u,,,%u,%u,%u\n", next_buffer_to_write, i,
+                    buffers[next_buffer_to_write][i].cad, buffers[next_buffer_to_write][i].str, buffers[next_buffer_to_write][i].GCT);
             }
-		}
+        }
 		clean_buffer(next_buffer_to_write);
 		next_buffer_to_write = (next_buffer_to_write + 1) % CONFIG_SDCARD_NUM_BUFFERS;
 	}
 
-    ESP_LOGI(TAG, "write_out_buffers(): Closing file");
+    ESP_LOGD(TAG, "write_out_buffers(): Closing file");
     fclose(f);
 
-    ESP_LOGI(TAG, "write_out_buffers() <");
+    ESP_LOGD(TAG, "write_out_buffers() <");
 
     return 1;
 }
@@ -265,6 +272,10 @@ void dispod_archiver_set_next_element()
     if(used_in_buffer[current_buffer] == CONFIG_SDCARD_BUFFER_SIZE){
 		dispod_archiver_set_to_next_buffer();
     }
+	buffers[current_buffer][used_in_buffer[current_buffer]].timeinfo.tm_year =  0;
+	buffers[current_buffer][used_in_buffer[current_buffer]].cad = 0;
+	buffers[current_buffer][used_in_buffer[current_buffer]].GCT = 0;
+	buffers[current_buffer][used_in_buffer[current_buffer]].str = 9;					// TODO check, wheter  this case happens?!
 
     // complete = xEventGroupWaitBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, pdFALSE, pdFALSE, 0) & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT;
     // ESP_LOGD(TAG, "dispod_archiver_set_next_element <: current_buffer %u, used in current buffer %u, size %u, complete %u",
@@ -287,29 +298,41 @@ void dispod_archiver_set_to_next_buffer()
     ESP_LOGD(TAG, "dispod_archiver_set_to_next_buffer <: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
 }
 
+void dispod_archiver_check_full_element()
+{
+    EventBits_t uxBits;
+
+	uxBits = xEventGroupWaitBits(buffer_evg, BUFFER_RSC_BIT | BUFFER_CUSTOM_BIT, pdTRUE, pdTRUE, 0);
+	if( (uxBits & (BUFFER_RSC_BIT | BUFFER_CUSTOM_BIT) ) == (BUFFER_RSC_BIT | BUFFER_CUSTOM_BIT) ){
+		dispod_archiver_set_next_element();
+	}
+}
+
 void dispod_archiver_add_RSCValues(uint8_t new_cad)
 {
     buffers[current_buffer][used_in_buffer[current_buffer]].cad = new_cad;
-	buffers[current_buffer][used_in_buffer[current_buffer]].str = 9;	// empty
-	buffers[current_buffer][used_in_buffer[current_buffer]].GCT = 0;	// empty
-    // ESP_LOGD(TAG, "dispod_archiver_add_RSCValues: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
-    dispod_archiver_set_next_element();
+	xEventGroupSetBits(buffer_evg, BUFFER_RSC_BIT);
+
+    dispod_archiver_check_full_element();
 }
 
 void dispod_archiver_add_customValues(uint16_t new_GCT, uint8_t new_str)
 {
-    buffers[current_buffer][used_in_buffer[current_buffer]].cad = 0;	// empty
     buffers[current_buffer][used_in_buffer[current_buffer]].GCT = new_GCT;
     buffers[current_buffer][used_in_buffer[current_buffer]].str = new_str;
-    // ESP_LOGD(TAG, "dispod_archiver_add_customValues: current_buffer %u, used in current buffer %u ", current_buffer, used_in_buffer[current_buffer]);
-    dispod_archiver_set_next_element();
+	xEventGroupSetBits(buffer_evg, BUFFER_CUSTOM_BIT);
+
+    dispod_archiver_check_full_element();
 }
 
 void dispod_archiver_add_time(tm timeinfo)
 {
-    buffers[current_buffer][used_in_buffer[current_buffer]].GCT      = 999; // TODO code for time element
+    char strftime_buf[64];
+
 	buffers[current_buffer][used_in_buffer[current_buffer]].timeinfo = timeinfo;
-	dispod_archiver_set_next_element();
+
+    strftime(strftime_buf, sizeof(strftime_buf), "%c", &buffers[current_buffer][used_in_buffer[current_buffer]].timeinfo);
+    ESP_LOGD(TAG, "dispod_archiver_add_time(): TIME: %s", strftime_buf);
 }
 
 void dispod_archiver_set_new_file()
@@ -328,7 +351,7 @@ void dispod_archiver_task(void *pvParameters)
         uxBits = xEventGroupWaitBits(dispod_sd_evg,
                 DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT | DISPOD_SD_PROBE_EVT | DISPOD_SD_GENERATE_TESTDATA_EVT,
                 pdTRUE, pdFALSE, portMAX_DELAY);
-
+        ESP_LOGI(TAG, "dispod_archiver_task(): uxBits = %u", uxBits);
         if(uxBits & DISPOD_SD_PROBE_EVT){
             xEventGroupClearBits(dispod_sd_evg, DISPOD_SD_PROBE_EVT);
 

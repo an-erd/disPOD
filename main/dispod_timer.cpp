@@ -234,11 +234,11 @@ void dispod_timer_task(void *pvParameters)
 			time(&now);
 			localtime_r(&now, &new_queue_element.data.time.timeinfo);
 
+			ESP_LOGD(TAG, "queue heartbeat, time since boot: %lld us", esp_timer_get_time());
             xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
             if(xStatus != pdTRUE ){
                 ESP_LOGW(TAG, "dispod_timer_task: DISPOD_TIMER_HEARTBEAT_BIT: cannot send to queue");
             }
-			ESP_LOGI(TAG, "queued heartbeat, time since boot: %lld us", esp_timer_get_time());
         }
 
 	}

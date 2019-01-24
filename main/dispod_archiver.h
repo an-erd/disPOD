@@ -5,10 +5,10 @@
 
 // parameters for data buffers
 typedef struct {
-	struct tm timeinfo;
+	struct tm timeinfo;	// empty: tm_year=0
     uint8_t cad;		// empty=0
     uint8_t str;		// empty=9, because 0-2 is used
-    uint16_t GCT;		// empty=0, =999 for timeinfo
+    uint16_t GCT;		// empty=0
 } buffer_element_t;
 
 void dispod_archiver_initialize();
