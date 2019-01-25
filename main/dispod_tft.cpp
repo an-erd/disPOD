@@ -26,19 +26,19 @@ static const char* TAG = "DISPOD_TFT";
 #define X_BUTTON_C	    255
 
 // layout measures for running screen
-#define FIELD_MIN_X				        160
+#define FIELD_MIN_X				        170
 #define FIELD_MAX_X				        310
-#define FIELD_BASE_Y			        10
-#define FIELD_HALFHEIGHT		        8
+#define FIELD_BASE_Y			        14
+#define FIELD_HALFHEIGHT		        11
 #define FIELD_WIDTH				        (FIELD_MAX_X - FIELD_MIN_X)
 
 // layout dimensions for indicator bar
-#define INDICATOR_MIN_X					160
+#define INDICATOR_MIN_X					170
 #define INDICATOR_MAX_X					310
 #define INDICATOR_ADJ_MIN_X				(INDICATOR_MIN_X + INDICATOR_TARGET_CIRCLE_RADIUS)
 #define INDICATOR_ADJ_MAX_X				(INDICATOR_MAX_X - INDICATOR_TARGET_CIRCLE_RADIUS)
-#define INDICATOR_BASE_Y				10
-#define INDICATOR_TARGET_CIRCLE_RADIUS	8
+#define INDICATOR_BASE_Y				14
+#define INDICATOR_TARGET_CIRCLE_RADIUS	11
 
 // Take from menuconfig
 #define MIN_INTERVAL_CADENCE		CONFIG_RUNNING_MIN_INTERVAL_CADENCE
@@ -52,7 +52,7 @@ EventGroupHandle_t dispod_display_evg;
 // initialize all display structs
 void dispod_screen_status_initialize(dispod_screen_status_t *params)
 {
-    ESP_LOGI(TAG, "dispod_screen_status_initialize()");
+    ESP_LOGD(TAG, "dispod_screen_status_initialize()");
 
     // initialize dispod_screen_status_t struct
     params->current_screen = SCREEN_STATUS;
@@ -241,7 +241,7 @@ static void dispod_screen_draw_fields(uint8_t line, char* name, uint8_t numField
     uint16_t    textHeight;
     uint16_t    xPad = 10, yPad = 10, yLine, xVal;
     char        buffer[32];
-    uint8_t     current;
+    uint16_t    current;
 
 	textHeight = M5.Lcd.fontHeight(GFXFF);
     yLine = yPad + (textHeight  + yPad) * line;
@@ -250,14 +250,15 @@ static void dispod_screen_draw_fields(uint8_t line, char* name, uint8_t numField
     M5.Lcd.setTextDatum(TL_DATUM);
     M5.Lcd.drawString(name, xPad, yLine, GFXFF);
 
-    current = (uint8_t) round(f_current);
+    current = (uint16_t) round(f_current);
 	bool inInterval = (current >= 1) && (current <= 2);
 	if (inInterval)
         M5.Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
 	else
 		M5.Lcd.setTextColor(TFT_RED, TFT_BLACK);
     sprintf(buffer, "%1.1f", f_current);
-    xVal = 10 + 60 + 10 + 60;
+
+    xVal = 10 + 75 + 10 + 60;
     M5.Lcd.setTextDatum(TR_DATUM);
     M5.Lcd.drawString(buffer, xVal, yLine, GFXFF);
     M5.Lcd.setTextDatum(TL_DATUM);
@@ -271,9 +272,10 @@ static void dispod_screen_draw_fields(uint8_t line, char* name, uint8_t numField
 	for (int i = 0; i < numFields; i++)
 		M5.Lcd.drawLine(FIELD_MIN_X + i * deltaX, y0 - FIELD_HALFHEIGHT, FIELD_MIN_X + i * deltaX, y0 + FIELD_HALFHEIGHT - 1, TFT_WHITE);
 
-
 	// mark current
-	M5.Lcd.fillRect(FIELD_MIN_X + current * deltaX + 2, y0 - FIELD_HALFHEIGHT + 2, deltaX - 4, 2 * FIELD_HALFHEIGHT - 4, TFT_WHITE);
+    uint16_t tmp_width = deltaX - 3 + (current == (numFields-1) ? 1 : 0);
+    uint32_t tmp_color = (inInterval ? TFT_GREEN : TFT_RED);
+	M5.Lcd.fillRect(FIELD_MIN_X + current * deltaX + 2, y0 - FIELD_HALFHEIGHT + 2, tmp_width, 2 * FIELD_HALFHEIGHT - 4, tmp_color);
     M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
@@ -296,10 +298,11 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 #endif // DEBUG_DISPOD
 
 	textHeight = M5.Lcd.fontHeight(GFXFF);
+    ESP_LOGI(TAG, "textHeight = %u", textHeight);
     yLine = yPad + (textHeight  + yPad) * line;
 
 	// current values out of range -> move into range
-	uint8_t adjCurVal = curVal;
+	uint16_t adjCurVal = curVal;
 	if (curVal < valMin)
 		adjCurVal = valMin;
 	if (curVal > valMax)
@@ -312,8 +315,8 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 	// calculate y base coordinates
 	uint16_t yBaseline = yLine + INDICATOR_BASE_Y;		// center/base line to display indicator
 
-	//DEBUGLOG("displayDrawIndicator: indMinX %u, indMaxX %u, indAdjMinX %u, indAdjMaxX %u, xLowInt %u, xHighInt %u, xTarget %u, yPad %u, yLine %u, yBaseLine %u",
-	//	INDICATOR_MIN_X, INDICATOR_MAX_X, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X, xLowInterval, xHighInterval, xTarget, yPad, yLine, yBaseline);
+	ESP_LOGD(TAG, "displayDrawIndicator: indMinX %u, indMaxX %u, indAdjMinX %u, indAdjMaxX %u, xLowInt %u, xHighInt %u, xTarget %u, yPad %u, yLine %u, yBaseLine %u",
+		INDICATOR_MIN_X, INDICATOR_MAX_X, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X, xLowInterval, xHighInterval, xTarget, yPad, yLine, yBaseline);
 
 	// check if the current value is in target interval
 	bool inInterval = (curVal >= lowInterval) && (curVal <= highInterval);
@@ -330,14 +333,14 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
     // show value
     if(print_value){
         sprintf(buffer, "%u", curVal);
-        xVal = 10 + 60 + 10 + 60;
+        xVal = 10 + 75 + 10 + 60;
         M5.Lcd.setTextDatum(TR_DATUM);
         M5.Lcd.drawString(buffer, xVal, yLine, GFXFF);
         M5.Lcd.setTextDatum(TL_DATUM);
     }
 	M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 
-    // ESP_LOGI(TAG, "drawindicator textwidth %u for '%s', textheight %u", TFT_getStringWidth(name), name, textHeight);
+    // ESP_LOGD(TAG, "drawindicator textwidth %u for '%s', textheight %u", TFT_getStringWidth(name), name, textHeight);
 
 	// baseline, from INDICATOR_MIN_X to INDICATOR_MAX_X
 	M5.Lcd.drawLine(INDICATOR_MIN_X+2, yBaseline, INDICATOR_MAX_X-2, yBaseline, TFT_WHITE);
@@ -345,16 +348,16 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 
 	// show rounded rectangle (first fill w/background, then draw w/foreground color)
 	M5.Lcd.fillRoundRect(
-		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		        // x0, y0 (top left corner)
-		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,	// w, h
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS - 2, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		        // x0, y0 (top left corner)
+		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS + 4, 5 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,	// w, h
 		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK);														            // radius, color
 	M5.Lcd.drawRoundRect(
-		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
-		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS-2, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
+		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS + 4, 5 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
 		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);														            // radius, color
-    // ESP_LOGI(TAG, "M5.Lcd.drawRoundRect x0 %u y0 %u w %u h %u r %u",
+    // ESP_LOGD(TAG, "M5.Lcd.drawRoundRect x0 %u y0 %u w %u h %u r %u",
     //     xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
-	// 	xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 4 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
+	// 	xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 5 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
 	// 	INDICATOR_TARGET_CIRCLE_RADIUS);
 
 	// middle circle, filled = in target range
@@ -365,7 +368,7 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 	else {
 		M5.Lcd.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_RED);
 	}
-    // ESP_LOGD(TAG, "M5.Lcd.fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
+    ESP_LOGD(TAG, "M5.Lcd.fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
 }
 
 static void dispod_screen_draw_footer(uint8_t line, dispod_screen_status_t *params)
@@ -441,16 +444,33 @@ static void dispod_screen_ota_update_display(otaUpdate_t otaUpdate, bool clearSc
 void dispod_screen_running_update_display(dispod_screen_status_t *params) {
 	runningValuesStruct_t* values = &running_values;
 
+
+
 	// Preparation
     M5.Lcd.fillScreen(TFT_BLACK);
-    M5.Lcd.setFreeFont(FF18);
+    M5.Lcd.setFreeFont(FF19);
     M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 
-	dispod_screen_draw_indicator(0, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+    dispod_screen_draw_indicator(0, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
 	dispod_screen_draw_indicator(1, "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
     dispod_screen_draw_fields   (2, "Str", 3, values->values_to_display.str / 10.);
     dispod_screen_draw_footer   (3, params);
 	// ESP_LOGD(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
+
+    // testing:
+    // ESP_LOGI(TAG, "dispod_screen_draw_indicator(): textWidth('GCT') = %u", M5.Lcd.textWidth("GCT"));
+    // ESP_LOGI(TAG, "dispod_screen_draw_indicator(): textWidth('222') = %u", M5.Lcd.textWidth("222"));
+    // dispod_screen_draw_indicator(0, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, 1, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+    // dispod_screen_draw_fields   (1, "Str", 3, 0);
+    // dispod_screen_draw_fields   (2, "Str", 3, 1);
+    // dispod_screen_draw_fields   (3, "Str", 3, 2);
+    // dispod_screen_draw_indicator(1, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, 300, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+    // dispod_screen_draw_indicator(2, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, MIN_INTERVAL_CADENCE, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+    // dispod_screen_draw_indicator(3, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, MAX_INTERVAL_CADENCE, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
+	// dispod_screen_draw_indicator(0, "GCT", true, MIN_INTERVAL_STANCETIME, 260, 10, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
+	// dispod_screen_draw_indicator(1, "STR", true, MIN_INTERVAL_STANCETIME, 260, MAX_INTERVAL_STANCETIME-1, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
+	// dispod_screen_draw_indicator(2, "CAD", true, MIN_INTERVAL_STANCETIME, 260, MAX_INTERVAL_STANCETIME, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
+	// dispod_screen_draw_indicator(3, "GCT", true, MIN_INTERVAL_STANCETIME, 260, MAX_INTERVAL_STANCETIME+1, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
 }
 
 void dispod_screen_task(void *pvParameters)
@@ -466,45 +486,45 @@ void dispod_screen_task(void *pvParameters)
         while(!(xEventGroupWaitBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT,
                 pdTRUE, pdFALSE, portMAX_DELAY) & DISPOD_DISPLAY_UPDATE_BIT));
 
-        ESP_LOGI(TAG, "dispod_screen_task: update display, screen_to_show %u", (uint8_t) params->screen_to_show);
+        ESP_LOGD(TAG, "dispod_screen_task: update display, screen_to_show %u", (uint8_t) params->screen_to_show);
         if(params->current_screen != params->screen_to_show){
-                ESP_LOGI(TAG, "dispod_screen_task: switching from '%u' to '%u'", params->current_screen, params->screen_to_show);
+                ESP_LOGD(TAG, "dispod_screen_task: switching from '%u' to '%u'", params->current_screen, params->screen_to_show);
         }
 
         switch(params->screen_to_show){
         case SCREEN_SPLASH:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_SPLASH - not available yet");
+            ESP_LOGW(TAG, "dispod_screen_task: SCREEN_SPLASH - not available yet");
             break;
         case SCREEN_STATUS:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_STATUS");
+            ESP_LOGD(TAG, "dispod_screen_task: SCREEN_STATUS");
             if(params->current_screen != params->screen_to_show)
                 params->current_screen = params->screen_to_show;
             dispod_screen_status_update_display(params);
             break;
         case SCREEN_RUNNING:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_RUNNING");
+            ESP_LOGD(TAG, "dispod_screen_task: SCREEN_RUNNING");
             if(params->current_screen != params->screen_to_show)
                 params->current_screen = params->screen_to_show;
             dispod_screen_running_update_display(params);
             break;
         case SCREEN_CONFIG:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_CONFIG - not available yet");
+            ESP_LOGW(TAG, "dispod_screen_task: SCREEN_CONFIG - not available yet");
             break;
         case SCREEN_OTA:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_OTA");
+            ESP_LOGW(TAG, "dispod_screen_task: SCREEN_OTA - not available yet");
             // dispod_screen_ota_update_display();
             break;
         case SCREEN_SCREENSAVER:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_SCREENSAVER - not available yet");
+            ESP_LOGW(TAG, "dispod_screen_task: SCREEN_SCREENSAVER - not available yet");
             break;
         case SCREEN_POWEROFF:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_POWEROFF - not available yet");
+            ESP_LOGW(TAG, "dispod_screen_task: SCREEN_POWEROFF - not available yet");
             break;
         case SCREEN_POWERON:
-            ESP_LOGI(TAG, "dispod_screen_task: SCREEN_POWERON - not available yet");
+            ESP_LOGW(TAG, "dispod_screen_task: SCREEN_POWERON - not available yet");
             break;
         default:
-            ESP_LOGI(TAG, "dispod_screen_task: unhandled: %d", params->screen_to_show);
+            ESP_LOGW(TAG, "dispod_screen_task: unhandled: %d", params->screen_to_show);
             break;
         }
     }

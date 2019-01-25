@@ -49,62 +49,62 @@ void dispod_archiver_initialize()
 
 //TF card test begin
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
-    ESP_LOGI(TAG, "listDir() > , Listing directory: %s\n", dirname);
+    ESP_LOGD(TAG, "listDir() > , Listing directory: %s\n", dirname);
 
     File root = fs.open(dirname);
     if(!root){
-        ESP_LOGI(TAG, "listDir(), Failed to open directory");
+        ESP_LOGW(TAG, "listDir(), Failed to open directory");
         return;
     }
     if(!root.isDirectory()){
-        ESP_LOGI(TAG, "listDir(), Not a directory");
+        ESP_LOGW(TAG, "listDir(), Not a directory");
         return;
     }
 
     File file = root.openNextFile();
     while(file){
         if(file.isDirectory()){
-            ESP_LOGI(TAG, "listDir(), DIR: %s", file.name());
+            ESP_LOGD(TAG, "listDir(), DIR: %s", file.name());
             if(levels){
                 listDir(fs, file.name(), levels -1);
             }
         } else {
-            ESP_LOGI(TAG, "listDir(), FILE: %s, SIZE: %u", file.name(), file.size());
+            ESP_LOGD(TAG, "listDir(), FILE: %s, SIZE: %u", file.name(), file.size());
         }
         file = root.openNextFile();
     }
-    ESP_LOGI(TAG, "listDir() <");
+    ESP_LOGD(TAG, "listDir() <");
 }
 
 void readFile(fs::FS &fs, const char * path) {
-    ESP_LOGI(TAG, "readFile() >, Reading file: %s", path);
+    ESP_LOGD(TAG, "readFile() >, Reading file: %s", path);
 
     File file = fs.open(path);
     if(!file){
-        ESP_LOGI(TAG, "readFile(), Failed to open file for reading");
+        ESP_LOGW(TAG, "readFile(), Failed to open file for reading");
         return;
     }
 
-    ESP_LOGI(TAG, "readFile(), Read from file: ");
+    ESP_LOGD(TAG, "readFile(), Read from file: ");
     while(file.available()){
         int ch = file.read();
-        ESP_LOGI(TAG, "readFile(): %c", ch);
+        ESP_LOGD(TAG, "readFile(): %c", ch);
     }
-    ESP_LOGI(TAG, "readFile() <");
+    ESP_LOGD(TAG, "readFile() <");
 }
 
 void writeFile(fs::FS &fs, const char * path, const char * message){
-    ESP_LOGI(TAG, "writeFile() >, Writing file: %s", path);
+    ESP_LOGD(TAG, "writeFile() >, Writing file: %s", path);
 
     File file = fs.open(path, FILE_WRITE);
     if(!file){
-        ESP_LOGI(TAG, "writeFile(), Failed to open file for writing");
+        ESP_LOGW(TAG, "writeFile(), Failed to open file for writing");
         return;
     }
     if(file.print(message)){
-        ESP_LOGI(TAG, "writeFile() <, file written");
+        ESP_LOGD(TAG, "writeFile() <, file written");
     } else {
-        ESP_LOGI(TAG, "writeFile() <, write failed");
+        ESP_LOGE(TAG, "writeFile() <, write failed");
     }
 }
 //TF card test end
@@ -194,7 +194,7 @@ int write_out_buffers(bool write_only_completed)
     int     file_nr;
     char    strftime_buf[64];
 
-    ESP_LOGI(TAG, "write_out_buffers() >");
+    ESP_LOGD(TAG, "write_out_buffers() >");
 
     // Read the last file number from file. If it does not exist, create a new and start with "0".
     // If it exists, read the value and increase by 1.
@@ -351,11 +351,11 @@ void dispod_archiver_task(void *pvParameters)
         uxBits = xEventGroupWaitBits(dispod_sd_evg,
                 DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT | DISPOD_SD_PROBE_EVT | DISPOD_SD_GENERATE_TESTDATA_EVT,
                 pdTRUE, pdFALSE, portMAX_DELAY);
-        ESP_LOGI(TAG, "dispod_archiver_task(): uxBits = %u", uxBits);
+        ESP_LOGD(TAG, "dispod_archiver_task(): uxBits = %u", uxBits);
         if(uxBits & DISPOD_SD_PROBE_EVT){
             xEventGroupClearBits(dispod_sd_evg, DISPOD_SD_PROBE_EVT);
 
-            ESP_LOGI(TAG, "DISPOD_SD_PROBE_EVT: DISPOD_SD_PROBE_EVT");
+            ESP_LOGD(TAG, "DISPOD_SD_PROBE_EVT: DISPOD_SD_PROBE_EVT");
             ESP_LOGI(TAG, "SD card info %d, card size kb %llu, total kb %llu used kb %llu, used %3.1f perc.",
                 SD.cardType(), SD.cardSize()/1024, SD.totalBytes()/1024, SD.usedBytes()/1024, (SD.usedBytes() / (float) SD.totalBytes()));
             // TF card test
@@ -377,7 +377,7 @@ void dispod_archiver_task(void *pvParameters)
 
         if((uxBits & DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT) == DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT){
 			write_only_completed = !( (uxBits & DISPOD_SD_WRITE_ALL_BUFFER_EVT) == DISPOD_SD_WRITE_ALL_BUFFER_EVT);
-            ESP_LOGI(TAG, "dispod_archiver_task: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, write_only_completed=%d", write_only_completed);
+            ESP_LOGD(TAG, "dispod_archiver_task: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT, write_only_completed=%d", write_only_completed);
             if( xEventGroupWaitBits(dispod_event_group, DISPOD_SD_AVAILABLE_BIT, pdFALSE, pdFALSE, portMAX_DELAY) & DISPOD_SD_AVAILABLE_BIT){
                 write_out_buffers(write_only_completed);
             } else {
@@ -386,7 +386,7 @@ void dispod_archiver_task(void *pvParameters)
         }
 
         if((uxBits & DISPOD_SD_GENERATE_TESTDATA_EVT) == DISPOD_SD_GENERATE_TESTDATA_EVT){
-            ESP_LOGI(TAG, "dispod_archiver_task: DISPOD_SD_GENERATE_TESTDATA_EVT start");
+            ESP_LOGD(TAG, "dispod_archiver_task: DISPOD_SD_GENERATE_TESTDATA_EVT start");
             for(int i=0; i < CONFIG_SDCARD_NUM_BUFFERS; i++){
                 for(int j=0; j < CONFIG_SDCARD_BUFFER_SIZE; j++){
                     if(j%2){
@@ -398,7 +398,7 @@ void dispod_archiver_task(void *pvParameters)
                         break;
                 }
             }
-            ESP_LOGI(TAG, "dispod_archiver_task: DISPOD_SD_GENERATE_TESTDATA_EVT done");
+            ESP_LOGD(TAG, "dispod_archiver_task: DISPOD_SD_GENERATE_TESTDATA_EVT done");
         }
     }
 }

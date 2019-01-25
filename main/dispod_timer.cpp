@@ -56,14 +56,14 @@ void dispod_timer_initialize()
     };
 
 
-	ESP_LOGI(TAG, "dispod_timer_initialize() started");
+	ESP_LOGD(TAG, "dispod_timer_initialize() started");
 	ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_metronome_on_args, &timer_handles[TIMER_METRONOM_PERIODIC]));
 	ESP_ERROR_CHECK(esp_timer_create(&timer_metronome_off_light_args,   &timer_handles[TIMER_METRONOM_OFF_LIGHT]));
 	ESP_ERROR_CHECK(esp_timer_create(&timer_metronome_off_sound_args,   &timer_handles[TIMER_METRONOM_OFF_SOUND]));
 	ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_heartbeat_args,   	&timer_handles[TIMER_HEARTBEAT_PERIODIC]));
 
 	// should be empty
-    ESP_ERROR_CHECK(esp_timer_dump(stdout));
+    // ESP_ERROR_CHECK(esp_timer_dump(stdout));
 }
 
 void dispod_timer_start_metronome()
@@ -71,8 +71,8 @@ void dispod_timer_start_metronome()
     // Start the metronom_on timer, which will fire the other both one-shot timer
     ESP_ERROR_CHECK(esp_timer_start_periodic(timer_handles[TIMER_METRONOM_PERIODIC], METRONOME_TIMER_US));
 
-	ESP_LOGI(TAG, "dispod_timer_start_metronome(), time since boot: %lld us", esp_timer_get_time());
-    ESP_ERROR_CHECK(esp_timer_dump(stdout));
+	ESP_LOGD(TAG, "dispod_timer_start_metronome(), time since boot: %lld us", esp_timer_get_time());
+    // ESP_ERROR_CHECK(esp_timer_dump(stdout));
 }
 
 void dispod_timer_stop_metronome()
@@ -80,8 +80,8 @@ void dispod_timer_stop_metronome()
     // Stop the metronom_on timer, we let the on-shot timer go to turn off sound and light
     ESP_ERROR_CHECK(esp_timer_stop(timer_handles[TIMER_METRONOM_PERIODIC]));
 
-	ESP_LOGI(TAG, "dispod_timer_stop_metronome(), time since boot: %lld us", esp_timer_get_time());
-    ESP_ERROR_CHECK(esp_timer_dump(stdout));
+	ESP_LOGV(TAG, "dispod_timer_stop_metronome(), time since boot: %lld us", esp_timer_get_time());
+    // ESP_ERROR_CHECK(esp_timer_dump(stdout));
 }
 
 static void timer_metronome_callback(void* arg)
@@ -98,7 +98,7 @@ static void timer_metronome_callback(void* arg)
 		case TIMER_METRONOM_PERIODIC:  uxBits = DISPOD_TIMER_METRONOME_ON_BIT;	          break;
 		case TIMER_METRONOM_OFF_LIGHT: uxBits = DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT;     break;
 		case TIMER_METRONOM_OFF_SOUND: uxBits = DISPOD_TIMER_METRONOME_OFF_SOUND_BIT;     break;
-		default: ESP_LOGI(TAG, "timer_metronome_callback, unhandled timer %u", timer_nr); break;
+		default: ESP_LOGW(TAG, "timer_metronome_callback, unhandled timer %u", timer_nr); break;
 	}
 
 	ESP_LOGD(TAG, "timer_metronome_callback, handled %u", timer_nr);
@@ -116,16 +116,16 @@ void dispod_timer_start_heartbeat()
 	// Start the heartbeat timer
     ESP_ERROR_CHECK(esp_timer_start_periodic(timer_handles[TIMER_HEARTBEAT_PERIODIC], CONFIG_RUNNING_LOGFILE_HEARTBEAT_INTERVAL * 1e+6)); // sec -> usec
 
-	ESP_LOGI(TAG, "dispod_timer_start_heartbeat(), time since boot: %lld us", esp_timer_get_time());
-    ESP_ERROR_CHECK(esp_timer_dump(stdout));
+	ESP_LOGD(TAG, "dispod_timer_start_heartbeat(), time since boot: %lld us", esp_timer_get_time());
+    // ESP_ERROR_CHECK(esp_timer_dump(stdout));
 }
 
 void dispod_timer_stop_heartbeat()
 {
     ESP_ERROR_CHECK(esp_timer_stop(timer_handles[TIMER_HEARTBEAT_PERIODIC]));
 
-	ESP_LOGI(TAG, "dispod_timer_stop_heartbeat(), time since boot: %lld us", esp_timer_get_time());
-    ESP_ERROR_CHECK(esp_timer_dump(stdout));
+	ESP_LOGD(TAG, "dispod_timer_stop_heartbeat(), time since boot: %lld us", esp_timer_get_time());
+    // ESP_ERROR_CHECK(esp_timer_dump(stdout));
 }
 
 static void timer_heartbeat_callback(void* arg)
@@ -136,11 +136,11 @@ static void timer_heartbeat_callback(void* arg)
 	BaseType_t xResult;
 
     int64_t time_since_boot = esp_timer_get_time();
-    ESP_LOGI(TAG, "timer_heartbeat_callback, time since boot: %lld us", time_since_boot);
+    ESP_LOGD(TAG, "timer_heartbeat_callback, time since boot: %lld us", time_since_boot);
 
 	switch(timer_nr){
 		case TIMER_HEARTBEAT_PERIODIC:  uxBits = DISPOD_TIMER_HEARTBEAT_BIT;	          break;
-		default: ESP_LOGI(TAG, "timer_heartbeat_callback, unhandled timer %u", timer_nr); break;
+		default: ESP_LOGW(TAG, "timer_heartbeat_callback, unhandled timer %u", timer_nr); break;
 	}
 
 	ESP_LOGD(TAG, "timer_heartbeat_callback, handled %u", timer_nr);
@@ -170,19 +170,19 @@ void dispod_timer_task(void *pvParameters)
 					| DISPOD_TIMER_HEARTBEAT_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 
         if(uxBits & DISPOD_TIMER_METRONOME_ON_BIT){
-            ESP_LOGV(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_ON_BIT");
+            ESP_LOGD(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_ON_BIT");
 			xEventGroupClearBits(dispod_timer_evg, DISPOD_TIMER_METRONOME_ON_BIT);
 
 			// Light on, if activated
             if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
-                ESP_LOGV(TAG, "dispod_timer_task: DISPOD_METRO_LIGHT_ACT_BIT");
+                ESP_LOGD(TAG, "dispod_timer_task: DISPOD_METRO_LIGHT_ACT_BIT");
                 pixels.ClearTo(NEOPIXEL_white);
                 pixels.Show();
 				ESP_ERROR_CHECK(esp_timer_start_once(timer_handles[TIMER_METRONOM_OFF_LIGHT], METRONOME_LIGHT_DURATION_US));
-				ESP_LOGI(TAG, "Started timer TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
+				ESP_LOGD(TAG, "Started timer TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
 			    // ESP_LOGI(TAG, "                                                         %lld us", esp_timer_get_time());
             } else if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT)){
-                ESP_LOGV(TAG, "dispod_timer_task: DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT");
+                ESP_LOGD(TAG, "dispod_timer_task: DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT");
                 if(pixelNumber){
                     pixels.ClearTo(NEOPIXEL_white, 0, 4);
                 } else {
@@ -191,33 +191,33 @@ void dispod_timer_task(void *pvParameters)
                 pixels.Show();
                 pixelNumber = 1 - pixelNumber;
 				ESP_ERROR_CHECK(esp_timer_start_once(timer_handles[TIMER_METRONOM_OFF_LIGHT], METRONOME_LIGHT_DURATION_US));
-				ESP_LOGI(TAG, "Started timer TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
+				ESP_LOGD(TAG, "Started timer TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
             }
 
 			// Sound on, if activated
             if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_SOUND_ACT_BIT)){
-                ESP_LOGV(TAG, "dispod_timer_task: DISPOD_METRO_SOUND_ACT_BIT");
+                ESP_LOGD(TAG, "dispod_timer_task: DISPOD_METRO_SOUND_ACT_BIT");
                 M5.Speaker.tone(1000);
 				ESP_ERROR_CHECK(esp_timer_start_once(timer_handles[TIMER_METRONOM_OFF_SOUND], METRONOME_SOUND_DURATION_US));
-				ESP_LOGI(TAG, "Started timer TIMER_METRONOM_OFF_SOUND, time since boot: %lld us", esp_timer_get_time());
+				ESP_LOGD(TAG, "Started timer TIMER_METRONOM_OFF_SOUND, time since boot: %lld us", esp_timer_get_time());
             }
 		}
 
 		// Light off
 		if(uxBits & DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT){
-            ESP_LOGV(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT");
+            ESP_LOGD(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT");
 			xEventGroupClearBits(dispod_timer_evg, DISPOD_TIMER_METRONOME_OFF_LIGHT_BIT);
             pixels.ClearTo(NEOPIXEL_black);
             pixels.Show();
-			ESP_LOGI(TAG, "Switched off TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
+			ESP_LOGD(TAG, "Switched off TIMER_METRONOM_OFF_LIGHT, time since boot: %lld us", esp_timer_get_time());
         }
 
 		// Sound off
 		if(uxBits & DISPOD_TIMER_METRONOME_OFF_SOUND_BIT){
-            ESP_LOGV(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_OFF_SOUND_BIT");
+            ESP_LOGD(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_OFF_SOUND_BIT");
 			xEventGroupClearBits(dispod_timer_evg, DISPOD_TIMER_METRONOME_OFF_SOUND_BIT);
             M5.Speaker.mute();
-			ESP_LOGI(TAG, "Switched off TIMER_METRONOME_OFF_SOUND, time since boot: %lld us", esp_timer_get_time());
+			ESP_LOGD(TAG, "Switched off TIMER_METRONOME_OFF_SOUND, time since boot: %lld us", esp_timer_get_time());
         }
 
 		// Heartbeat
@@ -226,7 +226,7 @@ void dispod_timer_task(void *pvParameters)
 			running_values_queue_element_t new_queue_element;
 			BaseType_t  xStatus;
 
-            ESP_LOGV(TAG, "dispod_timer_task: DISPOD_TIMER_HEARTBEAT_BIT");
+            ESP_LOGD(TAG, "dispod_timer_task: DISPOD_TIMER_HEARTBEAT_BIT");
 
 			xEventGroupClearBits(dispod_timer_evg, DISPOD_TIMER_HEARTBEAT_BIT);
 
@@ -240,6 +240,5 @@ void dispod_timer_task(void *pvParameters)
                 ESP_LOGW(TAG, "dispod_timer_task: DISPOD_TIMER_HEARTBEAT_BIT: cannot send to queue");
             }
         }
-
 	}
 }
