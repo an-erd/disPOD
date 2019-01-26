@@ -468,7 +468,7 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
         }
         ESP_LOGD(GATTC_TAG, "stop scan successfully");
 
-        dispod_screen_status_update_ble(&dispod_screen_status, BLE_NOT_CONNECTED, "MilestonePod");
+        // dispod_screen_status_update_ble(&dispod_screen_status, BLE_NOT_CONNECTED, "MilestonePod");   // TODO flickering
         xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
