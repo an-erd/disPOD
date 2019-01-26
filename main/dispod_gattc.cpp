@@ -315,9 +315,16 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
             // dispod_runvalues_update_RSCValues(&running_values, instantaneousCadence);    // TODO
             new_queue_element.id = ID_RSC;
             new_queue_element.data.rsc.cadance = instantaneousCadence;
+
+            bool q_send_fail = pdFALSE;
+            uint8_t q_wait = 0;
             xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
-            if(xStatus != pdTRUE )
+            if(xStatus != pdTRUE ){
                 ESP_LOGW(GATTC_TAG, "ESP_GATTC_NOTIFY_EVT: NOTIFY_HANDLE_RSC: cannot send to queue");
+                q_send_fail = pdTRUE;
+            }
+            q_wait = uxQueueMessagesWaiting(running_values_queue);
+            dispod_screen_status_update_queue(&dispod_screen_status, q_wait, pdTRUE, pdFALSE, q_send_fail);
             }
             break;
         case NOTIFY_HANDLE_CUSTOM:{
@@ -340,9 +347,16 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
             new_queue_element.id = ID_CUSTOM;
             new_queue_element.data.custom.GCT = stanceTime;
             new_queue_element.data.custom.str = footStrike;
+
+            bool q_send_fail = pdFALSE;
+            uint8_t q_wait = 0;
             xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
-            if(xStatus != pdTRUE )
+            if(xStatus != pdTRUE ){
                 ESP_LOGW(GATTC_TAG, "ESP_GATTC_NOTIFY_EVT: NOTIFY_HANDLE_RSC: cannot send to queue");
+                q_send_fail = pdTRUE;
+            }
+            q_wait = uxQueueMessagesWaiting(running_values_queue);
+            dispod_screen_status_update_queue(&dispod_screen_status, q_wait, pdTRUE, pdFALSE, q_send_fail);
             }
             break;
         default:
@@ -383,6 +397,10 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                 DISPOD_BLE_SCANNING_BIT | DISPOD_BLE_CONNECTING_BIT | DISPOD_BLE_CONNECTED_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
+        // TODO where to go from an disconnect ->
+        //   a) status screen -> retry BLE
+        //   b) running screen -> save everything an go back to status screen
+        ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DISCONNECT_EVT, NULL, 0, portMAX_DELAY));
         break;
     default:
         break;

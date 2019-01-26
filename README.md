@@ -110,3 +110,12 @@ I (26027) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT 262
 I (26036) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), cad [ 97   0   0   0   0], num   1, sum   97, val2dis 194
 I (26048) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), GCT [262   0   0   0   0], num   1, sum  262, val2dis 262
 I (26061) DISPOD_RUNVALUES: dispod_runvalues_calculate_display_values(), str [  1   0   0   0   0], num   1, sum    1, val2dis  10
+
+components\arduino\cores\esp32\IPAddress.h -> comment out last line
+// const IPAddress INADDR_NONE(0, 0, 0, 0);
+
+NeoPixelBus -> change in component.mk
+COMPONENT_SRCDIRS := src src/internal .
+COMPONENT_ADD_INCLUDEDIRS := src src/internal .
+
+

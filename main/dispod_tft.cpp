@@ -65,6 +65,11 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     dispod_screen_status_update_button      (params, BUTTON_B, false, "");
     dispod_screen_status_update_button      (params, BUTTON_C, false, "");
     dispod_screen_status_update_statustext  (params, false, "");
+
+    // queue
+    params->q_status.max_len            = 0;
+    params->q_status.messages_received  = 0;
+    params->q_status.messages_failed    = 0;
 }
 
 // function to change screen
@@ -239,7 +244,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params)
 static void dispod_screen_draw_fields(uint8_t line, char* name, uint8_t numFields, float f_current)
 {
     uint16_t    textHeight;
-    uint16_t    xPad = 10, yPad = 10, yLine, xVal;
+    uint16_t    xPad = 10, yPad = 6, yLine, xVal;
     char        buffer[32];
     uint16_t    current;
 
@@ -284,7 +289,7 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 	int16_t lowInterval, int16_t highInterval)
 {
     uint16_t    textHeight;
-    uint16_t    xPad = 10, yPad = 10, yLine, xVal;
+    uint16_t    xPad = 10, yPad = 6, yLine, xVal;
     char        buffer[32];
 
 #ifdef DEBUG_DISPOD
@@ -371,6 +376,27 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
     ESP_LOGD(TAG, "M5.Lcd.fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
 }
 
+static void dispod_screen_draw_status_line_running(uint8_t line, dispod_screen_status_t *params)
+{
+    uint16_t    textHeight;
+    uint16_t    xPad = 10, yPad = 6, yLine, xVal, ypos;
+    char        buffer[64];
+
+    M5.Lcd.setFreeFont(FF17);
+    textHeight = M5.Lcd.fontHeight(GFXFF);
+    // yLine = yPad + (textHeight  + yPad) * line;
+
+	// 5) Status text line (copied from above, needs cleanup)
+	// ypos = yLine + YPAD;
+    ypos = 240 - 2 * (textHeight + YPAD) - YPAD;
+    M5.Lcd.setTextDatum(TL_DATUM);
+    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+    snprintf(buffer, 64, "Q: max %u, snd %u, rec %u, fail %u",
+        params->q_status.max_len, params->q_status.messages_send, params->q_status.messages_received, params->q_status.messages_failed);
+	M5.Lcd.drawString(buffer, xPad, ypos, GFXFF);
+    ESP_LOGD(TAG, "dispod_screen_draw_status_line_running(): %s", buffer);
+}
+
 static void dispod_screen_draw_footer(uint8_t line, dispod_screen_status_t *params)
 {
 	uint16_t textHeight, boxSize, xpos, ypos, xpos2, xcen = 160;
@@ -444,8 +470,6 @@ static void dispod_screen_ota_update_display(otaUpdate_t otaUpdate, bool clearSc
 void dispod_screen_running_update_display(dispod_screen_status_t *params) {
 	runningValuesStruct_t* values = &running_values;
 
-
-
 	// Preparation
     M5.Lcd.fillScreen(TFT_BLACK);
     M5.Lcd.setFreeFont(FF19);
@@ -454,7 +478,8 @@ void dispod_screen_running_update_display(dispod_screen_status_t *params) {
     dispod_screen_draw_indicator(0, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
 	dispod_screen_draw_indicator(1, "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
     dispod_screen_draw_fields   (2, "Str", 3, values->values_to_display.str / 10.);
-    dispod_screen_draw_footer   (3, params);
+    dispod_screen_draw_status_line_running(3, params);
+    dispod_screen_draw_footer             (4, params);
 	// ESP_LOGD(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
 
     // testing:
@@ -472,6 +497,22 @@ void dispod_screen_running_update_display(dispod_screen_status_t *params) {
 	// dispod_screen_draw_indicator(2, "CAD", true, MIN_INTERVAL_STANCETIME, 260, MAX_INTERVAL_STANCETIME, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
 	// dispod_screen_draw_indicator(3, "GCT", true, MIN_INTERVAL_STANCETIME, 260, MAX_INTERVAL_STANCETIME+1, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
 }
+
+void dispod_screen_status_update_queue(dispod_screen_status_t *params, uint8_t cur_len, bool inc_send, bool inc_received, bool inc_failed)
+{
+    if(cur_len >  params->q_status.max_len)
+        params->q_status.max_len = cur_len;
+    if(inc_send)
+        params->q_status.messages_send++;
+    if(inc_received)
+        params->q_status.messages_received++;
+    if(inc_failed)
+        params->q_status.messages_failed++;
+
+    ESP_LOGV(TAG, "queue status: max_len=%u received=%u failed=%u",
+        params->q_status.max_len, params->q_status.messages_received, params->q_status.messages_failed);
+}
+
 
 void dispod_screen_task(void *pvParameters)
 {

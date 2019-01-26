@@ -235,10 +235,16 @@ void dispod_timer_task(void *pvParameters)
 			localtime_r(&now, &new_queue_element.data.time.timeinfo);
 
 			ESP_LOGD(TAG, "queue heartbeat, time since boot: %lld us", esp_timer_get_time());
+
+            bool q_send_fail = pdFALSE;
+            uint8_t q_wait = 0;
             xStatus = xQueueSendToBack(running_values_queue, &new_queue_element, xTicksToWait);
             if(xStatus != pdTRUE ){
                 ESP_LOGW(TAG, "dispod_timer_task: DISPOD_TIMER_HEARTBEAT_BIT: cannot send to queue");
+                q_send_fail = pdTRUE;
             }
+            q_wait = uxQueueMessagesWaiting(running_values_queue);
+            dispod_screen_status_update_queue(&dispod_screen_status, q_wait, pdTRUE, pdFALSE, q_send_fail);
         }
 	}
 }

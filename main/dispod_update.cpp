@@ -22,6 +22,9 @@ void dispod_update_task(void *pvParameters)
 
     for(;;) {
         if(xQueueReceive(running_values_queue, (void * )&new_queue_element, (portTickType)portMAX_DELAY)) {
+            uint8_t q_wait = uxQueueMessagesWaiting(running_values_queue);
+            dispod_screen_status_update_queue(&dispod_screen_status, q_wait, pdFALSE, pdTRUE, pdFALSE);
+
             switch(new_queue_element.id) {
             case ID_RSC:
 	            ESP_LOGD(TAG, "received from queue: 0x2a53: C %3u", new_queue_element.data.rsc.cadance);
@@ -39,6 +42,7 @@ void dispod_update_task(void *pvParameters)
 			    strftime(strftime_buf, sizeof(strftime_buf), "%c", &new_queue_element.data.time.timeinfo);
     	        ESP_LOGD(TAG, "received from queue: TIME: %s", strftime_buf);
                 dispod_archiver_add_time(new_queue_element.data.time.timeinfo);
+                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
                 break;
 			default:
                 ESP_LOGI(TAG, "unknown event id");

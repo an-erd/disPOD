@@ -144,6 +144,24 @@ void dispod_m5stack_task(void *pvParameters){
     }
 }
 
+static void s_leave_running_screen()
+{
+    xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
+    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+	dispod_timer_stop_metronome();
+    dispod_timer_stop_heartbeat();
+    pixels.ClearTo(NEOPIXEL_black);
+    pixels.Show();
+    dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
+    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
+    xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+}
+
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
     switch(id){
@@ -289,6 +307,18 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
 		dispod_timer_start_metronome();
         dispod_timer_start_heartbeat();
         break;
+    case DISPOD_BLE_DISCONNECT_EVT:
+        ESP_LOGV(TAG, "DISPOD_BLE_DISCONNECT_EVT");
+        if(xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT){
+            ESP_LOGV(TAG, "TODO DISPOD_BLE_DISCONNECT_EVT -> DISPOD_RUNNING_SCREEN_BIT");
+            s_leave_running_screen();
+			ESP_LOGD(TAG, "Archiver: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
+			xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
+        } else {
+            ESP_LOGV(TAG, "DISPOD_BLE_DISCONNECT_EVT -> not DISPOD_RUNNING_SCREEN_BIT -> DISPOD_STARTUP_COMPLETE_EVT");
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+        }
+        break;
     //
     case DISPOD_BUTTON_TAP_EVT: {
         button_unit_t button_unit = *(button_unit_t*) event_data;
@@ -365,20 +395,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 }
                 break;
             case BUTTON_C:
-                xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
-                xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
-                xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
-				dispod_timer_stop_metronome();
-                dispod_timer_stop_heartbeat();
-                pixels.ClearTo(NEOPIXEL_black);
-                pixels.Show();
-                dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
-                dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
-                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
-                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
-                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
-                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-                ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+                s_leave_running_screen();
 				ESP_LOGD(TAG, "Archiver: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
 				xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
                 break;

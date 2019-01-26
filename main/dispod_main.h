@@ -63,6 +63,7 @@ typedef enum {
     DISPOD_RETRY_WIFI_EVT,                  /*!< When an retry of WiFi is requested, the event comes */
     DISPOD_RETRY_BLE_EVT,                   /*!< When an retry of BLE is requested, the event comes */
     DISPOD_GO_TO_RUNNING_SCREEN_EVT,        /*!< When starting the running screen is requested, the event comes */
+    DISPOD_BLE_DISCONNECT_EVT,              /*!< When BLE disconnects, the event comes */
     // activity events
     DISPOD_BUTTON_TAP_EVT,                  /*!< When a button has been TAP event, the event comes */
     DISPOD_BUTTON_2SEC_PRESS_EVT,           /*!< When a button has been pressed for 2s, the event comes */

@@ -56,6 +56,13 @@ typedef enum {
     SD_AVAILABLE
 } display_sd_status_t;
 
+typedef struct {
+    uint8_t                 max_len;
+    uint16_t                messages_send;
+    uint16_t                messages_received;
+    uint16_t                messages_failed;
+} queue_status_t;
+
 // status screen values
 typedef struct {
     display_screen_t        current_screen;
@@ -70,6 +77,7 @@ typedef struct {
 	char		            button_text[NUM_BUTTONS][20];
 	bool                    show_status_text;
 	char                    status_text[32];
+    queue_status_t          q_status;
 } dispod_screen_status_t;
 
 // initialize all display structs
@@ -88,6 +96,9 @@ void dispod_screen_status_update_statustext (dispod_screen_status_t *params, boo
 
 // running screen
 void dispod_screen_running_update_display();
+
+// queue information
+void dispod_screen_status_update_queue      (dispod_screen_status_t *params, uint8_t cur_len, bool inc_send, bool inc_received, bool inc_failed);
 
 // function to run in a separate process to update the display using event groups
 void dispod_screen_task(void *pvParameters);
