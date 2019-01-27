@@ -65,9 +65,9 @@ typedef enum {
     DISPOD_GO_TO_RUNNING_SCREEN_EVT,        /*!< When starting the running screen is requested, the event comes */
     DISPOD_BLE_DISCONNECT_EVT,              /*!< When BLE disconnects, the event comes */
     // activity events
-    DISPOD_BUTTON_TAP_EVT,                  /*!< When a button has been TAP event, the event comes */
-    DISPOD_BUTTON_2SEC_PRESS_EVT,           /*!< When a button has been pressed for 2s, the event comes */
-    DISPOD_BUTTON_5SEC_PRESS_EVT,           /*!< When a button has been pressed for 5s, the event comes */
+    DISPOD_BUTTON_TAP_EVT,                  /*!< When a button has been TAP event (=released), the event comes */
+    DISPOD_BUTTON_2SEC_RELEASE_EVT,         /*!< When a button has been released after 2s, the event comes */
+    DISPOD_BUTTON_5SEC_RELEASE_EVT,         /*!< When a button has been released after 5s, the event comes */
     //
     DISPOD_EVENT_MAX
 } dispod_cb_event_t;

@@ -70,6 +70,7 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     params->q_status.max_len            = 0;
     params->q_status.messages_received  = 0;
     params->q_status.messages_failed    = 0;
+    params->show_q_status               = false;
 }
 
 // function to change screen
@@ -303,7 +304,7 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 #endif // DEBUG_DISPOD
 
 	textHeight = M5.Lcd.fontHeight(GFXFF);
-    ESP_LOGI(TAG, "textHeight = %u", textHeight);
+    ESP_LOGD(TAG, "textHeight = %u", textHeight);
     yLine = yPad + (textHeight  + yPad) * line;
 
 	// current values out of range -> move into range
@@ -382,18 +383,20 @@ static void dispod_screen_draw_status_line_running(uint8_t line, dispod_screen_s
     uint16_t    xPad = 10, yPad = 6, yLine, xVal, ypos;
     char        buffer[64];
 
-    M5.Lcd.setFreeFont(FF17);
-    textHeight = M5.Lcd.fontHeight(GFXFF);
-    // yLine = yPad + (textHeight  + yPad) * line;
-
-	// 5) Status text line (copied from above, needs cleanup)
-	// ypos = yLine + YPAD;
-    ypos = 240 - 2 * (textHeight + YPAD) - YPAD;
-    M5.Lcd.setTextDatum(TL_DATUM);
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
     snprintf(buffer, 64, "Q: max %u, snd %u, rec %u, fail %u",
         params->q_status.max_len, params->q_status.messages_send, params->q_status.messages_received, params->q_status.messages_failed);
-	M5.Lcd.drawString(buffer, xPad, ypos, GFXFF);
+	if(params->show_q_status){
+        M5.Lcd.setFreeFont(FF17);
+        textHeight = M5.Lcd.fontHeight(GFXFF);
+        // yLine = yPad + (textHeight  + yPad) * line;
+
+	    // 5) Status text line (copied from above, needs cleanup)
+	    // ypos = yLine + YPAD;
+        ypos = 240 - 2 * (textHeight + YPAD) - YPAD;
+        M5.Lcd.setTextDatum(TL_DATUM);
+        M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+        M5.Lcd.drawString(buffer, xPad, ypos, GFXFF);
+    }
     ESP_LOGD(TAG, "dispod_screen_draw_status_line_running(): %s", buffer);
 }
 
@@ -412,7 +415,7 @@ static void dispod_screen_draw_footer(uint8_t line, dispod_screen_status_t *para
 	// ypos += textHeight + YPAD;          // ypos = 240 - YPAD;
     M5.Lcd.setTextDatum(TC_DATUM);
     xpos = X_BUTTON_A;
-    ypos = 240 - textHeight - YPAD;
+    ypos = 240 - textHeight; // - YPAD;
 
     // ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
 	if (params->show_button[BUTTON_A])
@@ -511,6 +514,11 @@ void dispod_screen_status_update_queue(dispod_screen_status_t *params, uint8_t c
 
     ESP_LOGV(TAG, "queue status: max_len=%u received=%u failed=%u",
         params->q_status.max_len, params->q_status.messages_received, params->q_status.messages_failed);
+}
+
+void dispod_screen_status_update_queue_status(dispod_screen_status_t *params, bool new_show_status)
+{
+    params->show_q_status = new_show_status;
 }
 
 

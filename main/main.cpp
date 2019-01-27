@@ -406,14 +406,24 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         }
         break;
-    case DISPOD_BUTTON_2SEC_PRESS_EVT: {
-        button_unit_t* button_unit = (button_unit_t*) event_data;
-        ESP_LOGV(TAG, "DISPOD_BUTTON_2SEC_PRESS_EVT, button id %d", button_unit->btn_id);
+    case DISPOD_BUTTON_2SEC_RELEASE_EVT: {
+        button_unit_t button_unit = *(button_unit_t*) event_data;
+        ESP_LOGV(TAG, "DISPOD_BUTTON_2SEC_PRESS_EVT, button id %d", button_unit.btn_id);
+
+        // showing running screen
+        if((xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT)){
+            switch(button_unit.btn_id){
+            case BUTTON_B:
+                // Toggle show queue status
+                dispod_screen_status_update_queue_status(&dispod_screen_status, !dispod_screen_status.show_q_status);
+                break;
+            }
+        }
         }
         break;
-    case DISPOD_BUTTON_5SEC_PRESS_EVT: {
-        button_unit_t* button_unit = (button_unit_t*) event_data;
-        ESP_LOGV(TAG, "DISPOD_BUTTON_5SEC_PRESS_EVT, button id %d", button_unit->btn_id);
+    case DISPOD_BUTTON_5SEC_RELEASE_EVT: {
+        button_unit_t button_unit = *(button_unit_t*) event_data;
+        ESP_LOGV(TAG, "DISPOD_BUTTON_5SEC_PRESS_EVT, button id %d", button_unit.btn_id);
         }
         break;
     default:

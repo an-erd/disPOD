@@ -77,6 +77,7 @@ typedef struct {
 	char		            button_text[NUM_BUTTONS][20];
 	bool                    show_status_text;
 	char                    status_text[32];
+    bool                    show_q_status;
     queue_status_t          q_status;
 } dispod_screen_status_t;
 
@@ -98,6 +99,7 @@ void dispod_screen_status_update_statustext (dispod_screen_status_t *params, boo
 void dispod_screen_running_update_display();
 
 // queue information
+void dispod_screen_status_update_queue_status(dispod_screen_status_t *params, bool new_show_status);
 void dispod_screen_status_update_queue      (dispod_screen_status_t *params, uint8_t cur_len, bool inc_send, bool inc_received, bool inc_failed);
 
 // function to run in a separate process to update the display using event groups
