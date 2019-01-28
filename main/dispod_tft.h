@@ -71,7 +71,7 @@ typedef struct {
 	char		            wifi_ssid[32];
     display_ntp_status_t    ntp_status;
     display_ble_status_t    ble_status;
-    char                    ble_name[32];
+    char                    ble_name[64];
     display_sd_status_t     sd_status;
     bool                    show_button[NUM_BUTTONS];
 	char		            button_text[NUM_BUTTONS][20];

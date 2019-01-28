@@ -14,6 +14,7 @@
 #include "Free_Fonts.h"
 #include "dispod_main.h"
 #include "dispod_tft.h"
+#include "dispod_gattc.h"
 
 static const char* TAG = "DISPOD_TFT";
 
@@ -52,6 +53,7 @@ EventGroupHandle_t dispod_display_evg;
 // initialize all display structs
 void dispod_screen_status_initialize(dispod_screen_status_t *params)
 {
+    char buffer[64];
     ESP_LOGD(TAG, "dispod_screen_status_initialize()");
 
     // initialize dispod_screen_status_t struct
@@ -59,7 +61,8 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     params->screen_to_show = SCREEN_STATUS;
     dispod_screen_status_update_wifi        (params, WIFI_NOT_CONNECTED, "n/a");
     dispod_screen_status_update_ntp         (params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
-	dispod_screen_status_update_ble         (params, BLE_NOT_CONNECTED, NULL);      // TODO where to deactivate?
+    snprintf(buffer, 64, BLE_NAME_FORMAT, "-");
+	dispod_screen_status_update_ble         (params, BLE_NOT_CONNECTED, buffer);      // TODO where to deactivate?
     dispod_screen_status_update_sd          (params, SD_NOT_AVAILABLE);                // TODO where to deactivate?
     dispod_screen_status_update_button      (params, BUTTON_A, false, "");
     dispod_screen_status_update_button      (params, BUTTON_B, false, "");
@@ -209,7 +212,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params)
 	}
     M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
 	xpos += boxSize + XPAD;
-	M5.Lcd.drawString("MilestonePod", xpos, ypos, GFXFF);
+	M5.Lcd.drawString(params->ble_name, xpos, ypos, GFXFF);
 
 	// 5) Status text line
 	ypos += textHeight + YPAD;
@@ -225,7 +228,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params)
 	// ypos += textHeight + YPAD;          // ypos = 240 - YPAD;
     M5.Lcd.setTextDatum(TC_DATUM);
     xpos = X_BUTTON_A;
-    ypos = 240 - textHeight - YPAD;
+    ypos = 240 - textHeight; // - YPAD;
 
     // ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
 	if (params->show_button[BUTTON_A])

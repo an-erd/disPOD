@@ -33,6 +33,7 @@ static bool connect    = false;
 static bool get_server = false;
 static esp_gattc_char_elem_t *char_elem_result   = NULL;
 static esp_gattc_descr_elem_t *descr_elem_result = NULL;
+static char                 ble_device_name[64];
 
 /* declare static functions */
 static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
@@ -97,6 +98,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
 {
     esp_ble_gattc_cb_param_t *p_data = (esp_ble_gattc_cb_param_t *)param;
     esp_err_t scan_ret, mtu_ret;
+    char buffer[64];
 
     switch (event) {
     case ESP_GATTC_REG_EVT:
@@ -109,7 +111,8 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
     case ESP_GATTC_CONNECT_EVT:
         ESP_LOGD(GATTC_TAG, "ESP_GATTC_CONNECT_EVT conn_id %d, if %d", p_data->connect.conn_id, gattc_if);
 
-        dispod_screen_status_update_ble(&dispod_screen_status, BLE_CONNECTING, "MilestonePod*");
+        snprintf(buffer, 64, BLE_NAME_FORMAT, ble_device_name);
+        dispod_screen_status_update_ble(&dispod_screen_status, BLE_CONNECTING, buffer);
         xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT);
         xEventGroupSetBits(dispod_event_group, DISPOD_BLE_CONNECTING_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
@@ -392,7 +395,8 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
         get_server = false;
         ESP_LOGI(GATTC_TAG, "ESP_GATTC_DISCONNECT_EVT, reason = %d", p_data->disconnect.reason);
 
-        dispod_screen_status_update_ble(&dispod_screen_status, BLE_NOT_CONNECTED, "MilestonePod");
+        snprintf(buffer, 64, BLE_NAME_FORMAT, "-");
+        dispod_screen_status_update_ble(&dispod_screen_status, BLE_NOT_CONNECTED, buffer);
         xEventGroupClearBits(dispod_event_group,
                 DISPOD_BLE_SCANNING_BIT | DISPOD_BLE_CONNECTING_BIT | DISPOD_BLE_CONNECTED_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
@@ -411,6 +415,8 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
 {
     uint8_t *adv_name = NULL;
     uint8_t adv_name_len = 0;
+    char buffer[64];
+
     switch (event) {
     case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
 		ESP_LOGD(GATTC_TAG, "ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT");
@@ -428,8 +434,8 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
             break;
         }
         ESP_LOGD(GATTC_TAG, "scan start success");
-
-        dispod_screen_status_update_ble(&dispod_screen_status, BLE_SEARCHING, "MilestonePod");
+        snprintf(buffer, 64, BLE_NAME_FORMAT, "scanning");
+        dispod_screen_status_update_ble(&dispod_screen_status, BLE_SEARCHING, buffer);
         xEventGroupSetBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
@@ -454,6 +460,7 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
                     if (connect == false) {
                         connect = true;
                         ESP_LOGI(GATTC_TAG, "connect to the remote device.");
+                        snprintf(ble_device_name, 64, (char*)adv_name);
                         esp_ble_gap_stop_scanning();
                         esp_ble_gattc_open(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, scan_result->scan_rst.bda, scan_result->scan_rst.ble_addr_type, true);
                     }
@@ -463,7 +470,8 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
         case ESP_GAP_SEARCH_INQ_CMPL_EVT:
 		    ESP_LOGD(GATTC_TAG, "ESP_GAP_SEARCH_INQ_CMPL_EVT");
 
-            dispod_screen_status_update_ble(&dispod_screen_status, BLE_NOT_CONNECTED, "MilestonePod");
+            snprintf(buffer, 64, BLE_NAME_FORMAT, "-");
+            dispod_screen_status_update_ble(&dispod_screen_status, BLE_NOT_CONNECTED, buffer);
             xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT);
             xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
@@ -486,7 +494,6 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
         }
         ESP_LOGD(GATTC_TAG, "stop scan successfully");
 
-        // dispod_screen_status_update_ble(&dispod_screen_status, BLE_NOT_CONNECTED, "MilestonePod");   // TODO flickering
         xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
@@ -511,7 +518,8 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
                   param->update_conn_params.latency,
                   param->update_conn_params.timeout);
 
-        dispod_screen_status_update_ble(&dispod_screen_status, BLE_CONNECTED, "MilestonePod");
+        snprintf(buffer, 64, BLE_NAME_FORMAT, ble_device_name);
+        dispod_screen_status_update_ble(&dispod_screen_status, BLE_CONNECTED, buffer);
         xEventGroupClearBits(dispod_event_group, DISPOD_BLE_SCANNING_BIT | DISPOD_BLE_CONNECTING_BIT);
         xEventGroupSetBits(dispod_event_group, DISPOD_BLE_CONNECTED_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
