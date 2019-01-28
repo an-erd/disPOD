@@ -161,10 +161,10 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params)
 	}
 	M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
 	xpos += boxSize + XPAD;
-    if(params->wifi_status == WIFI_CONNECTED){
-        snprintf(buffer, 64, "Wifi (%s)", params->wifi_ssid);
+    if( (params->wifi_status == WIFI_CONNECTING) || (params->wifi_status == WIFI_CONNECTED) ){
+        snprintf(buffer, 64, WIFI_NAME_FORMAT, params->wifi_ssid);
     } else {
-        snprintf(buffer, 64, "Wifi");
+        snprintf(buffer, 64, WIFI_NAME_FORMAT, "-");
     }
 	M5.Lcd.drawString(buffer, xpos, ypos, GFXFF);
 

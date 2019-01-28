@@ -21,6 +21,4 @@ void dispod_ble_initialize();
 void dispod_ble_app_register();
 void dispod_ble_start_scanning();
 
-#define BLE_NAME_FORMAT     "BLE Device (%s)"
-
 #endif // __DISPOD_GATTC_H__

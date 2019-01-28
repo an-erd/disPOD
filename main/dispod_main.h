@@ -86,6 +86,9 @@ extern dispod_screen_status_t dispod_screen_status;
 // global running values data struct
 extern runningValuesStruct_t running_values;
 
+#define BLE_NAME_FORMAT     "BLE Device (%s)"
+#define WIFI_NAME_FORMAT    "WiFi (%s)"
+
 // SD card
 #define sdPIN_NUM_MISO 19
 #define sdPIN_NUM_MOSI 23
