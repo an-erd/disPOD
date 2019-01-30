@@ -20,7 +20,7 @@ static const char* TAG = "DISPOD_TFT";
 
 // layout measures for status screen
 #define XPAD		    10
-#define YPAD		    10
+#define YPAD		    6
 #define XCEN            160
 #define BOX_FRAME	    2
 #define BOX_SIZE        18
@@ -104,6 +104,7 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     params->q_status.messages_failed    = 0;
     params->show_q_status               = false;
 
+    // create sprites for the building blocks of the status/running screens
     for (int i = 0; i < SCREEN_NUM_SPRITES; i++){
         spr[i] = new TFT_eSprite(&M5.Lcd);
     }
@@ -112,10 +113,13 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     spr[SCREEN_BLOCK_STATUS_SD]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
     spr[SCREEN_BLOCK_STATUS_BLE]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
 
+    spr[SCREEN_BLOCK_RUNNING_CAD]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_RUNNING_GCT]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_RUNNING_STR]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+
     spr[SCREEN_OVERARCHING_STATUS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
     spr[SCREEN_OVERARCHING_STATS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
     spr[SCREEN_OVERARCHING_BUTTON]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-
 }
 
 // function to change screen
@@ -381,7 +385,7 @@ static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_va
 #endif // DEBUG_DISPOD
 
 	textHeight = M5.Lcd.fontHeight(GFXFF);
-    ESP_LOGD(TAG, "textHeight = %u", textHeight);
+    ESP_LOGI(TAG, "textHeight = %u", textHeight);
     yLine = yPad + (textHeight  + yPad) * line;
 
 	// current values out of range -> move into range
