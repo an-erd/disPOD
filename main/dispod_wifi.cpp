@@ -62,7 +62,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
             ESP_LOGD(TAG, "SYSTEM_EVENT_STA_START");
 
             xEventGroupSetBits(dispod_event_group, DISPOD_WIFI_SCANNING_BIT);
-            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_SCANNING, "");
+            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_SCANNING, "scanning");
             xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
             xEventGroupSetBits(evg, STRT_BIT);
@@ -75,7 +75,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
             ESP_LOGD(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
-            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_NOT_CONNECTED, "");
+            dispod_screen_status_update_wifi(&dispod_screen_status, WIFI_NOT_CONNECTED, "-");
             xEventGroupClearBits(dispod_event_group, DISPOD_WIFI_CONNECTING_BIT);
             xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
