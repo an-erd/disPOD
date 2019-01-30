@@ -24,7 +24,8 @@ typedef enum {
     SCREEN_OTA,
     SCREEN_SCREENSAVER,
     SCREEN_POWEROFF,
-    SCREEN_POWERON
+    SCREEN_POWERON,
+    SCREEN_NONE,
 } display_screen_t;
 
 typedef enum {

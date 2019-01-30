@@ -21,7 +21,15 @@ static const char* TAG = "DISPOD_TFT";
 // layout measures for status screen
 #define XPAD		    10
 #define YPAD		    10
+#define XCEN            160
 #define BOX_FRAME	    2
+#define BOX_SIZE        18
+#define BOX_X           10
+#define TEXT_X          38
+#define STATUS_SPRITE_WIDTH     320
+#define STATUS_SPRITE_HEIGHT    22
+#define TEXT_HEIGHT     22
+
 #define X_BUTTON_A	    65          // display button x position (for center of button)
 #define X_BUTTON_B	    160
 #define X_BUTTON_C	    255
@@ -50,6 +58,27 @@ static const char* TAG = "DISPOD_TFT";
 
 EventGroupHandle_t dispod_display_evg;
 
+// sprites for blocks in status screen and running screen
+typedef enum {
+    SCREEN_BLOCK_STATUS_WIFI = 0,
+    SCREEN_BLOCK_STATUS_NTP,
+    SCREEN_BLOCK_STATUS_SD,
+    SCREEN_BLOCK_STATUS_BLE,
+    SCREEN_BLOCK_RUNNING_CAD,
+    SCREEN_BLOCK_RUNNING_GCT,
+    SCREEN_BLOCK_RUNNING_STR,
+    SCREEN_OVERARCHING_STATUS,
+    SCREEN_OVERARCHING_STATS,
+    SCREEN_OVERARCHING_BUTTON,
+    SCREEN_NUM_SPRITES,             // number of sprites necessary
+} screen_block_t;
+
+TFT_eSprite* spr[SCREEN_NUM_SPRITES] = { 0 };
+
+// TFT_eSprite spr = TFT_eSprite(&M5.Lcd);
+
+
+
 // initialize all display structs
 void dispod_screen_status_initialize(dispod_screen_status_t *params)
 {
@@ -57,7 +86,7 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     ESP_LOGD(TAG, "dispod_screen_status_initialize()");
 
     // initialize dispod_screen_status_t struct
-    params->current_screen = SCREEN_STATUS;
+    params->current_screen = SCREEN_NONE;
     params->screen_to_show = SCREEN_STATUS;
     dispod_screen_status_update_wifi        (params, WIFI_NOT_CONNECTED, "n/a");
     dispod_screen_status_update_ntp         (params, NTP_TIME_NOT_SET);             // TODO where to deactivate?
@@ -74,6 +103,19 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     params->q_status.messages_received  = 0;
     params->q_status.messages_failed    = 0;
     params->show_q_status               = false;
+
+    for (int i = 0; i < SCREEN_NUM_SPRITES; i++){
+        spr[i] = new TFT_eSprite(&M5.Lcd);
+    }
+    spr[SCREEN_BLOCK_STATUS_WIFI]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_STATUS_NTP]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_STATUS_SD]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_STATUS_BLE]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+
+    spr[SCREEN_OVERARCHING_STATUS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_OVERARCHING_STATS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_OVERARCHING_BUTTON]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+
 }
 
 // function to change screen
@@ -122,35 +164,83 @@ void dispod_screen_status_update_statustext(dispod_screen_status_t *params, bool
         memcpy(params->status_text, "", strlen("")+1);
 }
 
-static void dispod_screen_status_update_display(dispod_screen_status_t *params)
+// the status block consists of
+//  a) a colored status box
+//      a1) white frame     -> draw only once
+//      a2) colored inside  -> update by status_color
+//  b) a status text
+static void s_draw_status_block(TFT_eSprite *spr, uint16_t status_color, char* status_text, bool first_sprite_draw)
 {
-	uint16_t textHeight, boxSize, xpos, ypos, xpos2, xcen = 160;
+    if(first_sprite_draw){
+        spr->setFreeFont(FF17);
+        spr->setTextColor(TFT_WHITE, TFT_BLACK);
+        spr->setTextDatum(TL_DATUM);
+        spr->fillSprite(TFT_BLACK);
+
+        // draw frame
+        spr->drawRect(BOX_X, 0, BOX_SIZE, BOX_SIZE, TFT_WHITE);
+    }
+
+    // draw inlay
+	spr->fillRect(BOX_X + BOX_FRAME, 0 + BOX_FRAME, BOX_SIZE - 2 * BOX_FRAME, BOX_SIZE - 2 * BOX_FRAME, status_color);
+
+    // clear and draw text
+    spr->fillRect(TEXT_X, 0, 320 - TEXT_X, STATUS_SPRITE_HEIGHT, TFT_BLACK);
+    // ESP_LOGI(TAG, "s_draw_status_block(), text %s", status_text);
+	spr->drawString(status_text, TEXT_X, 1, GFXFF);
+}
+
+static void s_draw_status_text(TFT_eSprite *spr, bool show_status_text, char* status_text, bool first_sprite_draw)
+{
+    if(first_sprite_draw){
+        spr->setFreeFont(FF17);
+        spr->setTextColor(TFT_WHITE, TFT_BLACK);
+        spr->setTextDatum(TC_DATUM);
+        spr->fillSprite(TFT_BLACK);
+    }
+    // clear and draw text
+    spr->fillSprite(TFT_BLACK);
+    if(show_status_text)
+    	spr->drawString(status_text, XCEN, 0, GFXFF);
+}
+
+static void s_draw_button_label(TFT_eSprite *spr,
+    bool show_A, char* text_A, bool show_B, char* text_B, bool show_C, char* text_C, bool first_sprite_draw)
+{
+    if(first_sprite_draw){
+        spr->setFreeFont(FF17);
+        spr->setTextColor(TFT_WHITE, TFT_BLACK);
+        spr->setTextDatum(TC_DATUM);
+        spr->fillSprite(TFT_BLACK);
+    }
+
+	if (show_A) spr->drawString(text_A, X_BUTTON_A, 0, GFXFF);
+	if (show_B) spr->drawString(text_B, X_BUTTON_B, 0, GFXFF);
+	if (show_C) spr->drawString(text_C, X_BUTTON_C, 0, GFXFF);
+}
+
+static void dispod_screen_status_update_display(dispod_screen_status_t *params, bool complete)
+{
+	uint16_t ypos, xpos2;
     uint16_t tmp_color;
     char     buffer[64];
 
-	// Preparation
     //  FF17 &FreeSans9pt7b
     //  FF18 &FreeSans12pt7b
     //  FF19 &FreeSans18pt7b
     //  FF20 &FreeSans24pt7b
-    M5.Lcd.fillScreen(BLACK);
-    M5.Lcd.setFreeFont(FF17);
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 
-	textHeight = M5.Lcd.fontHeight(GFXFF);
-	boxSize = textHeight - 4;
-	// ESP_LOGD(TAG, "screen textHeight %u", textHeight);
+    if(complete) {
+        M5.Lcd.fillScreen(BLACK);
+        M5.Lcd.setFreeFont(FF17);
+        M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 
-	// Title
-	ypos = 10;
-    M5.Lcd.setTextDatum(TC_DATUM);
-    M5.Lcd.drawString("Starting disPOD...", xcen, ypos, GFXFF);
+    	// Title
+        M5.Lcd.setTextDatum(TC_DATUM);
+        M5.Lcd.drawString("Starting disPOD...", XCEN, YPAD, GFXFF);
+    }
 
 	// 1) WiFi
-    M5.Lcd.setTextDatum(TL_DATUM);
-	xpos = XPAD;
-	ypos += textHeight + 15;
-    M5.Lcd.drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
 	switch (params->wifi_status) {
 	case WIFI_DEACTIVATED:      tmp_color = TFT_LIGHTGREY;  break;
 	case WIFI_NOT_CONNECTED:    tmp_color = TFT_RED;        break;
@@ -159,22 +249,17 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params)
     case WIFI_CONNECTED:        tmp_color = TFT_GREEN;      break;
 	default:                    tmp_color = TFT_PURPLE;     break;
 	}
-	M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
-	xpos += boxSize + XPAD;
-    snprintf(buffer, 64, WIFI_NAME_FORMAT, params->wifi_ssid);
-    // if( (params->wifi_status == WIFI_CONNECTING) || (params->wifi_status == WIFI_CONNECTED) ){
-    //     snprintf(buffer, 64, WIFI_NAME_FORMAT, params->wifi_ssid);
-    // } else if(params->wifi_status == WIFI_SCANNING){
-    //     snprintf(buffer, 64, WIFI_NAME_FORMAT, "scanning");
-    // } else {
-    //     snprintf(buffer, 64, WIFI_NAME_FORMAT, "-");
-    // }
-	M5.Lcd.drawString(buffer, xpos, ypos, GFXFF);
+
+    if( (params->wifi_status == WIFI_CONNECTING) || (params->wifi_status == WIFI_CONNECTED) ){
+        snprintf(buffer, 64, WIFI_NAME_FORMAT, params->wifi_ssid);
+    } else if(params->wifi_status == WIFI_SCANNING){
+        snprintf(buffer, 64, WIFI_NAME_FORMAT, "scanning");
+    } else {
+        snprintf(buffer, 64, WIFI_NAME_FORMAT, "-");
+    }
+    s_draw_status_block(spr[SCREEN_BLOCK_STATUS_WIFI], tmp_color, buffer, complete);
 
 	// 2) NTP
-	xpos = XPAD;
-	ypos += textHeight;
-	M5.Lcd.drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
 	switch (params->ntp_status) {
     case NTP_DEACTIVATED:       tmp_color = TFT_LIGHTGREY;  break;
     case NTP_TIME_NOT_SET:      tmp_color = TFT_RED;        break;
@@ -182,29 +267,18 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params)
     case NTP_UPDATED:           tmp_color = TFT_GREEN;      break;
 	default:                    tmp_color = TFT_PURPLE;     break;
 	}
-
-	M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
-    xpos += boxSize + XPAD;
-	M5.Lcd.drawString("Time set", xpos, ypos, GFXFF);
+    s_draw_status_block(spr[SCREEN_BLOCK_STATUS_NTP], tmp_color, "Time set", complete);
 
 	// 3) SD Card storage
-	xpos = XPAD;
-	ypos += textHeight;
-	M5.Lcd.drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
 	switch (params->sd_status) {
     case SD_DEACTIVATED:        tmp_color = TFT_LIGHTGREY;  break;
     case SD_NOT_AVAILABLE:      tmp_color = TFT_RED;        break;
     case SD_AVAILABLE:          tmp_color = TFT_GREEN;      break;
 	default:                    tmp_color = TFT_PURPLE;     break;
 	}
-    M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
-	xpos += boxSize + XPAD;
-	M5.Lcd.drawString("SD Card", xpos, ypos, GFXFF);
+    s_draw_status_block(spr[SCREEN_BLOCK_STATUS_SD], tmp_color, "SD Card", complete);
 
 	// 4) BLE devices
-	xpos = XPAD;
-	ypos += textHeight;
-	M5.Lcd.drawRect(xpos, ypos, boxSize, boxSize, TFT_WHITE);
 	switch (params->ble_status) {
     case BLE_DEACTIVATED:       tmp_color = TFT_LIGHTGREY;  break;
     case BLE_NOT_CONNECTED:     tmp_color = TFT_RED;        break;
@@ -213,39 +287,36 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params)
     case BLE_CONNECTED:         tmp_color = TFT_GREEN;      break;
 	default:                    tmp_color = TFT_PURPLE;     break;
 	}
-    M5.Lcd.fillRect(xpos + BOX_FRAME, ypos + BOX_FRAME, boxSize - 2 * BOX_FRAME, boxSize - 2 * BOX_FRAME, tmp_color);
-	xpos += boxSize + XPAD;
-	M5.Lcd.drawString(params->ble_name, xpos, ypos, GFXFF);
+    s_draw_status_block(spr[SCREEN_BLOCK_STATUS_BLE], tmp_color, params->ble_name, complete);
 
 	// 5) Status text line
-	ypos += textHeight + YPAD;
-    M5.Lcd.setTextDatum(TC_DATUM);
-    // ESP_LOGD(TAG, "5) status text litle, show %u x %u, y %u, text %s", (params->show_status_text?1:0), xpos, ypos, params->status_text);
-    if(params->show_status_text){
-	    M5.Lcd.drawString(params->status_text, xcen, ypos, GFXFF);
-    } else {
-        ;    // TODO no status text
-    }
+    s_draw_status_text(spr[SCREEN_OVERARCHING_STATUS], params->show_status_text, params->status_text, complete);
 
 	// 6) Button label
-	// ypos += textHeight + YPAD;          // ypos = 240 - YPAD;
-    M5.Lcd.setTextDatum(TC_DATUM);
-    xpos = X_BUTTON_A;
-    ypos = 240 - textHeight; // - YPAD;
+    s_draw_button_label(spr[SCREEN_OVERARCHING_BUTTON],
+        params->show_button[BUTTON_A], params->button_text[BUTTON_A],
+        params->show_button[BUTTON_B], params->button_text[BUTTON_B],
+        params->show_button[BUTTON_C], params->button_text[BUTTON_C], complete);
 
-    // ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
-	if (params->show_button[BUTTON_A])
-		M5.Lcd.drawString(params->button_text[BUTTON_A], xpos, ypos, GFXFF);
+    ESP_LOGI(TAG,"dispod_screen_status_update_display(), run before push" );
+    // push all sprites
+    ypos = YPAD + TEXT_HEIGHT + YPAD;
+    spr[SCREEN_BLOCK_STATUS_WIFI]->pushSprite(0, ypos);
 
-    xpos = X_BUTTON_B;
-    // ESP_LOGD(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
-	if (params->show_button[BUTTON_B])
-		M5.Lcd.drawString(params->button_text[BUTTON_B], xpos, ypos, GFXFF);
+	ypos += STATUS_SPRITE_HEIGHT + YPAD;
+    spr[SCREEN_BLOCK_STATUS_NTP]->pushSprite(0, ypos);
 
-    xpos = X_BUTTON_C;
-    // ESP_LOGD(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
-	if (params->show_button[BUTTON_C])
-		M5.Lcd.drawString(params->button_text[BUTTON_C], xpos, ypos, GFXFF);
+    ypos += STATUS_SPRITE_HEIGHT + YPAD;
+    spr[SCREEN_BLOCK_STATUS_SD]->pushSprite(0, ypos);
+
+    ypos += STATUS_SPRITE_HEIGHT + YPAD;
+    spr[SCREEN_BLOCK_STATUS_BLE]->pushSprite(0, ypos);
+
+    ypos += STATUS_SPRITE_HEIGHT + YPAD;
+    spr[SCREEN_OVERARCHING_STATUS]->pushSprite(0, ypos);
+
+    ypos = 240 - STATUS_SPRITE_HEIGHT;
+    spr[SCREEN_OVERARCHING_BUTTON]->pushSprite(0, ypos);
 }
 
 static void dispod_screen_draw_fields(uint8_t line, char* name, uint8_t numFields, float f_current)
@@ -476,7 +547,7 @@ static void dispod_screen_ota_update_display(otaUpdate_t otaUpdate, bool clearSc
 }
 */
 
-void dispod_screen_running_update_display(dispod_screen_status_t *params) {
+void dispod_screen_running_update_display(dispod_screen_status_t *params, bool complete) {
 	runningValuesStruct_t* values = &running_values;
 
 	// Preparation
@@ -530,7 +601,6 @@ void dispod_screen_status_update_queue_status(dispod_screen_status_t *params, bo
 
 void dispod_screen_task(void *pvParameters)
 {
-    // EventBits_t uxBits;
     bool complete = false;
     dispod_screen_status_t* params = (dispod_screen_status_t*)pvParameters;
 
@@ -552,15 +622,19 @@ void dispod_screen_task(void *pvParameters)
             break;
         case SCREEN_STATUS:
             ESP_LOGD(TAG, "dispod_screen_task: SCREEN_STATUS");
-            if(params->current_screen != params->screen_to_show)
+            if(params->current_screen != params->screen_to_show){
                 params->current_screen = params->screen_to_show;
-            dispod_screen_status_update_display(params);
+                complete = true;
+            }
+            dispod_screen_status_update_display(params, complete);
             break;
         case SCREEN_RUNNING:
             ESP_LOGD(TAG, "dispod_screen_task: SCREEN_RUNNING");
-            if(params->current_screen != params->screen_to_show)
+            if(params->current_screen != params->screen_to_show){
                 params->current_screen = params->screen_to_show;
-            dispod_screen_running_update_display(params);
+                complete = true;
+            }
+            dispod_screen_running_update_display(params, complete);
             break;
         case SCREEN_CONFIG:
             ESP_LOGW(TAG, "dispod_screen_task: SCREEN_CONFIG - not available yet");
@@ -582,5 +656,7 @@ void dispod_screen_task(void *pvParameters)
             ESP_LOGW(TAG, "dispod_screen_task: unhandled: %d", params->screen_to_show);
             break;
         }
+
+        complete = false;
     }
 }
