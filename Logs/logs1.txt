@@ -1,0 +1,208 @@
+Hard resetting via RTS pin...
+MONITOR
+--- idf_monitor on COM6 115200 ---
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
+ets Jun  8 2016 00:22:57
+
+rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0018,len:4
+load:0x3fff001c,len:6292
+load:0x40078000,len:10248
+load:0x40080400,len:6676
+entry 0x40080764
+I (28) boot: ESP-IDF v3.3-beta1-dirty 2nd stage bootloader
+I (28) boot: compile time 18:52:22
+I (28) boot: Enabling RNG early entropy source...
+I (34) boot: SPI Speed      : 40MHz
+I (38) boot: SPI Mode       : DIO
+I (42) boot: SPI Flash Size : 16MB
+I (46) boot: Partition Table:
+I (50) boot: ## Label            Usage          Type ST Offset   Length
+I (57) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (64) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (72) boot:  2 app0             OTA app          00 10 00010000 00640000
+I (79) boot:  3 app1             OTA app          00 11 00650000 00640000
+I (87) boot:  4 eeprom           Unknown data     01 99 00c90000 00001000
+I (94) boot:  5 spiffs           Unknown data     01 82 00c91000 0036f000
+I (102) boot: End of partition table
+I (106) boot: No factory image, trying OTA 0
+I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x399a0 (235936) map
+I (202) esp_image: segment 1: paddr=0x000499c8 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (203) esp_image: segment 2: paddr=0x000499d0 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (209) esp_image: segment 3: paddr=0x000499d8 vaddr=0x3ffbdb60 size=0x03770 ( 14192) load
+I (224) esp_image: segment 4: paddr=0x0004d150 vaddr=0x3ffc12d0 size=0x00000 (     0) load
+I (227) esp_image: segment 5: paddr=0x0004d158 vaddr=0x40080000 size=0x00400 (  1024) load
+0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
+
+I (236) esp_image: segment 6: paddr=0x0004d560 vaddr=0x40080400 size=0x02ab0 ( 10928) load
+I (250) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xc46c0 (804544) map
+0x400d0018: _flash_cache_start at ??:?
+
+I (536) esp_image: segment 8: paddr=0x001146e0 vaddr=0x40082eb0 size=0x1b16c (110956) load
+0x40082eb0: psram_cmd_recv_start at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:239 (discriminator 18)
+
+I (582) esp_image: segment 9: paddr=0x0012f854 vaddr=0x400c0000 size=0x00000 (     0) load
+I (582) esp_image: segment 10: paddr=0x0012f85c vaddr=0x50000000 size=0x00000 (     0) load
+I (589) esp_image: segment 11: paddr=0x0012f864 vaddr=0x50000000 size=0x00000 (     0) load
+I (615) boot: Loaded app from partition at offset 0x10000
+I (615) boot: Disabling RNG early entropy source...
+I (617) spiram: Found 32MBit SPI RAM device
+I (620) spiram: SPI RAM mode: flash 40m sram 40m
+I (625) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
+I (632) cpu_start: Pro cpu up.
+I (636) cpu_start: Application information:
+I (641) cpu_start: Project name:     dispod
+I (646) cpu_start: App version:      v0.1-17-ge1f013e-dirty
+I (652) cpu_start: Compile time:     19:43:59
+I (657) cpu_start: Compile date:     Jan 30 2019
+I (662) cpu_start: ESP-IDF:          v3.3-beta1-dirty
+I (668) cpu_start: Starting app cpu, entry point is 0x40081494
+0x40081494: call_start_cpu1 at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/cpu_start.c:261
+
+I (0) cpu_start: App cpu up.
+I (1569) spiram: SPI SRAM memory test OK
+I (1593) heap_init: Initializing. RAM available for dynamic allocation:
+I (1593) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
+I (1595) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
+I (1601) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
+I (1607) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
+I (1614) heap_init: At 3FFC3DA8 len 0001C258 (112 KiB): DRAM
+I (1620) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (1626) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (1633) heap_init: At 4009E01C len 00001FE4 (7 KiB): IRAM
+I (1639) cpu_start: Pro cpu start user code
+I (1644) spiram: Adding pool of 4050K of external SPI memory to heap allocator
+I (100) cpu_start: Starting scheduler on PRO CPU.
+I (0) cpu_start: Starting scheduler on APP CPU.
+I (102) spiram: Reserving pool of 32K of internal memory for DMA/internal allocations
+I (110) DISPOD: app_main() entered
+I (422) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
+I (422) DISPOD: initialize dispod
+I (423) DISPOD: Starting dispod_screen_task()
+I (427) DISPOD: Starting dispod_update_task()
+I (427) DISPOD_TFT: dispod_screen_task: started
+I (433) DISPOD: Starting dispod_archiver_task()
+I (433) DISPOD_UPDATER: dispod_update_task: started
+I (444) DISPOD: Starting dispod_m5stack_task()
+I (444) DISPOD_ARCHIVER: dispod_archiver_task: started
+I (454) DISPOD: Starting dispod_timer_task()
+I (454) DISPOD: dispod_m5stack_task: started
+I (465) DISPOD_TIMER: dispod_timer_task: started
+M5Stack initializing...OK
+I (943) wifi: wifi driver task: 3ffc74f0, prio:23, stack:3584, core=0
+I (944) wifi: wifi firmware version: 328353e
+I (944) wifi: config NVS flash: disabled
+I (946) wifi: config nano formating: disabled
+I (950) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (960) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (972) wifi: Init dynamic tx buffer num: 32
+I (973) wifi: Init data frame dynamic rx buffer num: 32
+I (978) wifi: Init management frame dynamic rx buffer num: 32
+I (984) wifi: Init static tx buffer num: 16
+I (989) wifi: Init static rx buffer size: 1600
+I (992) wifi: Init static rx buffer num: 10
+I (996) wifi: Init dynamic rx buffer num: 32
+I (1061) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
+I (1062) wifi: filter: set rx policy=0
+I (1063) wifi: mode : sta (84:0d:8e:25:92:34)
+I (1064) wifi: filter: set rx policy=1
+I (1068) wifi: connect step 0 -> 0, status=0, err_time=0
+I (1074) wifi: Start wifi scan
+I (1075) wifi: ssid=, channel=0, hidden=1, type=active, active=<0,0>, passive=0
+I (1083) wifi: first chan=1
+I (1085) wifi: filter: set rx policy=3
+I (1088) wifi: clear scan ap list
+I (1091) wifi: start scan: type=0x50f, priority=3, cb=0x0, arg=0x3f828c10, ss_state=0x1, time=80716, index=0
+I (1101) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (1228) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1228) wifi: perform scan: ss_state=0x9, chan<2,0>, dur<0,120>
+I (1350) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1350) wifi: perform scan: ss_state=0x9, chan<3,0>, dur<0,120>
+I (1471) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1472) wifi: perform scan: ss_state=0x9, chan<4,0>, dur<0,120>
+I (1593) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1593) wifi: perform scan: ss_state=0x9, chan<5,0>, dur<0,120>
+I (1714) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1715) wifi: perform scan: ss_state=0x9, chan<6,0>, dur<0,120>
+I (1836) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1837) wifi: perform scan: ss_state=0x9, chan<7,0>, dur<0,120>
+I (1958) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1959) wifi: perform scan: ss_state=0x9, chan<8,0>, dur<0,120>
+I (2080) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2081) wifi: perform scan: ss_state=0x9, chan<9,0>, dur<0,120>
+I (2202) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2202) wifi: perform scan: ss_state=0x9, chan<10,0>, dur<0,120>
+I (2323) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2324) wifi: perform scan: ss_state=0x9, chan<11,0>, dur<0,120>
+I (2445) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2445) wifi: perform scan: ss_state=0x9, chan<12,0>, dur<360,360>
+I (2806) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2807) wifi: perform scan: ss_state=0x9, chan<13,0>, dur<360,360>
+I (3167) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (3168) wifi: perform scan: ss_state=0x9, chan<14,0>, dur<360,360>
+I (3529) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (3529) wifi: filter: set rx policy=4
+I (3529) wifi: first chan=1
+I (3530) wifi: Send scan done event: status=0, apnum=6
+I (3534) DISPOD_WIFI: Setting WiFi configuration SSID W12...
+I (3541) wifi: clear blacklist
+I (3544) wifi: Start wifi connect
+I (3546) wifi: connect step 0 -> 0, status=0, err_time=0
+I (3551) wifi: connect chan=0
+I (3554) wifi: first chan=1
+I (3556) wifi: connect status 0 -> 1, step=0, err_time=0
+I (3561) wifi: connect step 0 -> 1, status=1, err_time=0
+I (3566) wifi: filter: set rx policy=3
+I (3570) wifi: clear scan ap list
+I (3573) wifi: start scan: type=0x50f, priority=2, cb=0x40154e54, arg=0x0, ss_state=0x1, time=2561824, index=0
+0x40154e54: cnx_start_handoff_cb at ??:?
+
+I (3582) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (3589) DISPOD_WIFI: Waiting for IP address...
+I (3591) wifi: profile match: ss_state=0x7
+I (3598) wifi: profile match: ss_state=0x7
+I (3692) wifi: profile match: ss_state=0x7
+I (3709) wifi: scan end: arg=0x0, status=0, ss_state=0x7
+I (3709) wifi: find first mathched ssid, scan done
+I (3709) wifi: filter: set rx policy=4
+I (3711) wifi: first chan=1
+I (3713) wifi: handoff_cb: status=0
+I (3717) wifi: ap found, mac=ec:08:6b:8a:ae:3a
+I (3721) wifi: new_bss=0x3f828020, cur_bss=0x0, new_chan=<1,0>, cur_chan=1
+I (3727) wifi: filter: set rx policy=5
+I (3731) wifi: new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+I (3737) wifi: connect_op: status=0, auth=5, cipher=3
+I (3742) wifi: auth mode is not none
+I (4520) wifi: connect_bss: auth=1, reconnect=0
+I (4520) wifi: state: init -> auth (b0)
+I (4521) wifi: start 1s AUTH timer
+I (4521) wifi: clear scan ap list
+I (4527) wifi: recv auth: seq=2, status=0
+I (4527) wifi: state: auth -> assoc (0)
+I (4531) wifi: restart connect 1s timer for assoc
+I (4538) wifi: recv assoc: type=0x10
+I (4539) wifi: filter: set rx policy=6
+I (4541) wifi: state: assoc -> run (10)
+I (4545) wifi: start 10s connect timer for 4 way handshake
+I (4563) wifi: connected with W12, channel 1, bssid = ec:08:6b:8a:ae:3a
+I (4564) wifi: remove all except ec:08:6b:8a:ae:3a from rc list
+I (4565) wifi: clear blacklist
+I (4568) wifi: filter: set rx policy=7
+I (4571) wifi: pm start, type: 1
+
+I (4574) wifi: Send sta connected event
+I (4578) wifi: connect status 1 -> 5, step=1, err_time=0
+I (5445) event: sta ip: 192.168.2.155, mask: 255.255.255.0, gw: 192.168.2.1
+I (5446) DISPOD_WIFI: got ip:192.168.2.155
+I (5448) DISPOD_SNTP: Time is not set yet. Getting time over NTP.
+I (5454) DISPOD_SNTP: Initializing SNTP
+I (5461) DISPOD_SNTP: Waiting for system time to be set... (1/10)
+I (7467) DISPOD_SNTP: The current local date/time is: Wed Jan 30 19:59:41 2019
+I (7467) DISPOD_SNTP: Time set yet.
+I (7469) DISPOD_ARCHIVER: SD card info 3, card size kb 15558144, total kb 15549952 used kb 704, used 0.0 perc.
+I (7480) BTDM_INIT: BT controller compile version [97a362b]
+I (7487) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (8351) DISPOD_GATTC: Forerunner 35
