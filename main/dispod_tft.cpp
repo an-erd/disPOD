@@ -20,7 +20,7 @@ static const char* TAG = "DISPOD_TFT";
 
 // layout measures for status screen
 #define XPAD		    10
-#define YPAD		    6
+#define YPAD		    3
 #define XCEN            160
 #define BOX_FRAME	    2
 #define BOX_SIZE        18
@@ -75,10 +75,6 @@ typedef enum {
 
 TFT_eSprite* spr[SCREEN_NUM_SPRITES] = { 0 };
 
-// TFT_eSprite spr = TFT_eSprite(&M5.Lcd);
-
-
-
 // initialize all display structs
 void dispod_screen_status_initialize(dispod_screen_status_t *params)
 {
@@ -120,6 +116,13 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     spr[SCREEN_OVERARCHING_STATUS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
     spr[SCREEN_OVERARCHING_STATS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
     spr[SCREEN_OVERARCHING_BUTTON]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+
+    // for (int i = 0; i < SCREEN_NUM_SPRITES; i++){
+    //     ESP_LOGI(TAG, "assert spr[%u]", i);
+    //     assert(spr[i]);
+    // }
+
+    // heap_caps_dump(MALLOC_CAP_SPIRAM);
 }
 
 // function to change screen
@@ -302,7 +305,6 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
         params->show_button[BUTTON_B], params->button_text[BUTTON_B],
         params->show_button[BUTTON_C], params->button_text[BUTTON_C], complete);
 
-    ESP_LOGI(TAG,"dispod_screen_status_update_display(), run before push" );
     // push all sprites
     ypos = YPAD + TEXT_HEIGHT + YPAD;
     spr[SCREEN_BLOCK_STATUS_WIFI]->pushSprite(0, ypos);
