@@ -28,20 +28,24 @@ static const char* TAG = "DISPOD_TFT";
 #define TEXT_X          38
 #define STATUS_SPRITE_WIDTH     320
 #define STATUS_SPRITE_HEIGHT    22
-#define TEXT_HEIGHT     22
+#define TEXT_HEIGHT_STATUS      22
 
 #define X_BUTTON_A	    65          // display button x position (for center of button)
 #define X_BUTTON_B	    160
 #define X_BUTTON_C	    255
 
 // layout measures for running screen
+#define TEXT_HEIGHT_RUNNING             42
+#define RUNNING_SPRITE_WIDTH            320
+#define RUNNING_SPRITE_HEIGHT           42
+
+#define VAL_X_RUNNING_TR                (XPAD+75+XPAD+60)   // top right orientation
 #define FIELD_MIN_X				        170
 #define FIELD_MAX_X				        310
 #define FIELD_BASE_Y			        14
 #define FIELD_HALFHEIGHT		        11
 #define FIELD_WIDTH				        (FIELD_MAX_X - FIELD_MIN_X)
 
-// layout dimensions for indicator bar
 #define INDICATOR_MIN_X					170
 #define INDICATOR_MAX_X					310
 #define INDICATOR_ADJ_MIN_X				(INDICATOR_MIN_X + INDICATOR_TARGET_CIRCLE_RADIUS)
@@ -105,24 +109,17 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
         spr[i] = new TFT_eSprite(&M5.Lcd);
     }
     spr[SCREEN_BLOCK_STATUS_WIFI]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-    spr[SCREEN_BLOCK_STATUS_NTP]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-    spr[SCREEN_BLOCK_STATUS_SD]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-    spr[SCREEN_BLOCK_STATUS_BLE]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_STATUS_NTP]->createSprite (STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_STATUS_SD]->createSprite  (STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_STATUS_BLE]->createSprite (STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
 
-    spr[SCREEN_BLOCK_RUNNING_CAD]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-    spr[SCREEN_BLOCK_RUNNING_GCT]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-    spr[SCREEN_BLOCK_RUNNING_STR]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_RUNNING_CAD]->createSprite(RUNNING_SPRITE_WIDTH, RUNNING_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_RUNNING_GCT]->createSprite(RUNNING_SPRITE_WIDTH, RUNNING_SPRITE_HEIGHT);
+    spr[SCREEN_BLOCK_RUNNING_STR]->createSprite(RUNNING_SPRITE_WIDTH, RUNNING_SPRITE_HEIGHT);
 
     spr[SCREEN_OVERARCHING_STATUS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-    spr[SCREEN_OVERARCHING_STATS]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
+    spr[SCREEN_OVERARCHING_STATS]->createSprite (STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
     spr[SCREEN_OVERARCHING_BUTTON]->createSprite(STATUS_SPRITE_WIDTH, STATUS_SPRITE_HEIGHT);
-
-    // for (int i = 0; i < SCREEN_NUM_SPRITES; i++){
-    //     ESP_LOGI(TAG, "assert spr[%u]", i);
-    //     assert(spr[i]);
-    // }
-
-    // heap_caps_dump(MALLOC_CAP_SPIRAM);
 }
 
 // function to change screen
@@ -218,9 +215,8 @@ static void s_draw_button_label(TFT_eSprite *spr,
         spr->setFreeFont(FF17);
         spr->setTextColor(TFT_WHITE, TFT_BLACK);
         spr->setTextDatum(TC_DATUM);
-        spr->fillSprite(TFT_BLACK);
     }
-
+    spr->fillSprite(TFT_BLACK);
 	if (show_A) spr->drawString(text_A, X_BUTTON_A, 0, GFXFF);
 	if (show_B) spr->drawString(text_B, X_BUTTON_B, 0, GFXFF);
 	if (show_C) spr->drawString(text_C, X_BUTTON_C, 0, GFXFF);
@@ -306,7 +302,7 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
         params->show_button[BUTTON_C], params->button_text[BUTTON_C], complete);
 
     // push all sprites
-    ypos = YPAD + TEXT_HEIGHT + YPAD;
+    ypos = YPAD + TEXT_HEIGHT_STATUS + 2 * YPAD;
     spr[SCREEN_BLOCK_STATUS_WIFI]->pushSprite(0, ypos);
 
 	ypos += STATUS_SPRITE_HEIGHT + YPAD;
@@ -318,254 +314,173 @@ static void dispod_screen_status_update_display(dispod_screen_status_t *params, 
     ypos += STATUS_SPRITE_HEIGHT + YPAD;
     spr[SCREEN_BLOCK_STATUS_BLE]->pushSprite(0, ypos);
 
-    ypos += STATUS_SPRITE_HEIGHT + YPAD;
+    ypos += STATUS_SPRITE_HEIGHT + 2 * YPAD;
     spr[SCREEN_OVERARCHING_STATUS]->pushSprite(0, ypos);
 
     ypos = 240 - STATUS_SPRITE_HEIGHT;
     spr[SCREEN_OVERARCHING_BUTTON]->pushSprite(0, ypos);
 }
 
-static void dispod_screen_draw_fields(uint8_t line, char* name, uint8_t numFields, float f_current)
+static void s_draw_fields(TFT_eSprite *spr, char* name, uint8_t numFields, float f_current, bool first_sprite_draw)
 {
-    uint16_t    textHeight;
-    uint16_t    xPad = 10, yPad = 6, yLine, xVal;
-    char        buffer[32];
+    bool        inInterval;
     uint16_t    current;
+    uint32_t    tmp_color;
+    char        buffer[32];
 
-	textHeight = M5.Lcd.fontHeight(GFXFF);
-    yLine = yPad + (textHeight  + yPad) * line;
+    if(first_sprite_draw){
+        spr->setFreeFont(FF19);
+        spr->setTextColor(TFT_WHITE, TFT_BLACK);
+        spr->setTextDatum(TL_DATUM);
+        spr->fillSprite(TFT_BLACK);
 
-    // field title
-    M5.Lcd.setTextDatum(TL_DATUM);
-    M5.Lcd.drawString(name, xPad, yLine, GFXFF);
+        // draw field title
+        spr->drawString(name, XPAD, 0, GFXFF);
+    }
 
+    // clear all but name
+    spr->fillRect(XPAD+75, 0, 320-XPAD-75, RUNNING_SPRITE_HEIGHT, TFT_BLACK);
+
+    // frame
+	spr->drawRect(FIELD_MIN_X, FIELD_BASE_Y - FIELD_HALFHEIGHT, FIELD_WIDTH, 2 * FIELD_HALFHEIGHT, TFT_WHITE);
+
+    // determine current field and wheter in interval and print
     current = (uint16_t) round(f_current);
-	bool inInterval = (current >= 1) && (current <= 2);
-	if (inInterval)
-        M5.Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
-	else
-		M5.Lcd.setTextColor(TFT_RED, TFT_BLACK);
+	inInterval = (current >= 1) && (current <= 2);
+    tmp_color = (inInterval ? TFT_GREEN : TFT_RED);
+    spr->setTextColor(tmp_color, TFT_BLACK);
     sprintf(buffer, "%1.1f", f_current);
 
-    xVal = 10 + 75 + 10 + 60;
-    M5.Lcd.setTextDatum(TR_DATUM);
-    M5.Lcd.drawString(buffer, xVal, yLine, GFXFF);
-    M5.Lcd.setTextDatum(TL_DATUM);
+    // draw field value
+    spr->setTextDatum(TR_DATUM);
+    spr->drawString(buffer, VAL_X_RUNNING_TR, 0, GFXFF);
+    spr->setTextDatum(TL_DATUM);
 
-	uint8_t y0 = yLine + FIELD_BASE_Y;
-	// frame
-	M5.Lcd.drawRect(FIELD_MIN_X, y0 - FIELD_HALFHEIGHT, FIELD_WIDTH, 2 * FIELD_HALFHEIGHT, TFT_WHITE);
-
-	// ticks
+	// draw ticks
 	uint8_t deltaX = FIELD_WIDTH / numFields;
 	for (int i = 0; i < numFields; i++)
-		M5.Lcd.drawLine(FIELD_MIN_X + i * deltaX, y0 - FIELD_HALFHEIGHT, FIELD_MIN_X + i * deltaX, y0 + FIELD_HALFHEIGHT - 1, TFT_WHITE);
+		spr->drawLine(FIELD_MIN_X + i * deltaX, FIELD_BASE_Y - FIELD_HALFHEIGHT, FIELD_MIN_X + i * deltaX, FIELD_BASE_Y + FIELD_HALFHEIGHT - 1, TFT_WHITE);
 
 	// mark current
     uint16_t tmp_width = deltaX - 3 + (current == (numFields-1) ? 1 : 0);
-    uint32_t tmp_color = (inInterval ? TFT_GREEN : TFT_RED);
-	M5.Lcd.fillRect(FIELD_MIN_X + current * deltaX + 2, y0 - FIELD_HALFHEIGHT + 2, tmp_width, 2 * FIELD_HALFHEIGHT - 4, tmp_color);
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+	spr->fillRect(FIELD_MIN_X + current * deltaX + 2, FIELD_BASE_Y - FIELD_HALFHEIGHT + 2, tmp_width, 2 * FIELD_HALFHEIGHT - 4, tmp_color);
+    spr->setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
-static void dispod_screen_draw_indicator(uint8_t line, char* name, bool print_value,
+static void s_draw_indicator(TFT_eSprite *spr, char* name, bool print_value,
 	int16_t valMin, int16_t valMax, int16_t curVal,
-	int16_t lowInterval, int16_t highInterval)
+	int16_t lowInterval, int16_t highInterval,
+    bool first_sprite_draw)
 {
-    uint16_t    textHeight;
-    uint16_t    xPad = 10, yPad = 6, yLine, xVal;
+    assert(INDICATOR_ADJ_MIN_X < INDICATOR_ADJ_MAX_X);
+    assert(lowInterval < highInterval);
+
+    bool        inInterval;
+    uint32_t    tmp_color;
     char        buffer[32];
 
-#ifdef DEBUG_DISPOD
-	// make some checks:
-	// - indicator adjusted min/max to make place for circle (center <-> target)
-	if (INDICATOR_ADJ_MIN_X >= INDICATOR_ADJ_MAX_X)
-		DEBUGLOG("ERROR: displayDrawIndicator: Indicator min/max values inconsistent");
-	// - indicator adjusted min/max to make place for circle (center <-> target)
-	if (lowInterval >= highInterval)
-		DEBUGLOG("ERROR: displayDrawIndicator: low/high interval values inconsistent");
-#endif // DEBUG_DISPOD
+    if(first_sprite_draw){
+        spr->setFreeFont(FF19);
+        spr->setTextColor(TFT_WHITE, TFT_BLACK);
+        spr->setTextDatum(TL_DATUM);
+        spr->fillSprite(TFT_BLACK);
 
-	textHeight = M5.Lcd.fontHeight(GFXFF);
-    ESP_LOGI(TAG, "textHeight = %u", textHeight);
-    yLine = yPad + (textHeight  + yPad) * line;
+        // draw field title
+        spr->drawString(name, XPAD, 0, GFXFF);
+    }
+
+    // clear all but name
+    spr->fillRect(XPAD+75, 0, 320-XPAD-75, RUNNING_SPRITE_HEIGHT, TFT_BLACK);
 
 	// current values out of range -> move into range
 	uint16_t adjCurVal = curVal;
-	if (curVal < valMin)
-		adjCurVal = valMin;
-	if (curVal > valMax)
-		adjCurVal = valMax;
+	if (curVal < valMin) adjCurVal = valMin;
+	if (curVal > valMax) adjCurVal = valMax;
 
 	// calculate x base coordinates
 	uint16_t xLowInterval   = __map(lowInterval,  valMin, valMax, INDICATOR_ADJ_MIN_X,     INDICATOR_ADJ_MAX_X);
 	uint16_t xHighInterval  = __map(highInterval, valMin, valMax, INDICATOR_ADJ_MIN_X,     INDICATOR_ADJ_MAX_X);
 	uint16_t xTarget        = __map(adjCurVal,    valMin, valMax, INDICATOR_ADJ_MIN_X + 2, INDICATOR_ADJ_MAX_X - 2);
-	// calculate y base coordinates
-	uint16_t yBaseline = yLine + INDICATOR_BASE_Y;		// center/base line to display indicator
-
-	ESP_LOGD(TAG, "displayDrawIndicator: indMinX %u, indMaxX %u, indAdjMinX %u, indAdjMaxX %u, xLowInt %u, xHighInt %u, xTarget %u, yPad %u, yLine %u, yBaseLine %u",
-		INDICATOR_MIN_X, INDICATOR_MAX_X, INDICATOR_ADJ_MIN_X, INDICATOR_ADJ_MAX_X, xLowInterval, xHighInterval, xTarget, yPad, yLine, yBaseline);
 
 	// check if the current value is in target interval
-	bool inInterval = (curVal >= lowInterval) && (curVal <= highInterval);
-
-	// show name
-    M5.Lcd.setTextDatum(TL_DATUM);
-    M5.Lcd.drawString(name, xPad, yLine, GFXFF);
-
-	if (inInterval)
-        M5.Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
-	else
-		M5.Lcd.setTextColor(TFT_RED, TFT_BLACK);
+	inInterval = (curVal >= lowInterval) && (curVal <= highInterval);
+    tmp_color = (inInterval ? TFT_GREEN : TFT_RED);
+    spr->setTextColor(tmp_color, TFT_BLACK);
 
     // show value
     if(print_value){
         sprintf(buffer, "%u", curVal);
-        xVal = 10 + 75 + 10 + 60;
-        M5.Lcd.setTextDatum(TR_DATUM);
-        M5.Lcd.drawString(buffer, xVal, yLine, GFXFF);
-        M5.Lcd.setTextDatum(TL_DATUM);
+        spr->setTextDatum(TR_DATUM);
+        spr->drawString(buffer, VAL_X_RUNNING_TR, 0, GFXFF);
+        spr->setTextDatum(TL_DATUM);
     }
-	M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-
-    // ESP_LOGD(TAG, "drawindicator textwidth %u for '%s', textheight %u", TFT_getStringWidth(name), name, textHeight);
+	spr->setTextColor(TFT_WHITE, TFT_BLACK);
 
 	// baseline, from INDICATOR_MIN_X to INDICATOR_MAX_X
-	M5.Lcd.drawLine(INDICATOR_MIN_X+2, yBaseline, INDICATOR_MAX_X-2, yBaseline, TFT_WHITE);
-	//DEBUGLOG("displayDrawIndicator: drawLine %u, %u, %u, %u, %u", INDICATOR_ADJ_MIN_X, yBaseline, INDICATOR_ADJ_MAX_X, yBaseline, color);
+	spr->drawLine(INDICATOR_MIN_X+2, INDICATOR_BASE_Y, INDICATOR_MAX_X-2, INDICATOR_BASE_Y, TFT_WHITE);
 
 	// show rounded rectangle (first fill w/background, then draw w/foreground color)
-	M5.Lcd.fillRoundRect(
-		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS - 2, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		        // x0, y0 (top left corner)
+	spr->fillRoundRect(
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS - 2, INDICATOR_BASE_Y - INDICATOR_TARGET_CIRCLE_RADIUS-2,		    // x0, y0 (top left corner)
 		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS + 4, 5 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,	// w, h
-		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK);														            // radius, color
-	M5.Lcd.drawRoundRect(
-		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS-2, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
+		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK);														                // radius, color
+	spr->drawRoundRect(
+		xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS - 2, INDICATOR_BASE_Y - INDICATOR_TARGET_CIRCLE_RADIUS-2,		    // x0, y0 (top left corner)
 		xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS + 4, 5 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
-		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);														            // radius, color
-    // ESP_LOGD(TAG, "M5.Lcd.drawRoundRect x0 %u y0 %u w %u h %u r %u",
-    //     xLowInterval - INDICATOR_TARGET_CIRCLE_RADIUS, yBaseline - INDICATOR_TARGET_CIRCLE_RADIUS-2,		            // x0, y0 (top left corner)
-	// 	xHighInterval - xLowInterval + 2 * INDICATOR_TARGET_CIRCLE_RADIUS, 5 + 2 * INDICATOR_TARGET_CIRCLE_RADIUS,  // w, h
-	// 	INDICATOR_TARGET_CIRCLE_RADIUS);
-
-	// middle circle, filled = in target range
-	M5.Lcd.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_BLACK); // delete (background) first
-	if (inInterval) {
-		M5.Lcd.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_GREEN);
-	}
-	else {
-		M5.Lcd.fillCircle(xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS, TFT_RED);
-	}
-    ESP_LOGD(TAG, "M5.Lcd.fillCircle x0 %u y0 %u r %u",xTarget, yBaseline, INDICATOR_TARGET_CIRCLE_RADIUS);
+		INDICATOR_TARGET_CIRCLE_RADIUS, TFT_WHITE);														                // radius, color
+	// middle circle
+	spr->fillCircle(xTarget, INDICATOR_BASE_Y, INDICATOR_TARGET_CIRCLE_RADIUS, tmp_color);
 }
-
-static void dispod_screen_draw_status_line_running(uint8_t line, dispod_screen_status_t *params)
-{
-    uint16_t    textHeight;
-    uint16_t    xPad = 10, yPad = 6, yLine, xVal, ypos;
-    char        buffer[64];
-
-    snprintf(buffer, 64, "Q: max %u, snd %u, rec %u, fail %u",
-        params->q_status.max_len, params->q_status.messages_send, params->q_status.messages_received, params->q_status.messages_failed);
-	if(params->show_q_status){
-        M5.Lcd.setFreeFont(FF17);
-        textHeight = M5.Lcd.fontHeight(GFXFF);
-        // yLine = yPad + (textHeight  + yPad) * line;
-
-	    // 5) Status text line (copied from above, needs cleanup)
-	    // ypos = yLine + YPAD;
-        ypos = 240 - 2 * (textHeight + YPAD) - YPAD;
-        M5.Lcd.setTextDatum(TL_DATUM);
-        M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-        M5.Lcd.drawString(buffer, xPad, ypos, GFXFF);
-    }
-    ESP_LOGD(TAG, "dispod_screen_draw_status_line_running(): %s", buffer);
-}
-
-static void dispod_screen_draw_footer(uint8_t line, dispod_screen_status_t *params)
-{
-	uint16_t textHeight, boxSize, xpos, ypos, xpos2, xcen = 160;
-    uint16_t tmp_color;
-    char     buffer[64];
-
-    M5.Lcd.setFreeFont(FF17);
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-	textHeight = M5.Lcd.fontHeight(GFXFF);
-
-    // copied from above -> needs cleanup and remove duplicate
-	// 6) Button label
-	// ypos += textHeight + YPAD;          // ypos = 240 - YPAD;
-    M5.Lcd.setTextDatum(TC_DATUM);
-    xpos = X_BUTTON_A;
-    ypos = 240 - textHeight; // - YPAD;
-
-    // ESP_LOGD(TAG, "6) button label, show A %u x %u, y %u, text %s", (params->show_button[BUTTON_A]?1:0), xpos, ypos, params->button_text[BUTTON_A]);
-	if (params->show_button[BUTTON_A])
-		M5.Lcd.drawString(params->button_text[BUTTON_A], xpos, ypos, GFXFF);
-
-    xpos = X_BUTTON_B;
-    // ESP_LOGD(TAG, "6) button label, show B %u x %u, y %u, text %s", (params->show_button[BUTTON_B]?1:0), xpos, ypos, params->button_text[BUTTON_B]);
-	if (params->show_button[BUTTON_B])
-		M5.Lcd.drawString(params->button_text[BUTTON_B], xpos, ypos, GFXFF);
-
-    xpos = X_BUTTON_C;
-    // ESP_LOGD(TAG, "6) button label, show C %u x %u, y %u, text %s", (params->show_button[BUTTON_C]?1:0), xpos, ypos, params->button_text[BUTTON_C]);
-	if (params->show_button[BUTTON_C])
-		M5.Lcd.drawString(params->button_text[BUTTON_C], xpos, ypos, GFXFF);
-}
-
-
-
-// OTA display update function
-/*#define BAR_PAD		3
-static void dispod_screen_ota_update_display(otaUpdate_t otaUpdate, bool clearScreen)
-{
-	int ypos;
-	int x0 = 20, x1 = 300, y0 = 60, y1 = 100;	// gauge corner
-	int mapx;
-
-	// Preparation
-    M5.Lcd.fillScreen(TFT_BLACK);
-	TFT_resetclipwin();
-    TFT_setFont(DEJAVU18_FONT, NULL);       // DEJAVU18_FONT
-    _fg = TFT_WHITE;
-	_bg = TFT_BLACK;                        // (color_t){ 64, 64, 64 };
-
-	// Title
-	ypos = 10;
-    M5.Lcd.drawString("OTA Update...", CENTER, ypos, GFXFF);
-
-	ypos = 180;
-	if (otaUpdate.otaUpdateError_) {
-		// Error Message
-		// M5.Lcd.drawString(otaErrorNames[otaUpdate.otaUpdateErrorNr_], CENTER, ypos, GFXFF);
-	}
-	else if (otaUpdate.otaUpdateEnd_) {
-		M5.Lcd.drawString("Done, rebooting...", CENTER, ypos, GFXFF);
-	}
-	else {
-		if (clearScreen)
-			TFT_drawRect(x0, y0, x1, y1, TFT_WHITE);
-		mapx = map(otaUpdate.otaUpdateProgress_, 0, 100, 0, x1 - x0 - 2 * BAR_PAD);
-		TFT_fillRect(x0 + BAR_PAD, y0 + BAR_PAD, mapx, y1 - y0 - 2 * BAR_PAD, TFT_LIGHTGREY);
-	}
-}
-*/
 
 void dispod_screen_running_update_display(dispod_screen_status_t *params, bool complete) {
 	runningValuesStruct_t* values = &running_values;
 
-	// Preparation
-    M5.Lcd.fillScreen(TFT_BLACK);
-    M5.Lcd.setFreeFont(FF19);
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+    uint16_t ypos;
+    char buffer[64];
 
-    dispod_screen_draw_indicator(0, "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE);
-	dispod_screen_draw_indicator(1, "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME);
-    dispod_screen_draw_fields   (2, "Str", 3, values->values_to_display.str / 10.);
-    dispod_screen_draw_status_line_running(3, params);
-    dispod_screen_draw_footer             (4, params);
+    if(complete) {
+        M5.Lcd.fillScreen(TFT_BLACK);
+        M5.Lcd.setFreeFont(FF19);
+        M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+    }
+
+    // 1-3) Cadence, GCT, Strike
+    s_draw_indicator(spr[SCREEN_BLOCK_RUNNING_CAD], "Cad", true, MIN_INTERVAL_CADENCE - 20, MAX_INTERVAL_CADENCE + 20, values->values_to_display.cad, MIN_INTERVAL_CADENCE, MAX_INTERVAL_CADENCE, complete);
+    s_draw_indicator(spr[SCREEN_BLOCK_RUNNING_GCT], "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME, complete);
+    s_draw_fields(spr[SCREEN_BLOCK_RUNNING_STR],    "Str", 3, values->values_to_display.str / 10., complete);
+
+    // 4) Status text line
+    s_draw_status_text(spr[SCREEN_OVERARCHING_STATUS], params->show_status_text, params->status_text, complete);
+
+    // 5) Statistics text line
+    snprintf(buffer, 64, "Q: max %u, snd %u, rec %u, fail %u",
+        params->q_status.max_len, params->q_status.messages_send, params->q_status.messages_received, params->q_status.messages_failed);
+    s_draw_status_text(spr[SCREEN_OVERARCHING_STATS], params->show_q_status, buffer, complete);
+
+	// 6) Button label
+    s_draw_button_label(spr[SCREEN_OVERARCHING_BUTTON],
+        params->show_button[BUTTON_A], params->button_text[BUTTON_A],
+        params->show_button[BUTTON_B], params->button_text[BUTTON_B],
+        params->show_button[BUTTON_C], params->button_text[BUTTON_C], complete);
+
+    // push all sprites
+    ypos = YPAD;
+    spr[SCREEN_BLOCK_RUNNING_CAD]->pushSprite(0, ypos);
+	ypos += RUNNING_SPRITE_HEIGHT + YPAD;
+
+    spr[SCREEN_BLOCK_RUNNING_GCT]->pushSprite(0, ypos);
+    ypos += RUNNING_SPRITE_HEIGHT + YPAD;
+
+    spr[SCREEN_BLOCK_RUNNING_STR]->pushSprite(0, ypos);
+    ypos += RUNNING_SPRITE_HEIGHT + YPAD;
+
+    spr[SCREEN_OVERARCHING_STATS]->pushSprite(0, ypos);
+    ypos += STATUS_SPRITE_HEIGHT + YPAD + YPAD;
+
+    spr[SCREEN_OVERARCHING_STATUS]->pushSprite(0, ypos);
+
+    ypos = 240 - STATUS_SPRITE_HEIGHT;
+    spr[SCREEN_OVERARCHING_BUTTON]->pushSprite(0, ypos);
 	// ESP_LOGD(TAG, "updateDisplayWithRunningValues: cad %3u stance %3u strike %1u", values->values_to_display.cad, values->values_to_display.GCT, values->values_to_display.str);
 
     // testing:
