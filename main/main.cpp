@@ -19,6 +19,7 @@
 #include "soc/timer_group_reg.h"
 
 #include <M5Stack.h>
+#include <ArduinoOTA.h>
 #include "dispod_main.h"
 #include "dispod_wifi.h"
 #include "dispod_gattc.h"
@@ -30,6 +31,7 @@
 #include "dispod_archiver.h"
 #include "dispod_button.h"
 #include "dispod_timer.h"
+
 
 static const char* TAG = "DISPOD";
 
@@ -131,12 +133,58 @@ static void initialize_nvs()
     ESP_ERROR_CHECK( ret );
 }
 
+
+static void initialize_ArduinoOTA()
+{
+    // Port defaults to 3232
+    // ArduinoOTA.setPort(3232);
+
+    // Hostname defaults to esp3232-[MAC]
+    // ArduinoOTA.setHostname("myesp32");
+
+    // No authentication by default
+    // ArduinoOTA.setPassword("admin");
+
+    // Password can be set with it's md5 value as well
+    // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
+    // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
+
+    ArduinoOTA
+      .onStart([]() {
+        String type;
+        if (ArduinoOTA.getCommand() == U_FLASH)
+          type = "sketch";
+        else // U_SPIFFS
+          type = "filesystem";
+
+        // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+        Serial.println("Start updating " + type);
+      })
+      .onEnd([]() {
+        Serial.println("\nEnd");
+      })
+      .onProgress([](unsigned int progress, unsigned int total) {
+        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+      })
+      .onError([](ota_error_t error) {
+        Serial.printf("Error[%u]: ", error);
+        if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+        else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+        else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+        else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+        else if (error == OTA_END_ERROR) Serial.println("End Failed");
+      });
+
+    ArduinoOTA.begin();
+}
+
 void dispod_m5stack_task(void *pvParameters){
     ESP_LOGI(TAG, "dispod_m5stack_task: started");
 
     for(;;){
         M5.update();
         dispod_m5_buttons_test();
+        ArduinoOTA.handle();
 
         TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
         TIMERG0.wdt_feed=1;
@@ -215,6 +263,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         if(uxBits & DISPOD_WIFI_CONNECTED_BIT){
             ESP_LOGV(TAG, "WiFi connected, update NTP");
             dispod_sntp_check_time();
+            initialize_ArduinoOTA();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
             // WiFi configured, but not connected, jump to SD mount

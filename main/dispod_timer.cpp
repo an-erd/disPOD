@@ -7,8 +7,8 @@
 static const char* TAG = "DISPOD_TIMER";
 EventGroupHandle_t dispod_timer_evg;
 
-static void timer_metronome_callback(void* arg);
-static void timer_heartbeat_callback(void* arg);
+static void IRAM_ATTR timer_metronome_callback(void* arg);
+static void IRAM_ATTR timer_heartbeat_callback(void* arg);
 
 // create 4 timer args and handles
 // - periodic timer for metronome on/cadence = 180 bpm
@@ -84,7 +84,7 @@ void dispod_timer_stop_metronome()
     // ESP_ERROR_CHECK(esp_timer_dump(stdout));
 }
 
-static void timer_metronome_callback(void* arg)
+static void IRAM_ATTR timer_metronome_callback(void* arg)
 {
 	uint8_t timer_nr = *((uint8_t *) arg);
 	EventBits_t     uxBits = 0;
@@ -128,7 +128,7 @@ void dispod_timer_stop_heartbeat()
     // ESP_ERROR_CHECK(esp_timer_dump(stdout));
 }
 
-static void timer_heartbeat_callback(void* arg)
+static void IRAM_ATTR timer_heartbeat_callback(void* arg)
 {
 	uint8_t timer_nr = *((uint8_t *) arg);
 	EventBits_t     uxBits = 0;

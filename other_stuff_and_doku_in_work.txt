@@ -153,3 +153,13 @@ Preparation done, waiting for NOTIFY
 Queue and event group       https://github.com/hamsternz/esp32_serial_log_to_sd/blob/master/main/gps_logger.c
 LCD                         https://github.com/espressif/esp-iot-solution/tree/master/components/spi_devices/lcd
 get around flickering w/    https://www.reddit.com/r/esp32/comments/87kp1e/your_experience_with_spi_connected_lcds/
+
+espota.exe -i 192.168.2.155 -p 3232 --auth= -f BLETest.ino.bin
+
+$ ./components/arduino/tools/espota.exe -i 192.168.2.155 -p 3232 --auth= -d -r -f build/dispod.bin
+20:50:04 [DEBUG]: Options: {'timeout': 10, 'esp_ip': '192.168.2.155', 'host_port': 26778, 'image': 'build/dispod.bin', 'host_ip': '0.0.0.0', 'auth': '', 'esp_port': 3232, 'spiffs': False, 'debug': True, 'progress': True}
+20:50:04 [INFO]: Starting on 0.0.0.0:26778
+20:50:04 [INFO]: Upload size: 1238784
+Sending invitation to 192.168.2.155
+20:50:04 [INFO]: Waiting for device...
+Uploading: [=================================                           ] 54%
