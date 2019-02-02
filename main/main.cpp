@@ -30,6 +30,7 @@
 #include "dispod_archiver.h"
 #include "dispod_button.h"
 #include "dispod_timer.h"
+#include "iot_ota.h"
 
 
 static const char* TAG = "DISPOD";
