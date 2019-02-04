@@ -88,7 +88,10 @@
         "neopixelbus.h": "c",
         "istream": "cpp",
         "sd.h": "c",
-        "fs.h": "c"
+        "fs.h": "c",
+        "unity.h": "c",
+        "m5display.h": "c",
+        "gittagversion.h": "c"
     },
 	"files.exclude": {
 		"**/.git": true,

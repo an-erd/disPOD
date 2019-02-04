@@ -39,6 +39,7 @@
 #define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT19)
 #define DISPOD_BTN_C_CNT_BIT                        (BIT20)
 #define DISPOD_RUNNING_SCREEN_BIT                   (BIT21)
+#define DISPOD_OTA_RUNNING_BIT                      (BIT22)     // OTA is running and ota_task exists
 extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group

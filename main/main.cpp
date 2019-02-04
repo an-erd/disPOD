@@ -137,26 +137,34 @@ void dispod_m5stack_task(void *pvParameters){
     }
 }
 
-#define OTA_SERVER_IP      "192.168.2.130"
-#define OTA_SERVER_PORT    80
-#define OTA_FILE_NAME      "test.bin"
-
 static void ota_task(void *arg)
 {
     ESP_LOGI(TAG, "ota_task(): test mutex");
-    iot_ota_start(OTA_SERVER_IP, OTA_SERVER_PORT, OTA_FILE_NAME, portMAX_DELAY);
+
+    xEventGroupSetBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT);
+    iot_ota_start(CONFIG_OTA_SERVER_IP, CONFIG_OTA_SERVER_PORT, CONFIG_OTA_FILE_NAME, 60000/portTICK_RATE_MS);
+    xEventGroupClearBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT);
+
     vTaskDelete(NULL);      // delete current task
 }
 
 static void s_try_ota_update()
 {
     ESP_LOGI(TAG, "s_do_ota(): free heap size before ota: %d", esp_get_free_heap_size());
-    xTaskCreate(ota_task, "ota_task", 1024 * 8, NULL, 5, NULL);
-    while (iot_ota_get_ratio() < 100) {
+    // ESP_ERROR_CHECK(
+        xTaskCreate(ota_task, "ota_task", 1024 * 8, NULL, 5, NULL);
+        // );
+
+    // wait for the task to start
+    while( !(xEventGroupWaitBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT,
+        pdFALSE, pdFALSE, portMAX_DELAY) & DISPOD_OTA_RUNNING_BIT) );
+
+    while( (iot_ota_get_ratio() < 100) && (xEventGroupWaitBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT, pdFALSE, pdFALSE, 0) & DISPOD_OTA_RUNNING_BIT) ){
         ESP_LOGI(TAG, "OTA progress: %d %%", iot_ota_get_ratio());
         vTaskDelay(500 / portTICK_RATE_MS);
     }
-    ESP_LOGI(TAG, "OTA done: %d %%", iot_ota_get_ratio());
+
+    ESP_LOGI(TAG, "OTA while-loop done: complete %d %%", iot_ota_get_ratio());
     vTaskDelay(1000 / portTICK_RATE_MS);
     ESP_LOGI(TAG, "free heap size after ota: %d", esp_get_free_heap_size());
     // esp_restart();
