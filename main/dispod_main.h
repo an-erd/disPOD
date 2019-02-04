@@ -39,12 +39,14 @@
 #define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT19)
 #define DISPOD_BTN_C_CNT_BIT                        (BIT20)
 #define DISPOD_RUNNING_SCREEN_BIT                   (BIT21)
+#define DISPOD_OTA_RUNNING_BIT                      (BIT22)     // OTA is running and ota_task exists
 extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
-#define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write only completed buffers
-#define DISPOD_SD_PROBE_EVT                         (BIT1)      // check availability of card and function -> set Bits for status
-#define DISPOD_SD_GENERATE_TESTDATA_EVT             (BIT2)      // fill the buffer array with test data
+#define DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT        (BIT0)      // write completed buffers
+#define DISPOD_SD_WRITE_ALL_BUFFER_EVT				(BIT1)		// write incompleted buffers, too
+#define DISPOD_SD_PROBE_EVT                         (BIT2)      // check availability of card and function -> set Bits for status
+#define DISPOD_SD_GENERATE_TESTDATA_EVT             (BIT3)      // fill the buffer array with test data
 extern EventGroupHandle_t dispod_sd_evg;
 
 // disPOD Client callback function events
@@ -62,10 +64,11 @@ typedef enum {
     DISPOD_RETRY_WIFI_EVT,                  /*!< When an retry of WiFi is requested, the event comes */
     DISPOD_RETRY_BLE_EVT,                   /*!< When an retry of BLE is requested, the event comes */
     DISPOD_GO_TO_RUNNING_SCREEN_EVT,        /*!< When starting the running screen is requested, the event comes */
+    DISPOD_BLE_DISCONNECT_EVT,              /*!< When BLE disconnects, the event comes */
     // activity events
-    DISPOD_BUTTON_TAP_EVT,                  /*!< When a button has been TAP event, the event comes */
-    DISPOD_BUTTON_2SEC_PRESS_EVT,           /*!< When a button has been pressed for 2s, the event comes */
-    DISPOD_BUTTON_5SEC_PRESS_EVT,           /*!< When a button has been pressed for 5s, the event comes */
+    DISPOD_BUTTON_TAP_EVT,                  /*!< When a button has been TAP event (=released), the event comes */
+    DISPOD_BUTTON_2SEC_RELEASE_EVT,         /*!< When a button has been released after 2s, the event comes */
+    DISPOD_BUTTON_5SEC_RELEASE_EVT,         /*!< When a button has been released after 5s, the event comes */
     //
     DISPOD_EVENT_MAX
 } dispod_cb_event_t;
@@ -83,6 +86,9 @@ extern dispod_screen_status_t dispod_screen_status;
 
 // global running values data struct
 extern runningValuesStruct_t running_values;
+
+#define BLE_NAME_FORMAT     "BLE Device (%s)"
+#define WIFI_NAME_FORMAT    "WiFi (%s)"
 
 // SD card
 #define sdPIN_NUM_MISO 19

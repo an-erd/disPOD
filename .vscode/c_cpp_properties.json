@@ -48,7 +48,9 @@
                 "${workspaceFolder}/components/arduino/cores/esp32",
                 "${workspaceFolder}/components/arduino/libraries/FS/src",
                 "${workspaceFolder}/components/Adafruit_NeoPixel",
-                "${workspaceFolder}/components"
+                "${workspaceFolder}/components",
+                "${workspaceFolder}/components/arduino/libraries/Update/src",
+                "${workspaceFolder}/components/general/ota/include"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {

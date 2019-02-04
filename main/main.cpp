@@ -15,6 +15,8 @@
 #include "soc/timer_group_struct.h"
 #include "driver/periph_ctrl.h"
 #include "esp32-hal-ledc.h"
+#include "soc/timer_group_struct.h"
+#include "soc/timer_group_reg.h"
 
 #include <M5Stack.h>
 #include "dispod_main.h"
@@ -28,6 +30,8 @@
 #include "dispod_archiver.h"
 #include "dispod_button.h"
 #include "dispod_timer.h"
+#include "iot_ota.h"
+
 
 static const char* TAG = "DISPOD";
 
@@ -60,15 +64,6 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(M5STACK_FIRE_NEO_NUM_LEDS, M
 RgbColor NEOPIXEL_white(colorSaturation);
 RgbColor NEOPIXEL_black(0);
 
-// TODO temp to don't have it twice
-const char* otaErrorNames[] = {
-	"Error: Auth Failed",		// OTA_AUTH_ERROR
-	"Error: Begin Failed",		// OTA_BEGIN_ERROR
-	"Error: Connect Failed",	// OTA_CONNECT_ERROR
-	"Error: Receive Failed",	// OTA_RECEIVE_ERROR
-	"Error: End Failed",		// OTA_END_ERROR
-};
-
 static void dispod_initialize()
 {
     if(CONFIG_USE_WIFI)
@@ -92,9 +87,9 @@ static void initialize_spiffs()
         .format_if_mount_failed = false
     };
 
-    ESP_LOGI(TAG, "SPIFFS: calling esp_vfs_spiffs_register()");
+    ESP_LOGD(TAG, "SPIFFS: calling esp_vfs_spiffs_register()");
     ret = esp_vfs_spiffs_register(&conf);
-    ESP_LOGI(TAG, "SPIFFS: esp_vfs_spiffs_register() returned");
+    ESP_LOGD(TAG, "SPIFFS: esp_vfs_spiffs_register() returned");
 
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
@@ -135,14 +130,69 @@ void dispod_m5stack_task(void *pvParameters){
     for(;;){
         M5.update();
         dispod_m5_buttons_test();
+
+        TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+        TIMERG0.wdt_feed=1;
+        TIMERG0.wdt_wprotect=0;
     }
+}
+
+static void ota_task(void *arg)
+{
+    ESP_LOGI(TAG, "ota_task(): test mutex");
+
+    xEventGroupSetBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT);
+    iot_ota_start(CONFIG_OTA_SERVER_IP, CONFIG_OTA_SERVER_PORT, CONFIG_OTA_FILE_NAME, 60000/portTICK_RATE_MS);
+    xEventGroupClearBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT);
+
+    vTaskDelete(NULL);      // delete current task
+}
+
+static void s_try_ota_update()
+{
+    ESP_LOGI(TAG, "s_do_ota(): free heap size before ota: %d", esp_get_free_heap_size());
+    // ESP_ERROR_CHECK(
+        xTaskCreate(ota_task, "ota_task", 1024 * 8, NULL, 5, NULL);
+        // );
+
+    // wait for the task to start
+    while( !(xEventGroupWaitBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT,
+        pdFALSE, pdFALSE, portMAX_DELAY) & DISPOD_OTA_RUNNING_BIT) );
+
+    while( (iot_ota_get_ratio() < 100) && (xEventGroupWaitBits(dispod_event_group, DISPOD_OTA_RUNNING_BIT, pdFALSE, pdFALSE, 0) & DISPOD_OTA_RUNNING_BIT) ){
+        ESP_LOGI(TAG, "OTA progress: %d %%", iot_ota_get_ratio());
+        vTaskDelay(500 / portTICK_RATE_MS);
+    }
+
+    ESP_LOGI(TAG, "OTA while-loop done: complete %d %%", iot_ota_get_ratio());
+    vTaskDelay(1000 / portTICK_RATE_MS);
+    ESP_LOGI(TAG, "free heap size after ota: %d", esp_get_free_heap_size());
+    // esp_restart();
+}
+
+static void s_leave_running_screen()
+{
+    xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
+    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+	dispod_timer_stop_metronome();
+    dispod_timer_stop_heartbeat();
+    pixels.ClearTo(NEOPIXEL_black);
+    pixels.Show();
+    dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
+    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
+    xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
 }
 
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
     switch(id){
     case DISPOD_STARTUP_EVT:
-        ESP_LOGI(TAG, "DISPOD_STARTUP_EVT");
+        ESP_LOGV(TAG, "DISPOD_STARTUP_EVT");
 
         // Initialize the M5Stack object and the M5Stack NeoPixels
         M5.begin(true, true, true); // LCD, SD, Serial
@@ -162,58 +212,58 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_BASIC_INIT_DONE_EVT:
-        ESP_LOGI(TAG, "DISPOD_BASIC_INIT_DONE_EVT");
+        ESP_LOGV(TAG, "DISPOD_BASIC_INIT_DONE_EVT");
         dispod_wifi_network_init();
         // show splash and some info here
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SPLASH_AND_NETWORK_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_SPLASH_AND_NETWORK_INIT_DONE_EVT:
-        ESP_LOGI(TAG, "DISPOD_DISPLAY_INIT_DONE_EVT");
+        ESP_LOGV(TAG, "DISPOD_DISPLAY_INIT_DONE_EVT");
         uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
         if(uxBits & DISPOD_WIFI_ACTIVATED_BIT){
             // WiFi activated -> connect to WiFi
-            ESP_LOGI(TAG, "connect to WiFi");
+            ESP_LOGV(TAG, "connect to WiFi");
             dispod_wifi_network_up();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_WIFI_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
             // WiFi not activated (and thus no NTP), jump to SD mount
-            ESP_LOGI(TAG, "no WiFi configured (thus no NTP), mount SD next");
+            ESP_LOGV(TAG, "no WiFi configured (thus no NTP), mount SD next");
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;
     case DISPOD_WIFI_INIT_DONE_EVT:
-        ESP_LOGI(TAG, "DISPOD_WIFI_INIT_DONE_EVT");
+        ESP_LOGV(TAG, "DISPOD_WIFI_INIT_DONE_EVT");
         break;
     case DISPOD_WIFI_GOT_IP_EVT:
-        ESP_LOGI(TAG, "DISPOD_WIFI_GOT_IP_EVT");
+        ESP_LOGV(TAG, "DISPOD_WIFI_GOT_IP_EVT");
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, 0);
         if(uxBits & DISPOD_WIFI_CONNECTED_BIT){
-            ESP_LOGI(TAG, "WiFi connected, update NTP");
+            ESP_LOGV(TAG, "WiFi connected, update NTP");
             dispod_sntp_check_time();
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         } else {
             // WiFi configured, but not connected, jump to SD mount
-            ESP_LOGI(TAG, "no WiFi connection thus no NTP, connect to BLE next");
+            ESP_LOGV(TAG, "no WiFi connection thus no NTP, connect to BLE next");
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_NTP_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;
     case DISPOD_NTP_INIT_DONE_EVT:
-        ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT");
+        ESP_LOGV(TAG, "DISPOD_NTP_INIT_DONE_EVT");
         uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_SD_ACTIVATED_BIT, pdFALSE, pdFALSE, 0);
-        ESP_LOGI(TAG, "uxBits: DISPOD_SD_ACTIVATED_BIT = %u, uxBits = %u", DISPOD_SD_ACTIVATED_BIT, uxBits);
+        ESP_LOGD(TAG, "uxBits: DISPOD_SD_ACTIVATED_BIT = %u, uxBits = %u", DISPOD_SD_ACTIVATED_BIT, uxBits);
         if( ( uxBits & DISPOD_SD_ACTIVATED_BIT) == DISPOD_SD_ACTIVATED_BIT){
-            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: dispod_sd_evg DISPOD_SD_PROBE_EVT");
+            ESP_LOGD(TAG, "DISPOD_NTP_INIT_DONE_EVT: dispod_sd_evg DISPOD_SD_PROBE_EVT");
             xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_PROBE_EVT);
         } else {
-            ESP_LOGI(TAG, "DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_PROBE_EVT");
+            ESP_LOGD(TAG, "DISPOD_NTP_INIT_DONE_EVT: skip DISPOD_SD_PROBE_EVT");
             ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_SD_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         }
         break;
     case DISPOD_SD_INIT_DONE_EVT:
-        ESP_LOGI(TAG, "DISPOD_SD_INIT_DONE_EVT");
+        ESP_LOGV(TAG, "DISPOD_SD_INIT_DONE_EVT");
         uxBits = xEventGroupWaitBits(dispod_event_group, DISPOD_BLE_RETRY_BIT, pdTRUE, pdFALSE, 0);
-        ESP_LOGI(TAG, "uxBits: DISPOD_BLE_RETRY_BIT = %u, uxBits = %u", DISPOD_BLE_RETRY_BIT, uxBits);
+        ESP_LOGD(TAG, "uxBits: DISPOD_BLE_RETRY_BIT = %u, uxBits = %u", DISPOD_BLE_RETRY_BIT, uxBits);
         if(!(uxBits & DISPOD_BLE_RETRY_BIT)){
             dispod_ble_initialize();
             dispod_ble_app_register();
@@ -222,14 +272,14 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         break;
     case DISPOD_BLE_DEVICE_DONE_EVT:
-        ESP_LOGI(TAG, "DISPOD_BLE_DEVICE_DONE_EVT");
+        ESP_LOGV(TAG, "DISPOD_BLE_DEVICE_DONE_EVT");
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_STARTUP_COMPLETE_EVT:{
         bool retryWifi = false;
         bool retryBLE = false;
         bool cont = false;
-        ESP_LOGI(TAG, "DISPOD_STARTUP_COMPLETE_EVT");
+        ESP_LOGV(TAG, "DISPOD_STARTUP_COMPLETE_EVT");
         // at this point we've either
         // - no Wifi configured: no WiFi, no NTP, maybe BLE
         // - WiFi configured: maybe WiFi -> maybe updated NTP, maybe BLE
@@ -267,13 +317,13 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         break;
     case DISPOD_RETRY_WIFI_EVT:
-        ESP_LOGI(TAG, "DISPOD_RETRY_WIFI_EVT");
+        ESP_LOGV(TAG, "DISPOD_RETRY_WIFI_EVT");
         break;
     case DISPOD_RETRY_BLE_EVT:
-        ESP_LOGI(TAG, "DISPOD_RETRY_BLE_EVT");
+        ESP_LOGV(TAG, "DISPOD_RETRY_BLE_EVT");
         break;
     case DISPOD_GO_TO_RUNNING_SCREEN_EVT:
-        ESP_LOGI(TAG, "DISPOD_GO_TO_RUNNING_SCREEN_EVT");
+        ESP_LOGV(TAG, "DISPOD_GO_TO_RUNNING_SCREEN_EVT");
         xEventGroupSetBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
         dispod_screen_change(&dispod_screen_status, SCREEN_RUNNING);
         dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, true, "Beep");
@@ -281,11 +331,24 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Back");
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 		dispod_timer_start_metronome();
+        dispod_timer_start_heartbeat();
+        break;
+    case DISPOD_BLE_DISCONNECT_EVT:
+        ESP_LOGV(TAG, "DISPOD_BLE_DISCONNECT_EVT");
+        if(xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT){
+            ESP_LOGV(TAG, "TODO DISPOD_BLE_DISCONNECT_EVT -> DISPOD_RUNNING_SCREEN_BIT");
+            s_leave_running_screen();
+			ESP_LOGD(TAG, "Archiver: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
+			xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
+        } else {
+            ESP_LOGV(TAG, "DISPOD_BLE_DISCONNECT_EVT -> not DISPOD_RUNNING_SCREEN_BIT -> DISPOD_STARTUP_COMPLETE_EVT");
+            ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+        }
         break;
     //
     case DISPOD_BUTTON_TAP_EVT: {
         button_unit_t button_unit = *(button_unit_t*) event_data;
-        ESP_LOGI(TAG, "DISPOD_BUTTON_TAP_EVT, button id %d", button_unit.btn_id);
+        ESP_LOGV(TAG, "DISPOD_BUTTON_TAP_EVT, button id %d", button_unit.btn_id);
 
         // come here from DISPOD_STARTUP_COMPLETE_EVT
         if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT, pdFALSE, pdFALSE, 0)
@@ -321,10 +384,15 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
                     ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_GO_TO_RUNNING_SCREEN_EVT, NULL, 0, portMAX_DELAY));
+                    // open new running value file
+                    dispod_archiver_set_new_file();
+
+					// Test data generation, when entering running screen
+					// xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_GENERATE_TESTDATA_EVT);
                 }
                 break;
             default:
-                ESP_LOGI(TAG, "unhandled button");
+                ESP_LOGW(TAG, "unhandled button");
                 break;
             }
         }
@@ -353,42 +421,49 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                 }
                 break;
             case BUTTON_C:
-                xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
-                xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
-                xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
-				dispod_timer_stop_metronome();
-                pixels.ClearTo(NEOPIXEL_black);
-                pixels.Show();
-                dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
-                dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
-                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
-                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
-                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
-                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-                ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
-                ESP_LOGI(TAG, "Test: SD CARD: DISPOD_SD_GENERATE_TESTDATA_EVT >");
-                xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_GENERATE_TESTDATA_EVT);
-                ESP_LOGI(TAG, "Test: SD CARD: DISPOD_SD_GENERATE_TESTDATA_EVT <");
+                s_leave_running_screen();
+				ESP_LOGD(TAG, "Archiver: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
+				xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
                 break;
             default:
-                ESP_LOGI(TAG, "unhandled button");
+                ESP_LOGW(TAG, "unhandled button");
                 break;
             }
         }
         }
         break;
-    case DISPOD_BUTTON_2SEC_PRESS_EVT: {
-        button_unit_t* button_unit = (button_unit_t*) event_data;
-        ESP_LOGI(TAG, "DISPOD_BUTTON_2SEC_PRESS_EVT, button id %d", button_unit->btn_id);
+    case DISPOD_BUTTON_2SEC_RELEASE_EVT: {
+        button_unit_t button_unit = *(button_unit_t*) event_data;
+        ESP_LOGV(TAG, "DISPOD_BUTTON_2SEC_PRESS_EVT, button id %d", button_unit.btn_id);
+
+        // showing status screen with WiFi available -> allow for OTA
+        if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT, pdFALSE, pdFALSE, 0)
+                & ( DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT))){
+            switch(button_unit.btn_id){
+            case BUTTON_B:
+                // start/try OTA
+                s_try_ota_update();
+                break;
+            }
+        }
+        // showing running screen
+        if((xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT)){
+            switch(button_unit.btn_id){
+            case BUTTON_B:
+                // Toggle show queue status
+                dispod_screen_status_update_queue_status(&dispod_screen_status, !dispod_screen_status.show_q_status);
+                break;
+            }
+        }
         }
         break;
-    case DISPOD_BUTTON_5SEC_PRESS_EVT: {
-        button_unit_t* button_unit = (button_unit_t*) event_data;
-        ESP_LOGI(TAG, "DISPOD_BUTTON_5SEC_PRESS_EVT, button id %d", button_unit->btn_id);
+    case DISPOD_BUTTON_5SEC_RELEASE_EVT: {
+        button_unit_t button_unit = *(button_unit_t*) event_data;
+        ESP_LOGV(TAG, "DISPOD_BUTTON_5SEC_PRESS_EVT, button id %d", button_unit.btn_id);
         }
         break;
     default:
-        ESP_LOGI(TAG, "unhandled event base/id %s:%d", base, id);
+        ESP_LOGW(TAG, "unhandled event base/id %s:%d", base, id);
         break;
     }
 }

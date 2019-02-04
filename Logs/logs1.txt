@@ -1,0 +1,318 @@
+MONITOR
+--- idf_monitor on COM6 115200 ---
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
+ets Jun  8 2016 00:22:57
+
+rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0018,len:4
+load:0x3fff001c,len:6292
+load:0x40078000,len:10248
+load:0x40080400,len:6676
+entry 0x40080764
+I (28) boot: ESP-IDF v3.3-beta1-dirty 2nd stage bootloader
+I (28) boot: compile time 18:52:22
+I (28) boot: Enabling RNG early entropy source...
+I (33) boot: SPI Speed      : 40MHz
+I (38) boot: SPI Mode       : DIO
+I (42) boot: SPI Flash Size : 16MB
+I (46) boot: Partition Table:
+I (49) boot: ## Label            Usage          Type ST Offset   Length
+I (57) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (64) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (72) boot:  2 app0             OTA app          00 10 00010000 00640000
+I (79) boot:  3 app1             OTA app          00 11 00650000 00640000
+I (86) boot:  4 eeprom           Unknown data     01 99 00c90000 00001000
+I (94) boot:  5 spiffs           Unknown data     01 82 00c91000 0036f000
+I (101) boot: End of partition table
+I (106) boot: No factory image, trying OTA 0
+I (111) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x399a0 (235936) map
+I (202) esp_image: segment 1: paddr=0x000499c8 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (203) esp_image: segment 2: paddr=0x000499d0 vaddr=0x3ff80000 size=0x00000 (     0) load
+I (209) esp_image: segment 3: paddr=0x000499d8 vaddr=0x3ffbdb60 size=0x03770 ( 14192) load
+I (224) esp_image: segment 4: paddr=0x0004d150 vaddr=0x3ffc12d0 size=0x00000 (     0) load
+I (227) esp_image: segment 5: paddr=0x0004d158 vaddr=0x40080000 size=0x00400 (  1024) load
+0x40080000: _WindowOverflow4 at C:/msys32/home/AKAEM/esp/esp-idf/components/freertos/xtensa_vectors.S:1685
+
+I (236) esp_image: segment 6: paddr=0x0004d560 vaddr=0x40080400 size=0x02ab0 ( 10928) load
+I (249) esp_image: segment 7: paddr=0x00050018 vaddr=0x400d0018 size=0xc4708 (804616) map
+0x400d0018: _flash_cache_start at ??:?
+
+I (535) esp_image: segment 8: paddr=0x00114728 vaddr=0x40082eb0 size=0x1b16c (110956) load
+0x40082eb0: psram_cmd_recv_start at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/spiram_psram.c:239 (discriminator 18)
+
+I (582) esp_image: segment 9: paddr=0x0012f89c vaddr=0x400c0000 size=0x00000 (     0) load
+I (582) esp_image: segment 10: paddr=0x0012f8a4 vaddr=0x50000000 size=0x00000 (     0) load
+I (589) esp_image: segment 11: paddr=0x0012f8ac vaddr=0x50000000 size=0x00000 (     0) load
+I (615) boot: Loaded app from partition at offset 0x10000
+I (615) boot: Disabling RNG early entropy source...
+I (617) spiram: Found 32MBit SPI RAM device
+I (620) spiram: SPI RAM mode: flash 40m sram 40m
+I (625) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
+I (632) cpu_start: Pro cpu up.
+I (636) cpu_start: Application information:
+I (641) cpu_start: Project name:     dispod
+I (646) cpu_start: App version:      v0.1-18-gfdaf93f-dirty
+I (652) cpu_start: Compile time:     20:01:23
+I (657) cpu_start: Compile date:     Jan 30 2019
+I (662) cpu_start: ESP-IDF:          v3.3-beta1-dirty
+I (668) cpu_start: Starting app cpu, entry point is 0x40081494
+0x40081494: call_start_cpu1 at C:/msys32/home/AKAEM/esp/esp-idf/components/esp32/cpu_start.c:261
+
+I (0) cpu_start: App cpu up.
+I (1569) spiram: SPI SRAM memory test OK
+I (1593) heap_init: Initializing. RAM available for dynamic allocation:
+I (1593) heap_init: At 3FFAFF10 len 000000F0 (0 KiB): DRAM
+I (1595) heap_init: At 3FFB6388 len 00001C78 (7 KiB): DRAM
+I (1601) heap_init: At 3FFB9A20 len 00004108 (16 KiB): DRAM
+I (1607) heap_init: At 3FFBDB5C len 00000004 (0 KiB): DRAM
+I (1613) heap_init: At 3FFC3DA8 len 0001C258 (112 KiB): DRAM
+I (1620) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (1626) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (1633) heap_init: At 4009E01C len 00001FE4 (7 KiB): IRAM
+I (1639) cpu_start: Pro cpu start user code
+I (1644) spiram: Adding pool of 4050K of external SPI memory to heap allocator
+I (100) cpu_start: Starting scheduler on PRO CPU.
+I (0) cpu_start: Starting scheduler on APP CPU.
+I (102) spiram: Reserving pool of 32K of internal memory for DMA/internal allocations
+I (110) DISPOD: app_main() entered
+I (426) DISPOD: SPIFFS: Partition size: total: 3302156, used: 773080
+I (427) DISPOD: initialize dispod
+I (427) DISPOD: Starting dispod_screen_task()
+I (432) DISPOD: Starting dispod_update_task()
+I (432) DISPOD_TFT: dispod_screen_task: started
+I (438) DISPOD: Starting dispod_archiver_task()
+I (438) DISPOD_UPDATER: dispod_update_task: started
+I (448) DISPOD: Starting dispod_m5stack_task()
+I (448) DISPOD_ARCHIVER: dispod_archiver_task: started
+I (459) DISPOD: Starting dispod_timer_task()
+I (459) DISPOD: dispod_m5stack_task: started
+I (469) DISPOD_TIMER: dispod_timer_task: started
+M5Stack initializing...OK
+I (951) wifi: wifi driver task: 3ffc74f0, prio:23, stack:3584, core=0
+I (952) wifi: wifi firmware version: 328353e
+I (952) wifi: config NVS flash: disabled
+I (954) wifi: config nano formating: disabled
+I (958) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (968) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (980) wifi: Init dynamic tx buffer num: 32
+I (981) wifi: Init data frame dynamic rx buffer num: 32
+I (986) wifi: Init management frame dynamic rx buffer num: 32
+I (992) wifi: Init static tx buffer num: 16
+I (997) wifi: Init static rx buffer size: 1600
+W (1000) wifi: malloc buffer fail
+I (1003) wifi: Init static rx buffer num: 1
+I (1007) wifi: Init dynamic rx buffer num: 32
+I (1072) phy: phy_version: 4000, b6198fa, Sep  3 2018, 15:11:06, 0, 0
+I (1073) wifi: filter: set rx policy=0
+I (1075) wifi: mode : sta (84:0d:8e:25:92:34)
+I (1076) wifi: filter: set rx policy=1
+I (1079) wifi: connect step 0 -> 0, status=0, err_time=0
+I (1086) wifi: Start wifi scan
+I (1087) wifi: ssid=, channel=0, hidden=1, type=active, active=<0,0>, passive=0
+I (1094) wifi: first chan=1
+I (1097) wifi: filter: set rx policy=3
+I (1100) wifi: clear scan ap list
+I (1103) wifi: start scan: type=0x50f, priority=3, cb=0x0, arg=0x3f828c10, ss_state=0x1, time=81185, index=0
+I (1113) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (1239) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1240) wifi: perform scan: ss_state=0x9, chan<2,0>, dur<0,120>
+I (1361) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1362) wifi: perform scan: ss_state=0x9, chan<3,0>, dur<0,120>
+I (1483) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1483) wifi: perform scan: ss_state=0x9, chan<4,0>, dur<0,120>
+I (1604) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1605) wifi: perform scan: ss_state=0x9, chan<5,0>, dur<0,120>
+I (1726) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1726) wifi: perform scan: ss_state=0x9, chan<6,0>, dur<0,120>
+I (1847) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1848) wifi: perform scan: ss_state=0x9, chan<7,0>, dur<0,120>
+I (1969) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (1969) wifi: perform scan: ss_state=0x9, chan<8,0>, dur<0,120>
+I (2090) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2091) wifi: perform scan: ss_state=0x9, chan<9,0>, dur<0,120>
+I (2212) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2212) wifi: perform scan: ss_state=0x9, chan<10,0>, dur<0,120>
+I (2333) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2334) wifi: perform scan: ss_state=0x9, chan<11,0>, dur<0,120>
+I (2455) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2455) wifi: perform scan: ss_state=0x9, chan<12,0>, dur<360,360>
+I (2816) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (2816) wifi: perform scan: ss_state=0x9, chan<13,0>, dur<360,360>
+I (3177) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (3177) wifi: perform scan: ss_state=0x9, chan<14,0>, dur<360,360>
+I (3538) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (3539) wifi: filter: set rx policy=4
+I (3539) wifi: first chan=1
+I (3539) wifi: Send scan done event: status=0, apnum=0
+I (3543) wifi: Start wifi scan
+I (3546) wifi: ssid=, channel=0, hidden=1, type=active, active=<0,0>, passive=0
+I (3553) wifi: first chan=1
+I (3555) wifi: filter: set rx policy=3
+I (3559) wifi: clear scan ap list
+I (3562) wifi: start scan: type=0x50f, priority=3, cb=0x0, arg=0x3f828c10, ss_state=0x1, time=2539863, index=0
+I (3572) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (3698) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (3698) wifi: perform scan: ss_state=0x9, chan<2,0>, dur<0,120>
+I (3820) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (3820) wifi: perform scan: ss_state=0x9, chan<3,0>, dur<0,120>
+I (3941) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (3941) wifi: perform scan: ss_state=0x9, chan<4,0>, dur<0,120>
+I (4063) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4063) wifi: perform scan: ss_state=0x9, chan<5,0>, dur<0,120>
+I (4184) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4185) wifi: perform scan: ss_state=0x9, chan<6,0>, dur<0,120>
+I (4306) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4306) wifi: perform scan: ss_state=0x9, chan<7,0>, dur<0,120>
+I (4427) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4428) wifi: perform scan: ss_state=0x9, chan<8,0>, dur<0,120>
+I (4549) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4549) wifi: perform scan: ss_state=0x9, chan<9,0>, dur<0,120>
+I (4670) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4671) wifi: perform scan: ss_state=0x9, chan<10,0>, dur<0,120>
+I (4792) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4792) wifi: perform scan: ss_state=0x9, chan<11,0>, dur<0,120>
+I (4913) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (4914) wifi: perform scan: ss_state=0x9, chan<12,0>, dur<360,360>
+I (5274) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (5275) wifi: perform scan: ss_state=0x9, chan<13,0>, dur<360,360>
+I (5635) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (5636) wifi: perform scan: ss_state=0x9, chan<14,0>, dur<360,360>
+I (5996) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (5997) wifi: filter: set rx policy=4
+I (5997) wifi: first chan=1
+I (5997) wifi: Send scan done event: status=0, apnum=0
+I (6001) wifi: Start wifi scan
+I (6004) wifi: ssid=, channel=0, hidden=1, type=active, active=<0,0>, passive=0
+I (6011) wifi: first chan=1
+I (6014) wifi: filter: set rx policy=3
+I (6017) wifi: clear scan ap list
+I (6020) wifi: start scan: type=0x50f, priority=3, cb=0x0, arg=0x3f828c10, ss_state=0x1, time=4998008, index=0
+I (6030) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (6156) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (6157) wifi: perform scan: ss_state=0x9, chan<2,0>, dur<0,120>
+I (6278) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (6278) wifi: perform scan: ss_state=0x9, chan<3,0>, dur<0,120>
+I (6399) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (6400) wifi: perform scan: ss_state=0x9, chan<4,0>, dur<0,120>
+I (6521) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (6521) wifi: perform scan: ss_state=0x9, chan<5,0>, dur<0,120>
+I (6642) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (6643) wifi: perform scan: ss_state=0x9, chan<6,0>, dur<0,120>
+I (6764) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (6764) wifi: perform scan: ss_state=0x9, chan<7,0>, dur<0,120>
+I (6885) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (6886) wifi: perform scan: ss_state=0x9, chan<8,0>, dur<0,120>
+I (7007) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (7007) wifi: perform scan: ss_state=0x9, chan<9,0>, dur<0,120>
+I (7128) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (7129) wifi: perform scan: ss_state=0x9, chan<10,0>, dur<0,120>
+I (7250) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (7250) wifi: perform scan: ss_state=0x9, chan<11,0>, dur<0,120>
+I (7371) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (7372) wifi: perform scan: ss_state=0x9, chan<12,0>, dur<360,360>
+I (7732) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (7733) wifi: perform scan: ss_state=0x9, chan<13,0>, dur<360,360>
+I (8093) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (8093) wifi: perform scan: ss_state=0x9, chan<14,0>, dur<360,360>
+I (8454) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (8455) wifi: filter: set rx policy=4
+I (8455) wifi: first chan=1
+I (8455) wifi: Send scan done event: status=0, apnum=0
+I (8459) wifi: Start wifi scan
+I (8462) wifi: ssid=, channel=0, hidden=1, type=active, active=<0,0>, passive=0
+I (8469) wifi: first chan=1
+I (8471) wifi: filter: set rx policy=3
+I (8475) wifi: clear scan ap list
+I (8478) wifi: start scan: type=0x50f, priority=3, cb=0x0, arg=0x3f828c10, ss_state=0x1, time=7455859, index=0
+I (8488) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (8614) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (8614) wifi: perform scan: ss_state=0x9, chan<2,0>, dur<0,120>
+I (8735) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (8736) wifi: perform scan: ss_state=0x9, chan<3,0>, dur<0,120>
+I (8857) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (8857) wifi: perform scan: ss_state=0x9, chan<4,0>, dur<0,120>
+I (8978) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (8979) wifi: perform scan: ss_state=0x9, chan<5,0>, dur<0,120>
+I (9100) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (9101) wifi: perform scan: ss_state=0x9, chan<6,0>, dur<0,120>
+I (9222) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (9222) wifi: perform scan: ss_state=0x9, chan<7,0>, dur<0,120>
+I (9343) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (9343) wifi: perform scan: ss_state=0x9, chan<8,0>, dur<0,120>
+I (9464) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (9465) wifi: perform scan: ss_state=0x9, chan<9,0>, dur<0,120>
+I (9586) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (9587) wifi: perform scan: ss_state=0x9, chan<10,0>, dur<0,120>
+I (9708) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (9708) wifi: perform scan: ss_state=0x9, chan<11,0>, dur<0,120>
+I (9829) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (9829) wifi: perform scan: ss_state=0x9, chan<12,0>, dur<360,360>
+I (10190) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (10191) wifi: perform scan: ss_state=0x9, chan<13,0>, dur<360,360>
+I (10551) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (10551) wifi: perform scan: ss_state=0x9, chan<14,0>, dur<360,360>
+I (10912) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (10913) wifi: filter: set rx policy=4
+I (10913) wifi: first chan=1
+I (10913) wifi: Send scan done event: status=0, apnum=0
+I (10918) wifi: Start wifi scan
+I (10920) wifi: ssid=, channel=0, hidden=1, type=active, active=<0,0>, passive=0
+I (10927) wifi: first chan=1
+I (10930) wifi: filter: set rx policy=3
+I (10933) wifi: clear scan ap list
+I (10937) wifi: start scan: type=0x50f, priority=3, cb=0x0, arg=0x3f828c10, ss_state=0x1, time=9914590, index=0
+I (10946) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (11073) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11073) wifi: perform scan: ss_state=0x9, chan<2,0>, dur<0,120>
+I (11194) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11195) wifi: perform scan: ss_state=0x9, chan<3,0>, dur<0,120>
+I (11316) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11316) wifi: perform scan: ss_state=0x9, chan<4,0>, dur<0,120>
+I (11437) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11438) wifi: perform scan: ss_state=0x9, chan<5,0>, dur<0,120>
+I (11559) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11559) wifi: perform scan: ss_state=0x9, chan<6,0>, dur<0,120>
+I (11680) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11681) wifi: perform scan: ss_state=0x9, chan<7,0>, dur<0,120>
+I (11802) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11802) wifi: perform scan: ss_state=0x9, chan<8,0>, dur<0,120>
+I (11923) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (11924) wifi: perform scan: ss_state=0x9, chan<9,0>, dur<0,120>
+I (12045) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (12045) wifi: perform scan: ss_state=0x9, chan<10,0>, dur<0,120>
+I (12166) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (12167) wifi: perform scan: ss_state=0x9, chan<11,0>, dur<0,120>
+I (12288) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (12288) wifi: perform scan: ss_state=0x9, chan<12,0>, dur<360,360>
+I (12649) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (12649) wifi: perform scan: ss_state=0x9, chan<13,0>, dur<360,360>
+I (13010) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (13010) wifi: perform scan: ss_state=0x9, chan<14,0>, dur<360,360>
+I (13371) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (13371) wifi: filter: set rx policy=4
+I (13372) wifi: first chan=1
+I (13372) wifi: Send scan done event: status=0, apnum=0
+I (13376) wifi: Start wifi scan
+I (13379) wifi: ssid=, channel=0, hidden=1, type=active, active=<0,0>, passive=0
+I (13386) wifi: first chan=1
+I (13389) wifi: filter: set rx policy=3
+I (13392) wifi: clear scan ap list
+I (13395) wifi: start scan: type=0x50f, priority=3, cb=0x0, arg=0x3f828c10, ss_state=0x1, time=12373452, index=0
+I (13405) wifi: perform scan: ss_state=0x9, chan<1,0>, dur<0,120>
+I (13532) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (13532) wifi: perform scan: ss_state=0x9, chan<2,0>, dur<0,120>
+I (13653) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (13654) wifi: perform scan: ss_state=0x9, chan<3,0>, dur<0,120>
+I (13775) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (13775) wifi: perform scan: ss_state=0x9, chan<4,0>, dur<0,120>
+I (13896) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (13897) wifi: perform scan: ss_state=0x9, chan<5,0>, dur<0,120>
+I (14018) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (14018) wifi: perform scan: ss_state=0x9, chan<6,0>, dur<0,120>
+I (14139) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (14140) wifi: perform scan: ss_state=0x9, chan<7,0>, dur<0,120>
+I (14261) wifi: scan end: arg=0x0, status=0, ss_state=0x3
+I (14261) wifi: perform scan: ss_state=0x9, chan<8,0>, dur<0,120>
