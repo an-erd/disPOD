@@ -75,6 +75,18 @@ menu "disPOD Configuration"
 
     endmenu
 
+    menu "OTA configuration"
+        config OTA_SERVER_IP
+            string "Enter HTTP server IP or domain"
+            default "192.168.2.130"
+        config OTA_SERVER_PORT
+            int "Enter HTTP server port"
+            default 80
+        config OTA_FILE_NAME
+            string "Enter OTA file path"
+            default "/dispod.bin"
+    endmenu
+
     menu "SD Card configuration"
 
         config DISPOD_USE_SD
