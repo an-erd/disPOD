@@ -3,6 +3,7 @@
 
 #include "dispod_main.h"
 #include "dispod_timer.h"
+#include "dispod_ledc.h"
 
 static const char* TAG = "DISPOD_TIMER";
 EventGroupHandle_t dispod_timer_evg;
@@ -197,7 +198,8 @@ void dispod_timer_task(void *pvParameters)
 			// Sound on, if activated
             if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_SOUND_ACT_BIT)){
                 ESP_LOGD(TAG, "dispod_timer_task: DISPOD_METRO_SOUND_ACT_BIT");
-                M5.Speaker.tone(1000);
+                ESP_LOGD(TAG, "beep: vol = %u", dispod_screen_status.volume);
+                dispod_beep(dispod_screen_status.volume);
 				ESP_ERROR_CHECK(esp_timer_start_once(timer_handles[TIMER_METRONOM_OFF_SOUND], METRONOME_SOUND_DURATION_US));
 				ESP_LOGD(TAG, "Started timer TIMER_METRONOM_OFF_SOUND, time since boot: %lld us", esp_timer_get_time());
             }
@@ -216,7 +218,7 @@ void dispod_timer_task(void *pvParameters)
 		if(uxBits & DISPOD_TIMER_METRONOME_OFF_SOUND_BIT){
             ESP_LOGD(TAG, "dispod_timer_task: DISPOD_TIMER_METRONOME_OFF_SOUND_BIT");
 			xEventGroupClearBits(dispod_timer_evg, DISPOD_TIMER_METRONOME_OFF_SOUND_BIT);
-            M5.Speaker.mute();
+            dispod_beep(0);
 			ESP_LOGD(TAG, "Switched off TIMER_METRONOME_OFF_SOUND, time since boot: %lld us", esp_timer_get_time());
         }
 

@@ -154,6 +154,10 @@ Queue and event group       https://github.com/hamsternz/esp32_serial_log_to_sd/
 LCD                         https://github.com/espressif/esp-iot-solution/tree/master/components/spi_devices/lcd
 get around flickering w/    https://www.reddit.com/r/esp32/comments/87kp1e/your_experience_with_spi_connected_lcds/
 
+
+
+$ python /home/AKAEM/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port COM6 --baud 921600  --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x10000 /home/AKAEM/esp/disPOD/build/dispod.bin
+
 espota.exe -i 192.168.2.155 -p 3232 --auth= -f BLETest.ino.bin
 
 $ ./components/arduino/tools/espota.exe -i 192.168.2.155 -p 3232 --auth= -d -r -f build/dispod.bin
@@ -163,3 +167,19 @@ $ ./components/arduino/tools/espota.exe -i 192.168.2.155 -p 3232 --auth= -d -r -
 Sending invitation to 192.168.2.155
 20:50:04 [INFO]: Waiting for device...
 Uploading: [=================================                           ] 54%
+
+>miniweb -v -i 192.168.2.130 -p 80
+file /dispod.bin
+
+
+
+make erase_flash
+
+make partition_table
+python /home/AKAEM/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port COM6 --baud 921600 --before default_reset --after hard_reset write_flash 0x8000 /home/AKAEM/esp/disPOD/build/partitions.bin
+make partition_table-flash
+
+make flash
+
+python /home/AKAEM/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port COM6 --baud 115200 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size detect --no-c
+ompress --verify 0xc91000 ./spiffs_image/spiffs_image.img

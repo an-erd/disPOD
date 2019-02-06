@@ -194,10 +194,9 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     case DISPOD_STARTUP_EVT:
         ESP_LOGV(TAG, "DISPOD_STARTUP_EVT");
 
-        // Initialize the M5Stack object and the M5Stack NeoPixels
+        // Initialize the M5Stack (without speaker) object and the M5Stack NeoPixels
         M5.begin(true, true, true); // LCD, SD, Serial
-        M5.Speaker.setBeep(1000, 40);
-        // ledcWrite(TONE_PIN_CHANNEL, 3);  // TODO DUTY
+        dispod_init_beep(SPEAKER_PIN, 1000);
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
         pixels.Begin();
@@ -398,36 +397,72 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         // showing running screen
         if((xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT)){
-            switch(button_unit.btn_id){
-            case BUTTON_A:
-                // Toggle Metronome/Sound
-                if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_SOUND_ACT_BIT)){
-                    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
-                } else {
-                    xEventGroupSetBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
-                }
+            if(!(xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_VOL_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_VOL_BIT)){
+                switch(button_unit.btn_id){
+                case BUTTON_A:
+                    // Toggle Metronome/Sound
+                    if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT, pdFALSE, pdFALSE, 0) & DISPOD_METRO_SOUND_ACT_BIT)){
+                        xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+                    } else {
+                        xEventGroupSetBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+                    }
 
-                break;
-            case BUTTON_B:
-                // Toggle Metronome/Light
-                if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdTRUE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
-                    xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT);
-                    pixels.ClearTo(NEOPIXEL_black);
-                    pixels.Show();
-                } else if ((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT, pdTRUE, pdFALSE, 0) & DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT)) {
-                    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT | DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT);
-                } else {
-                    xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+                    break;
+                case BUTTON_B:
+                    // Toggle Metronome/Light
+                    if((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT, pdTRUE, pdFALSE, 0) & DISPOD_METRO_LIGHT_ACT_BIT)){
+                        xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT);
+                        pixels.ClearTo(NEOPIXEL_black);
+                        pixels.Show();
+                    } else if ((xEventGroupWaitBits(dispod_event_group, DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT, pdTRUE, pdFALSE, 0) & DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT)) {
+                        xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT | DISPOD_METRO_LIGHT_TOGGLE_ACT_BIT);
+                    } else {
+                        xEventGroupSetBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+                    }
+                    break;
+                case BUTTON_C:
+                    s_leave_running_screen();
+			    	ESP_LOGD(TAG, "Archiver: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
+			    	xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
+                    break;
+                default:
+                    ESP_LOGW(TAG, "unhandled button");
+                    break;
                 }
-                break;
-            case BUTTON_C:
-                s_leave_running_screen();
-				ESP_LOGD(TAG, "Archiver: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
-				xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
-                break;
-            default:
-                ESP_LOGW(TAG, "unhandled button");
-                break;
+            } else {
+                switch(button_unit.btn_id){
+                char buffer[64];
+                case BUTTON_A:
+                    // Volume "-"
+                    if(dispod_screen_status.volume){
+                        dispod_screen_status.volume--;
+                        snprintf(buffer, 64, STATUS_VOLUME_FORMAT, dispod_screen_status.volume);
+                        dispod_screen_status_update_statustext(&dispod_screen_status, true, buffer);
+                        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+                    }
+                    break;
+                case BUTTON_B:
+                    // Volume "+"
+                    if(dispod_screen_status.volume < 15){
+                        dispod_screen_status.volume++;
+                        snprintf(buffer, 64, STATUS_VOLUME_FORMAT, dispod_screen_status.volume);
+                        dispod_screen_status_update_statustext(&dispod_screen_status, true, buffer);
+                        xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+                    }
+                    break;
+                case BUTTON_C:
+                    // Leave Volume
+                    xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_VOL_BIT);
+                    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, true, "Beep");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "Flash");
+                    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Back");
+                    xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+                    break;
+                default:
+                    ESP_LOGW(TAG, "unhandled button");
+                    break;
+                }
             }
         }
         }
@@ -448,7 +483,18 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         // showing running screen
         if((xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT, pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT)){
+            char buffer[64];
             switch(button_unit.btn_id){
+            case BUTTON_A:
+                // Allow volume control
+                xEventGroupSetBits(dispod_event_group, DISPOD_RUNNING_SCREEN_VOL_BIT);
+                snprintf(buffer, 64, STATUS_VOLUME_FORMAT, dispod_screen_status.volume);
+                dispod_screen_status_update_statustext(&dispod_screen_status, true, buffer);
+                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, true, "-");
+                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "+");
+                dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Back");
+                xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+                break;
             case BUTTON_B:
                 // Toggle show queue status
                 dispod_screen_status_update_queue_status(&dispod_screen_status, !dispod_screen_status.show_q_status);

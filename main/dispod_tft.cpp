@@ -104,6 +104,9 @@ void dispod_screen_status_initialize(dispod_screen_status_t *params)
     params->q_status.messages_failed    = 0;
     params->show_q_status               = false;
 
+    // voloume
+    params->volume                      = 1;
+
     // create sprites for the building blocks of the status/running screens
     for (int i = 0; i < SCREEN_NUM_SPRITES; i++){
         spr[i] = new TFT_eSprite(&M5.Lcd);
@@ -449,13 +452,13 @@ void dispod_screen_running_update_display(dispod_screen_status_t *params, bool c
     s_draw_indicator(spr[SCREEN_BLOCK_RUNNING_GCT], "GCT", true, MIN_INTERVAL_STANCETIME, 260, values->values_to_display.GCT, MIN_INTERVAL_STANCETIME, MAX_INTERVAL_STANCETIME, complete);
     s_draw_fields(spr[SCREEN_BLOCK_RUNNING_STR],    "Str", 3, values->values_to_display.str / 10., complete);
 
-    // 4) Status text line
-    s_draw_status_text(spr[SCREEN_OVERARCHING_STATUS], params->show_status_text, params->status_text, complete);
-
-    // 5) Statistics text line
-    snprintf(buffer, 64, "Q: max %u, snd %u, rec %u, fail %u",
+    // 4) Statistics text line
+    snprintf(buffer, 64, STATS_QUEUE_FORMAT,
         params->q_status.max_len, params->q_status.messages_send, params->q_status.messages_received, params->q_status.messages_failed);
     s_draw_status_text(spr[SCREEN_OVERARCHING_STATS], params->show_q_status, buffer, complete);
+
+    // 5) Status text line
+    s_draw_status_text(spr[SCREEN_OVERARCHING_STATUS], params->show_status_text, params->status_text, complete);
 
 	// 6) Button label
     s_draw_button_label(spr[SCREEN_OVERARCHING_BUTTON],

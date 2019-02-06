@@ -50,7 +50,11 @@
                 "${workspaceFolder}/components/Adafruit_NeoPixel",
                 "${workspaceFolder}/components",
                 "${workspaceFolder}/components/arduino/libraries/Update/src",
-                "${workspaceFolder}/components/general/ota/include"
+                "${workspaceFolder}/components/general/ota/include",
+                "${workspaceFolder}/components/ota/include",
+                "${workspaceFolder}/components/NeoPixelBus/src",
+                "${workspaceFolder}/components/arduino/libraries/SPI/src",
+                "${workspaceFolder}/components/arduino/variants/m5stack_fire"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {
