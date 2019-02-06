@@ -31,6 +31,7 @@
 #include "dispod_button.h"
 #include "dispod_timer.h"
 #include "iot_ota.h"
+#include "iot_param.h"
 
 
 static const char* TAG = "DISPOD";
@@ -190,6 +191,9 @@ static void s_leave_running_screen()
 
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
+    esp_err_t ret;
+    param_t dispod_param;
+
     switch(id){
     case DISPOD_STARTUP_EVT:
         ESP_LOGV(TAG, "DISPOD_STARTUP_EVT");
@@ -204,10 +208,20 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
 
         dispod_initialize();
         dispod_screen_status_initialize(&dispod_screen_status);
+
+        ret = iot_param_load(PARAM_NAMESPACE, PARAM_KEY, &dispod_param);
+        if(ret == ESP_OK){
+            dispod_screen_status.volume = dispod_param.volume;
+            ESP_LOGI(TAG, "DISPOD_STARTUP_EVT: read param ok, read volume %u", dispod_param.volume);
+        } else {
+            // volume is already initialized, so it's fine
+            ESP_LOGE(TAG, "DISPOD_STARTUP_EVT: read param failed, ret = %d", ret);
+        }
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
+
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
     case DISPOD_BASIC_INIT_DONE_EVT:
@@ -457,6 +471,19 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, true, "Beep");
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, true, "Flash");
                     dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, true, "Back");
+
+                    ret = iot_param_load(PARAM_NAMESPACE, PARAM_KEY, &dispod_param);
+                    if(ret == ESP_OK){
+                        ESP_LOGI(TAG, "DISPOD_STARTUP_EVT: read param ok, read volume %u", dispod_param.volume);
+                    } else {
+                        ESP_LOGE(TAG, "Leave volume screen: read param failed, ret = %d", ret);
+                        dispod_param.volume = 999;
+                    }
+                    if(dispod_param.volume != dispod_screen_status.volume){
+                        dispod_param.volume = dispod_screen_status.volume;
+                        ESP_LOGI(TAG, "Leave volume screen: write param volume %u", dispod_param.volume);
+                        iot_param_save(PARAM_NAMESPACE, PARAM_KEY, &dispod_param, sizeof(param_t));
+                    }
                     xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
                     break;
                 default:

@@ -16,6 +16,15 @@
 #include "dispod_tft.h"
 #include "dispod_timer.h"
 
+// IOT param
+typedef struct {
+    uint16_t volume;
+} param_t;
+
+#define PARAM_NAMESPACE "disPOD"
+#define PARAM_KEY       "struct"
+
+
 // disPOD event group
 #define DISPOD_WIFI_ACTIVATED_BIT                   (BIT0)      // WiFi is activated
 #define DISPOD_WIFI_SCANNING_BIT                    (BIT1)      // WiFi scanning for APs
