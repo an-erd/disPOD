@@ -1,6 +1,3 @@
-[submodule "components/NeoPixelBus"]
-	path = components/NeoPixelBus
-	url = https://github.com/Makuna/NeoPixelBus.git
 [submodule "components/M5Stack"]
 	path = components/M5Stack
 	url = https://github.com/an-erd/M5Stack
