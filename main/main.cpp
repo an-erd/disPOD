@@ -125,13 +125,49 @@ static void initialize_nvs()
     ESP_ERROR_CHECK( ret );
 }
 
+static void s_leave_running_screen()
+{
+    xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
+    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
+    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
+	dispod_timer_stop_metronome();
+    dispod_timer_stop_heartbeat();
+    pixels.ClearTo(NEOPIXEL_black);
+    pixels.Show();
+    dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
+    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
+    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
+    xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
+    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
+}
+
 void dispod_m5stack_task(void *pvParameters){
     ESP_LOGI(TAG, "dispod_m5stack_task: started");
 
     for(;;){
         M5.update();
         dispod_m5_buttons_test();
+        if(dispod_idle_timer_expired()){
+            dispod_idle_timer_stop();
+            ESP_LOGI(TAG, "dispod_m5stack_task: idle timer expired");
 
+            if((xEventGroupWaitBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT,
+                pdFALSE, pdFALSE, 0) & DISPOD_RUNNING_SCREEN_BIT) ){
+                ESP_LOGI(TAG, "dispod_m5stack_task: idle timer expired - leave running screen");
+                s_leave_running_screen();
+			    ESP_LOGD(TAG, "dispod_m5stack_task: DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT");
+			    xEventGroupSetBits(dispod_sd_evg, DISPOD_SD_WRITE_COMPLETED_BUFFER_EVT | DISPOD_SD_WRITE_ALL_BUFFER_EVT);
+            } else {
+                ESP_LOGI(TAG, "dispod_m5stack_task: idle timer expired - power off");
+                // esp_bluedroid_disable();
+                // esp_wifi_stop();
+                M5.powerOFF();
+            }
+        }
+
+        // feed watchdog
         TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
         TIMERG0.wdt_feed=1;
         TIMERG0.wdt_wprotect=0;
@@ -171,24 +207,6 @@ static void s_try_ota_update()
     // esp_restart();
 }
 
-static void s_leave_running_screen()
-{
-    xEventGroupClearBits(dispod_event_group, DISPOD_RUNNING_SCREEN_BIT);
-    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
-    xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
-	dispod_timer_stop_metronome();
-    dispod_timer_stop_heartbeat();
-    pixels.ClearTo(NEOPIXEL_black);
-    pixels.Show();
-    dispod_screen_change(&dispod_screen_status, SCREEN_STATUS);
-    dispod_screen_status_update_statustext(&dispod_screen_status, false, "");
-    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_A, false, "");
-    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_B, false, "");
-    dispod_screen_status_update_button(&dispod_screen_status, BUTTON_C, false, "");
-    xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-    ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_STARTUP_COMPLETE_EVT, NULL, 0, portMAX_DELAY));
-}
-
 static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, void* event_data)
 {
     esp_err_t ret;
@@ -200,6 +218,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
 
         // Initialize the M5Stack (without speaker) object and the M5Stack NeoPixels
         M5.begin(true, true, true); // LCD, SD, Serial
+        M5.setWakeupButton(BUTTON_A_PIN);
         dispod_init_beep(SPEAKER_PIN, 1000);
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_SOUND_ACT_BIT);
         xEventGroupClearBits(dispod_event_group, DISPOD_METRO_LIGHT_ACT_BIT);
@@ -221,6 +240,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
 
         dispod_runvalues_initialize(&running_values);
         dispod_archiver_initialize();
+        dispod_idle_timer_stop();
 
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BASIC_INIT_DONE_EVT, NULL, 0, portMAX_DELAY));
         break;
@@ -328,12 +348,15 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         }
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
         }
+        dispod_idle_timer_set(CONFIG_IDLE_TIME_STATUS_SCREEN * 1000);
         break;
     case DISPOD_RETRY_WIFI_EVT:
         ESP_LOGV(TAG, "DISPOD_RETRY_WIFI_EVT");
+        dispod_idle_timer_stop();
         break;
     case DISPOD_RETRY_BLE_EVT:
         ESP_LOGV(TAG, "DISPOD_RETRY_BLE_EVT");
+        dispod_idle_timer_stop();
         break;
     case DISPOD_GO_TO_RUNNING_SCREEN_EVT:
         ESP_LOGV(TAG, "DISPOD_GO_TO_RUNNING_SCREEN_EVT");
@@ -345,6 +368,7 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
 		dispod_timer_start_metronome();
         dispod_timer_start_heartbeat();
+        dispod_idle_timer_set(CONFIG_IDLE_TIME_RUNNING_SCREEN * 1000);
         break;
     case DISPOD_BLE_DISCONNECT_EVT:
         ESP_LOGV(TAG, "DISPOD_BLE_DISCONNECT_EVT");
@@ -362,6 +386,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     case DISPOD_BUTTON_TAP_EVT: {
         button_unit_t button_unit = *(button_unit_t*) event_data;
         ESP_LOGV(TAG, "DISPOD_BUTTON_TAP_EVT, button id %d", button_unit.btn_id);
+
+        dispod_touch_timer();
 
         // come here from DISPOD_STARTUP_COMPLETE_EVT
         if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_A_RETRY_WIFI_BIT | DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT, pdFALSE, pdFALSE, 0)
@@ -498,6 +524,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
         button_unit_t button_unit = *(button_unit_t*) event_data;
         ESP_LOGV(TAG, "DISPOD_BUTTON_2SEC_PRESS_EVT, button id %d", button_unit.btn_id);
 
+        dispod_touch_timer();
+
         // showing status screen with WiFi available -> allow for OTA
         if((xEventGroupWaitBits(dispod_event_group, DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT, pdFALSE, pdFALSE, 0)
                 & ( DISPOD_BTN_B_RETRY_BLE_BIT | DISPOD_BTN_C_CNT_BIT))){
@@ -533,6 +561,8 @@ static void run_on_event(void* handler_arg, esp_event_base_t base, int32_t id, v
     case DISPOD_BUTTON_5SEC_RELEASE_EVT: {
         button_unit_t button_unit = *(button_unit_t*) event_data;
         ESP_LOGV(TAG, "DISPOD_BUTTON_5SEC_PRESS_EVT, button id %d", button_unit.btn_id);
+
+        dispod_touch_timer();
         }
         break;
     default:

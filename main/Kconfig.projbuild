@@ -226,4 +226,16 @@ menu "disPOD Configuration"
 
     endmenu
 
+    menu "Display/device timeout configuration"
+
+        config IDLE_TIME_STATUS_SCREEN
+            int "Time (sec) to turn of the device if device is not moved and is not working on initialization/connection. 0 for no shutdown."
+            range 0 600
+            default 300
+        config IDLE_TIME_RUNNING_SCREEN
+            int "Time (sec) to leave running screen if no BLE package is received. 0 to not leave running screen automatically."
+            range 0 600
+            default 300
+    endmenu
+
 endmenu

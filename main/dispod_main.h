@@ -6,6 +6,8 @@
 #include "esp_event.h"
 #include "esp_event_loop.h"
 #include "esp_err.h"
+#include "esp_bt_main.h"
+#include "esp_wifi.h"
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
 #include "driver/ledc.h"
@@ -15,6 +17,7 @@
 #include "dispod_runvalues.h"
 #include "dispod_tft.h"
 #include "dispod_timer.h"
+#include "dispod_idle_timer.h"
 
 // IOT param
 typedef struct {
