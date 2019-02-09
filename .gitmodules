@@ -4,3 +4,6 @@
 [submodule "components/arduino"]
 	path = components/arduino
 	url = https://github.com/an-erd/arduino-esp32.git
+[submodule "components/NeoPixelBus"]
+	path = components/NeoPixelBus
+	url = https://github.com/an-erd/NeoPixelBus.git
