@@ -399,10 +399,6 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
         xEventGroupClearBits(dispod_event_group,
                 DISPOD_BLE_SCANNING_BIT | DISPOD_BLE_CONNECTING_BIT | DISPOD_BLE_CONNECTED_BIT);
         xEventGroupSetBits(dispod_display_evg, DISPOD_DISPLAY_UPDATE_BIT);
-
-        // TODO where to go from an disconnect ->
-        //   a) status screen -> retry BLE
-        //   b) running screen -> save everything an go back to status screen
         ESP_ERROR_CHECK(esp_event_post_to(dispod_loop_handle, WORKFLOW_EVENTS, DISPOD_BLE_DISCONNECT_EVT, NULL, 0, portMAX_DELAY));
         break;
     default:
@@ -455,7 +451,7 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
             if (adv_name != NULL) {
                 // TODO: better control of device we're searching for
                 if (strlen(remote_device_name) <= adv_name_len && strncmp((char *)adv_name, remote_device_name, strlen(remote_device_name)) == 0) {
-                    ESP_LOGI(GATTC_TAG, "searched device %s\n", remote_device_name);
+                    ESP_LOGI(GATTC_TAG, "searched device %s", remote_device_name);
                     if (connect == false) {
                         connect = true;
                         ESP_LOGI(GATTC_TAG, "connect to the remote device.");
@@ -571,39 +567,39 @@ void dispod_ble_initialize()
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ret = esp_bt_controller_init(&bt_cfg);
     if (ret) {
-        ESP_LOGE(GATTC_TAG, "%s initialize controller failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTC_TAG, "%s initialize controller failed: %s", __func__, esp_err_to_name(ret));
         return;
     }
 
     ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
     if (ret) {
-        ESP_LOGE(GATTC_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTC_TAG, "%s enable controller failed: %s", __func__, esp_err_to_name(ret));
         return;
     }
 
     ret = esp_bluedroid_init();
     if (ret) {
-        ESP_LOGE(GATTC_TAG, "%s init bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTC_TAG, "%s init bluetooth failed: %s", __func__, esp_err_to_name(ret));
         return;
     }
 
     ret = esp_bluedroid_enable();
     if (ret) {
-        ESP_LOGE(GATTC_TAG, "%s enable bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTC_TAG, "%s enable bluetooth failed: %s", __func__, esp_err_to_name(ret));
         return;
     }
 
     //register the callback function to the gap module
     ret = esp_ble_gap_register_callback(esp_gap_cb);
     if (ret){
-        ESP_LOGE(GATTC_TAG, "%s gap register failed, error code = %x\n", __func__, ret);
+        ESP_LOGE(GATTC_TAG, "%s gap register failed, error code = %x", __func__, ret);
         return;
     }
 
     //register the callback function to the gattc module
     ret = esp_ble_gattc_register_callback(esp_gattc_cb);
     if(ret){
-        ESP_LOGE(GATTC_TAG, "%s gattc register failed, error code = %x\n", __func__, ret);
+        ESP_LOGE(GATTC_TAG, "%s gattc register failed, error code = %x", __func__, ret);
         return;
     }
 }
@@ -614,7 +610,7 @@ void dispod_ble_app_register()
 
     ret = esp_ble_gattc_app_register(PROFILE_A_APP_ID);
     if (ret){
-        ESP_LOGE(GATTC_TAG, "%s gattc app register failed, error code = %x\n", __func__, ret);
+        ESP_LOGE(GATTC_TAG, "%s gattc app register failed, error code = %x", __func__, ret);
     }
     esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(500);
     if (local_mtu_ret){
