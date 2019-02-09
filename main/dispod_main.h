@@ -6,6 +6,8 @@
 #include "esp_event.h"
 #include "esp_event_loop.h"
 #include "esp_err.h"
+#include "esp_bt_main.h"
+#include "esp_wifi.h"
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
 #include "driver/ledc.h"
@@ -15,6 +17,16 @@
 #include "dispod_runvalues.h"
 #include "dispod_tft.h"
 #include "dispod_timer.h"
+#include "dispod_idle_timer.h"
+
+// IOT param
+typedef struct {
+    uint16_t volume;
+} param_t;
+
+#define PARAM_NAMESPACE "disPOD"
+#define PARAM_KEY       "struct"
+
 
 // disPOD event group
 #define DISPOD_WIFI_ACTIVATED_BIT                   (BIT0)      // WiFi is activated
@@ -39,7 +51,8 @@
 #define DISPOD_BTN_B_RETRY_BLE_BIT                  (BIT19)
 #define DISPOD_BTN_C_CNT_BIT                        (BIT20)
 #define DISPOD_RUNNING_SCREEN_BIT                   (BIT21)
-#define DISPOD_OTA_RUNNING_BIT                      (BIT22)     // OTA is running and ota_task exists
+#define DISPOD_RUNNING_SCREEN_VOL_BIT               (BIT22)     // allow for metronome sound volume adjustment
+#define DISPOD_OTA_RUNNING_BIT                      (BIT23)     // OTA is running and ota_task exists
 extern EventGroupHandle_t dispod_event_group;
 
 // disPOD SD card event group
@@ -87,8 +100,10 @@ extern dispod_screen_status_t dispod_screen_status;
 // global running values data struct
 extern runningValuesStruct_t running_values;
 
-#define BLE_NAME_FORMAT     "BLE Device (%s)"
-#define WIFI_NAME_FORMAT    "WiFi (%s)"
+#define BLE_NAME_FORMAT         "BLE Device (%s)"
+#define WIFI_NAME_FORMAT        "WiFi (%s)"
+#define STATUS_VOLUME_FORMAT    "Volume: %u"
+#define STATS_QUEUE_FORMAT      "Q: max %u, snd %u, rec %u, fail %u"
 
 // SD card
 #define sdPIN_NUM_MISO 19

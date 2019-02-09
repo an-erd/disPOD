@@ -35,23 +35,29 @@ static const char* TAG = "DISPOD_LEDC";
 #define gH 784
 #define gSH 830
 #define aH 880
+#define beep_freq 1000
 
 #define GPIO_OUTPUT_SPEED LEDC_HIGH_SPEED_MODE
 
-void sound(int gpio_num, uint32_t freq, uint32_t duration, uint32_t volume)
-{
-	ledc_timer_config_t timer_conf;
-    memset(&timer_conf, 0, sizeof(ledc_timer_config_t));
+static uint16_t volume_map[16] = {   0,
+                                     1,   3,  10,  30,  60,
+                                    90, 120, 150, 180, 230,
+                                   260, 300, 350, 450, 600 };
 
+static ledc_timer_config_t timer_conf;
+static ledc_channel_config_t ledc_conf;
+
+void dispod_init_beep(int gpio_num, uint32_t freq)
+{
+    ESP_LOGD(TAG, "dispod_init_beep()");
+    memset(&timer_conf, 0, sizeof(ledc_timer_config_t));
 	timer_conf.speed_mode       = GPIO_OUTPUT_SPEED;
 	timer_conf.duty_resolution  = LEDC_TIMER_10_BIT;
 	timer_conf.timer_num        = LEDC_TIMER_0;
 	timer_conf.freq_hz          = freq;
 	ledc_timer_config(&timer_conf);
 
-	ledc_channel_config_t ledc_conf;
     memset(&ledc_conf, 0, sizeof(ledc_channel_config_t));
-
 	ledc_conf.gpio_num          = gpio_num;
 	ledc_conf.speed_mode        = GPIO_OUTPUT_SPEED;
 	ledc_conf.channel           = LEDC_CHANNEL_0;
@@ -60,17 +66,13 @@ void sound(int gpio_num, uint32_t freq, uint32_t duration, uint32_t volume)
 	ledc_conf.duty              = 0x0;  // 50%=0x3FFF, 100%=0x7FFF for 15 Bit
 	                                    // 50%=0x01FF, 100%=0x03FF for 10 Bit
 	ledc_channel_config(&ledc_conf);
+}
 
-    uint32_t new_duty = map(volume, 0, 100, 0, 0x03FF);
-    ESP_LOGI(TAG, "volume %u, mapped %u (currently unused)", volume, new_duty);
+void dispod_beep(uint32_t volume)
+{
+    // uint32_t new_duty = map(volume, 0, 10, 0, 0x01FF);
+    ESP_LOGD(TAG, "volume %u, mapped %u)", volume, volume_map[volume]);
 
-	// start
-    ledc_set_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0, volume); // 0x7F -> 12% duty - play here for your speaker or buzzer
-    ledc_update_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0);
-
-	vTaskDelay(duration/portTICK_PERIOD_MS);
-
-    // stop
-    ledc_set_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0, 0);
+    ledc_set_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0, volume_map[volume]);
     ledc_update_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0);
 }
